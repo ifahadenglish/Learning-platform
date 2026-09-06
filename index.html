@@ -319,6 +319,78 @@ td.num, th.num { text-align:center; }
   .ai-chip.active { background:#2a78d6; color:#fff; border-color:transparent; }
   .ai-quota { font-size:.75rem; color:var(--color-text-muted,#7a7368); margin-top:6px; }
 
+  /* ---------- الجدول الدراسي: أيام صفوف · حصص أعمدة ---------- */
+  .sc-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+  .sc-weeklabel { font-weight:800; font-size:.92rem; }
+  .sc-legend { display:flex; gap:12px; flex-wrap:wrap; font-size:.8rem; }
+  .sc-key { display:inline-flex; align-items:center; gap:5px; }
+  .sc-dot { width:11px; height:11px; border-radius:4px; display:inline-block; border:1px solid rgba(0,0,0,.06); }
+  .sc-dot.ok { background:#DCFCE7; } .sc-dot.no { background:#FEF3C7; } .sc-dot.empty { background:#F8FAFC; }
+
+  .sc-card { padding:14px; }
+  .sc-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
+  .sc-week { border-collapse:separate; border-spacing:7px; width:100%; min-width:940px; }
+
+  .sc-week thead th { font-weight:700; font-size:.8rem; color:#64748B; padding:8px 6px;
+                      background:#F8FAFC; border:1px solid #EEF2F7; border-radius:10px;
+                      text-align:center; white-space:nowrap; min-width:104px; }
+  .sc-week thead th .sc-colname { display:block; font-size:.84rem; color:#334155; font-weight:800; }
+  .sc-week thead th .sc-coltime { display:block; font-size:.7rem; margin-top:2px; color:#94A3B8;
+                                  direction:ltr; unicode-bidi:isolate; font-variant-numeric:tabular-nums; }
+  .sc-week thead th.sc-breakhead { background:#F1F5F9; min-width:78px; }
+
+  /* عمود اليوم مثبَّت أثناء التمرير الأفقي */
+  .sc-week .sc-daycol { position:sticky; inset-inline-start:0; z-index:3; min-width:96px; text-align:start;
+                        background:#F8FAFC; border:1px solid #EEF2F7; border-radius:10px; padding:10px 12px; }
+  .sc-week thead .sc-daycol { z-index:4; }
+  .sc-week tbody .sc-daycol { font-weight:800; color:#334155; font-size:.9rem; }
+  .sc-daydate { display:block; font-size:.68rem; font-weight:600; color:#94A3B8; margin-top:2px;
+                direction:ltr; unicode-bidi:isolate; font-variant-numeric:tabular-nums; }
+
+  .sc-week td { padding:0; vertical-align:stretch; }
+  .sc-none { background:#F8FAFC; border:1px solid #F1F5F9; border-radius:10px; text-align:center;
+             color:#CBD5E1; font-size:.95rem; min-width:104px; height:78px; }
+  .sc-none .sc-dash { display:inline-block; line-height:78px; }
+  .sc-breakcell { background:repeating-linear-gradient(135deg,#F8FAFC,#F8FAFC 7px,#F1F5F9 7px,#F1F5F9 14px);
+                  border:1px solid #F1F5F9; border-radius:10px; text-align:center; color:#94A3B8; min-width:78px; }
+  .sc-breakcell span { display:inline-block; line-height:78px; font-size:1rem; }
+
+  .sc-slotcell { min-width:104px; }
+  .sc-slot { display:flex; flex-direction:column; gap:2px; width:100%; height:100%; min-height:78px;
+             padding:9px 10px; border-radius:10px; cursor:pointer; font:inherit; text-align:start;
+             border:1px solid transparent; transition:transform .1s ease, box-shadow .14s ease; }
+  .sc-slot:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(15,23,42,.10); }
+  .sc-slot:focus-visible { outline:2px solid #94A3B8; outline-offset:2px; }
+  .sc-slot.is-done { background:#DCFCE7; color:#15803D; border-color:#CBF3D8; }
+  .sc-slot.is-todo { background:#FEF3C7; color:#B45309; border-color:#FAE8B0; }
+  .sc-slot .sc-cls  { font-weight:800; font-size:1.02rem; line-height:1.25; }
+  .sc-slot .sc-sub  { font-size:.74rem; opacity:.85; }
+  .sc-slot .sc-time { font-size:.7rem; opacity:.8; direction:ltr; unicode-bidi:isolate; font-variant-numeric:tabular-nums; }
+  .sc-slot .sc-state{ font-size:.7rem; font-weight:800; margin-top:auto; }
+
+  @media (max-width: 820px) {
+    .sc-card { padding:10px; }
+    .sc-week { min-width:860px; }
+  }
+  @media (prefers-color-scheme: dark) {
+    .sc-week thead th, .sc-week .sc-daycol { background:#1E232C; border-color:#2A313C; }
+    .sc-week thead th .sc-colname, .sc-week tbody .sc-daycol { color:#D7DEE8; }
+    .sc-week thead th.sc-breakhead { background:#232935; }
+    .sc-none { background:#1B2029; border-color:#252B36; color:#4A5464; }
+    .sc-breakcell { background:repeating-linear-gradient(135deg,#1B2029,#1B2029 7px,#232935 7px,#232935 14px);
+                    border-color:#252B36; }
+    /* نُبقي الباستيل هوية الحالة في الوضع الداكن مع نص داكن مقروء */
+    .sc-slot.is-done { background:#CFF0DA; color:#12603A; border-color:#B9E6C9; }
+    .sc-slot.is-todo { background:#F6E6B8; color:#8A4B0B; border-color:#EDD79B; }
+  }
+
+  .va-timeline { max-height:340px; overflow-y:auto; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:#fff; }
+  .va-ev { display:flex; gap:12px; align-items:baseline; padding:8px 12px; border-bottom:1px solid var(--color-border); font-size:.86rem; line-height:1.7; }
+  .va-ev:last-child { border-bottom:none; }
+  .va-ev .t { min-width:150px; color:var(--color-text-muted); font-size:.78rem; white-space:nowrap; }
+  .va-ev .a { flex:1; }
+  .va-detailrow > td { background:var(--color-primary-bg,#eef3fb); }
+
   .ae-groups { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
   .ae-group { flex:1 1 240px; display:flex; align-items:flex-start; gap:10px; cursor:pointer;
               border:1px solid var(--color-border); border-radius:var(--radius-sm); padding:11px 13px;
@@ -1098,6 +1170,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link active" data-nav="admin-home" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -1159,6 +1232,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link active" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -1198,6 +1272,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link active" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -1320,6 +1395,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link active" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -1350,6 +1426,22 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
           </div>
         </div>
       
+        <!-- إحصائيات الزوار: للمعلم وحده. مخفية في وضع الاطلاع (no-view)،
+             ودوالّها غير مُدرجة في قائمة القراءة المسموحة للزائر، فلا سبيل له إليها إطلاقًا. -->
+        <div class="card mt-2 no-view" id="va-card">
+          <div class="flex-between">
+            <h3 style="margin:0;">📈 إحصائيات الزوار</h3>
+            <div class="flex-gap">
+              <span class="badge badge-warning">🔒 يظهر لك وحدك</span>
+              <button class="btn btn-outline btn-sm" onclick="vaLoad()">تحديث</button>
+            </div>
+          </div>
+          <p class="text-sm text-muted">ماذا تصفّح كل زائر بالضبط، ومتى، وكم مرة — يُسجَّل في الخادم عند كل طلب،
+            فلا يستطيع الزائر تعطيله ولا رؤيته.</p>
+          <div id="va-summary" class="mt-1"></div>
+          <div id="va-body" class="mt-2"><div class="state-box"><span class="spinner"></span></div></div>
+        </div>
+
         <div class="card mt-2">
           <div class="flex-between">
             <h3 style="margin:0;">🌟 الشهادات والتوصيات</h3>
@@ -1506,6 +1598,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link active" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -1616,6 +1709,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -1773,6 +1867,72 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
   </div>
 </div>
 
+<!-- ================= شاشة: الجدول الدراسي ================= -->
+<section id="screen-admin-schedule" class="hidden">
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="brand"><span>🎓</span> فهد الخالدي</div>
+      <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
+      <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
+      <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
+      <a class="nav-link active" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
+      <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
+      <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
+      <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
+      <a class="nav-link" onclick="go('admin-attendance')">🗓️ التحضير</a>
+      <a class="nav-link" onclick="go('admin-absence')">📉 متابعة الغياب</a>
+      <a class="nav-link" onclick="go('admin-remedial')">🧩 الخطط العلاجية</a>
+      <a class="nav-link" onclick="go('admin-styles')">🧠 أنماط التعلم</a>
+      <a class="nav-link" onclick="go('admin-activities')">🎯 الأنشطة</a>
+      <a class="nav-link" onclick="go('admin-stats')">📊 الإحصائيات</a>
+      <a class="nav-link" onclick="go('admin-ai')">🤖 المساعد الذكي</a>
+      <div class="nav-footer"><button class="btn btn-outline btn-block btn-sm" onclick="doSignOut()">تسجيل خروج</button></div>
+    </aside>
+    <div style="flex:1; min-width:0;">
+      <div class="app-topbar"><div class="brand" style="padding:0;"><span>🎓</span> فهد الخالدي</div><button class="btn btn-outline btn-sm" onclick="doSignOut()">خروج</button></div>
+      <main class="app-main">
+        <div class="flex-between">
+          <h2>🗓️ الجدول الدراسي</h2>
+          <div class="flex-gap no-view" style="flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" onclick="scOpenSettings()">⚙️ إعدادات أوقات الدوام</button>
+            <button class="btn btn-outline btn-sm" onclick="scOpenVersions()">🗂️ إدارة الجداول</button>
+            <button class="btn btn-primary btn-sm" onclick="scOpenNewVersion()">➕ إضافة جدول جديد</button>
+          </div>
+        </div>
+        <p class="text-sm text-muted">حصصك الفعلية فقط. الخانات الفارغة وحصص الانتظار لا تظهر ولا تُحتسب.</p>
+
+        <div class="sc-toolbar no-print">
+          <button class="btn btn-outline btn-sm" onclick="scShiftWeek(-1)">← الأسبوع السابق</button>
+          <button class="btn btn-outline btn-sm" onclick="scThisWeek()">هذا الأسبوع</button>
+          <button class="btn btn-outline btn-sm" onclick="scShiftWeek(1)">الأسبوع التالي →</button>
+          <span id="sc-weeklabel" class="sc-weeklabel"></span>
+          <span style="flex:1;"></span>
+          <span class="sc-legend">
+            <span class="sc-key"><span class="sc-dot ok"></span> ✓ تم التحضير</span>
+            <span class="sc-key"><span class="sc-dot no"></span> ○ لم يتم التحضير</span>
+            <span class="sc-key"><span class="sc-dot empty"></span> — لا توجد حصة</span>
+          </span>
+        </div>
+
+        <div id="sc-summary" class="mt-1"></div>
+        <div id="sc-banner" class="mt-1"></div>
+        <div id="sc-grid" class="mt-2"><div class="state-box"><span class="spinner"></span></div></div>
+        <div id="sc-times" class="mt-2"></div>
+      </main>
+    </div>
+  </div>
+  <nav class="mobile-nav">
+    <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a class="active" onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
+    <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
+    <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
+  </nav>
+  <div id="sc-modalhost"></div>
+</section>
+
 <section id="screen-admin-stats" class="hidden viz">
   <div class="app-shell">
     <aside class="app-sidebar">
@@ -1780,6 +1940,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -1967,6 +2128,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -2060,6 +2222,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -2182,6 +2345,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -2364,6 +2528,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link active" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -2480,6 +2645,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -2610,6 +2776,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <a class="nav-link" onclick="go('admin-home')">🏠 الرئيسية والطلاب</a>
       <a class="nav-link" onclick="go('admin-curriculum')">📚 المنهج والدروس</a>
       <a class="nav-link" onclick="go('admin-academic')">🏫 الشُّعب والصفوف</a>
+      <a class="nav-link" onclick="go('admin-schedule')">🗓️ الجدول الدراسي</a>
       <a class="nav-link" onclick="go('admin-visitors')">👋 أكواد الزوار</a>
       <a class="nav-link" onclick="go('admin-exams')">📝 الاختبارات</a>
       <a class="nav-link" onclick="go('admin-followup')">📋 متابعة الدرجات</a>
@@ -3079,12 +3246,12 @@ window.mdRender = mdRender;
 window.mdInline = mdInline;
 
 /* ================= الراوتر بين الشاشات ================= */
-const SCREENS = ['landing','role-select','contact','about','visitor-login','visitor-home','admin-login','admin-home','admin-curriculum','admin-academic','admin-visitors','admin-exams','admin-attendance','admin-stats','attend','student-login','student-messages','student-home','student-curriculum','student-exams','student-ai','admin-ai','admin-absence','admin-remedial','admin-activities','student-plans','admin-followup','book','admin-styles','student-styles'];
+const SCREENS = ['landing','role-select','contact','about','visitor-login','visitor-home','admin-login','admin-home','admin-curriculum','admin-academic','admin-visitors','admin-exams','admin-attendance','admin-stats','attend','student-login','student-messages','student-home','student-curriculum','student-exams','student-ai','admin-ai','admin-absence','admin-remedial','admin-activities','student-plans','admin-followup','book','admin-styles','student-styles','admin-schedule'];
 window.go = async function go(name) {
   // في وضع الاطلاع: الشاشات غير المتاحة تُمنع بلطف بدل أن تطلب كلمة مرور
   if (viewerMode && !VW_ALLOWED.has(name)) { toast('هذه الشاشة غير متاحة في وضع الاطلاع', 'error'); return; }
   SCREENS.forEach((s) => el('screen-' + s).classList.toggle('hidden', s !== name));
-  document.body.classList.toggle('has-mobile-nav', ['admin-home','admin-curriculum','admin-academic','admin-visitors','admin-exams','admin-attendance','admin-stats','student-home','student-curriculum','student-exams','student-messages','student-ai','admin-ai','admin-absence','admin-remedial','admin-activities','student-plans','admin-followup','admin-styles','student-styles','visitor-home'].includes(name));
+  document.body.classList.toggle('has-mobile-nav', ['admin-home','admin-curriculum','admin-academic','admin-visitors','admin-exams','admin-attendance','admin-stats','student-home','student-curriculum','student-exams','student-messages','student-ai','admin-ai','admin-absence','admin-remedial','admin-activities','student-plans','admin-followup','admin-styles','student-styles','visitor-home','admin-schedule'].includes(name));
   if (name === 'admin-login') resetAdminLogin();
   if (name === 'student-login') {
     resetStudentLogin();
@@ -3119,6 +3286,7 @@ window.go = async function go(name) {
   if (name === 'student-plans') await spBoot();
   if (name === 'admin-followup') await fuBoot();
   if (name === 'book') await bkBoot(); else bkLeave();
+  if (name === 'admin-schedule') await scBoot();
   if (name === 'admin-styles') await lsBoot();
   if (name === 'student-styles') await lsStudentBoot();
 };
@@ -4186,6 +4354,9 @@ function fmtDate(iso) {
 }
 async function avBoot() {
   if (!(await vwGuard())) return;
+  // إحصائيات الزوار للمعلم وحده: لا نناديها أصلًا في وضع الاطلاع
+  if (viewerMode) el('va-card').classList.add('hidden');
+  else { el('va-card').classList.remove('hidden'); vaLoad(); }
   await vtLoadCodes();
   await vtLoadTestimonials();
 }
@@ -4532,9 +4703,11 @@ async function shBoot() {
   const { data: studentId } = await supabase.rpc('current_student_id');
   if (!studentId) { await supabase.auth.signOut(); return go('student-login'); }
   const { data: student } = await supabase.from('students').select('id, full_name, student_code').eq('id', studentId).maybeSingle();
+  // بلا هذا الفحص كانت الصفحة كلها تتعطّل ولا يرى الطالب شيئًا لو تعذّرت قراءة بياناته
+  if (!student) { await supabase.auth.signOut(); return go('student-login'); }
   currentStudent = student;
   el('sh-greeting').textContent = `أهلًا ${student.full_name} 👋`;
-  el('sh-code').textContent = `الرقم التعريفي: ${student.student_code} · اللغة الإنجليزية`;
+  el('sh-code').textContent = `الرقم التعريفي: ${student.student_code ?? '—'} · اللغة الإنجليزية`;
 
   let msgs = [], exams = [], plans = [];
   try { const r = await supabase.rpc('my_messages', { p_limit: 60 }); msgs = r.data ?? []; } catch { /* غير حرج */ }
@@ -5751,6 +5924,9 @@ function atDatesForWeeks(weeks) {
 }
 
 let atClasses = [], atCurrentClass = 'all', atFilter = 'all', atDate = new Date(), atGrids = {}, atWeeks = [], atAdmin = false, atTimers = {}, atWired = false;
+/* «تم التحضير» فعلٌ من المعلم لا مجرد فتح الشاشة:
+   لا نحفظ لشعبة إلا إذا عدّل فيها فعلًا. قبل ذلك لا يُكتب أي سجل حضور. */
+let atDirty = new Set();
 let atSettings = { school: 'سعيد بن العاص المتوسطة', semester: '1', academicYear: '١٤٤٦-١٤٤٧هـ' };
 
 function atLoadSettings() {
@@ -5792,6 +5968,7 @@ async function atBoot() {
   atClasses = (data ?? []).map((c) => ({ id: c.id, name: c.name, grade_name: c.grade_levels?.name ?? '' }));
   el('at-linkclass').innerHTML = atClasses.map((c) => `<option value="${c.id}">${atEsc(c.name)}</option>`).join('');
   atRenderTabs(); atRenderWeekGrid(); atUpdateWeeksDisplay();
+  if (await atApplyPendingOpen()) return;   // قادم من الجدول الدراسي: شعبة وتاريخ محددان
   await atReload();
 }
 
@@ -5822,6 +5999,22 @@ function atRenderTabs() {
     .concat(atClasses.map((c) => `<button class="chip ${atCurrentClass === c.id ? 'active' : ''}" onclick="atSetClass('${c.id}')">${atEsc(c.name)}</button>`)).join('');
 }
 window.atSetClass = async (id) => { atCurrentClass = id; atRenderTabs(); await atReload(); };
+
+/* فتح التحضير مباشرة من حصة في الجدول الدراسي — نظام التحضير نفسه، لا نظام جديد. */
+window.atOpenFor = async (classId, isoDate) => {
+  atPendingOpen = { classId, isoDate };
+  await go('admin-attendance');
+};
+let atPendingOpen = null;
+async function atApplyPendingOpen() {
+  if (!atPendingOpen) return false;
+  const { classId, isoDate } = atPendingOpen;
+  atPendingOpen = null;
+  if (isoDate) { atDate = new Date(`${isoDate}T00:00:00`); atRenderHeader(); }
+  atCurrentClass = classId; atRenderTabs();
+  await atReload();
+  return true;
+}
 
 function atSourceBadge(s) {
   if (s.pending) return '<span class="src-badge pending">لم يسجّل بعد</span>';
@@ -5903,6 +6096,7 @@ function atCellClick(e) {
 }
 
 function atMarkDirty(classId) {
+  atDirty.add(classId);
   el('at-savepill').className = 'save-pill saving';
   el('at-savepill').textContent = 'جارٍ الحفظ...';
   clearTimeout(atTimers[classId]);
@@ -5911,13 +6105,14 @@ function atMarkDirty(classId) {
 
 async function atPersist(classId) {
   const grid = atGrids[classId];
-  if (!grid) return;
+  if (!grid || !grid.students?.length) return;
   try {
     const { error } = await supabase.rpc('save_attendance_grid', {
       p_class_id: classId, p_date: atIso(atDate), p_number: 1,
       p_rows: grid.students.map((s) => ({ student_id: s.student_id, present: !!s.present, homework: !!s.homework, project: !!s.project, activity: !!s.activity, participation: !!s.participation, star: !!s.star })),
     });
     if (error) throw new Error(error.message);
+    atDirty.delete(classId);
     el('at-savepill').className = 'save-pill saved';
     el('at-savepill').textContent = '✓ تم الحفظ';
   } catch (err) {
@@ -5926,7 +6121,10 @@ async function atPersist(classId) {
     toast('تعذّر حفظ التحضير: ' + err.message, 'error');
   }
 }
-async function atPersistAll() { for (const c of atVisible()) await atPersist(c.id); }
+/* لا يُحفظ إلا ما عُدِّل فعلًا. مجرد التنقّل بين الأيام لم يعد يكتب تحضيرًا. */
+async function atPersistAll() {
+  for (const c of atVisible()) if (atDirty.has(c.id)) await atPersist(c.id);
+}
 
 window.atShiftDay = async (delta) => { await atPersistAll(); const d = new Date(atDate); d.setDate(d.getDate() + delta); atDate = d; atRenderHeader(); await atReload(); };
 window.atToday = async () => { await atPersistAll(); atDate = new Date(); atRenderHeader(); await atReload(); };
@@ -7869,6 +8067,451 @@ async function vfRenderFull() {
 
 /* ---------- شاشة المعلم: توليد الكود بالأعمدة الجديدة ---------- */
 
+/* ================= الجدول الدراسي =================
+   الجدول مسؤول عن: اليوم، رقم الحصة، الشعبة، المادة، وقت البداية والنهاية.
+   وليس مسؤولًا عن طريقة التحضير — الحالة تُقرأ من نظام الحضور القائم كما هي. */
+
+const SC_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+const scEsc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const scIso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const scHM = (t) => String(t ?? '').slice(0, 5);
+function scWeekStart(d) { const x = new Date(d); x.setDate(x.getDate() - x.getDay()); x.setHours(0, 0, 0, 0); return x; }
+
+let scWeek = scWeekStart(new Date());
+let scRows = [], scTimes = [], scCfg = {}, scVersions = [];
+
+async function scBoot() {
+  if (!(await vwGuard())) return;
+  await scReload();
+}
+
+window.scReload = async function scReload() {
+  el('sc-grid').innerHTML = '<div class="state-box"><span class="spinner"></span></div>';
+  el('sc-weeklabel').textContent = `أسبوع ${scIso(scWeek)}`;
+  try {
+    const [rowsRes, cfgRes, verRes] = await Promise.all([
+      supabase.rpc('teacher_week_schedule', { p_week_start: scIso(scWeek) }),
+      supabase.rpc('get_schedule_time_config'),
+      supabase.rpc('list_schedule_versions'),
+    ]);
+    if (rowsRes.error) throw new Error(rowsRes.error.message);
+    scRows = rowsRes.data ?? [];
+    scCfg = cfgRes.data ?? {};
+    scVersions = verRes.data ?? [];
+    const t = await supabase.rpc('schedule_period_times', { p_config: scActiveCfg() });
+    scTimes = t.data ?? [];
+    scRender();
+  } catch (err) {
+    el('sc-grid').innerHTML = `<div class="state-box"><div class="icon">⚠️</div>${scEsc(err.message)}</div>`;
+  }
+};
+
+// أوقات الأسبوع المعروض تأتي من لقطة إصداره، لا من الإعدادات الحالية
+function scActiveCfg() {
+  const vid = scRows[0]?.version_id;
+  const v = scVersions.find((x) => x.id === vid);
+  return v?.time_config ?? scCfg;
+}
+
+window.scShiftWeek = async (n) => { scWeek.setDate(scWeek.getDate() + n * 7); await scReload(); };
+window.scThisWeek = async () => { scWeek = scWeekStart(new Date()); await scReload(); };
+
+/* تسمية الشعبة كما يكتبها المعلم: «٢/٣» = الشعبة ٢ من الصف الثالث */
+const SC_GRADE_ORDINALS = { 'الأول': 1, 'الثاني': 2, 'الثالث': 3, 'الرابع': 4, 'الخامس': 5, 'السادس': 6 };
+function scClassLabel(r) {
+  const name = String(r.class_name ?? '').trim();
+  const grade = String(r.grade_name ?? '');
+  const hit = Object.keys(SC_GRADE_ORDINALS).find((k) => grade.includes(k));
+  return hit ? `${name}/${SC_GRADE_ORDINALS[hit]}` : name;
+}
+
+function scRender() {
+  const cfg = scActiveCfg();
+  const periods = scTimes.filter((t) => !t.is_break);
+  const breakAfter = Number(cfg.break_after_period ?? 3);
+  const brk = scTimes.find((t) => t.is_break);
+
+  if (!scRows.length) {
+    el('sc-summary').innerHTML = '';
+    el('sc-banner').innerHTML = `<div class="card"><div class="state-box"><div class="icon">🗓️</div>
+      لا يوجد جدول سارٍ في هذا الأسبوع.
+      <div class="empty-hint mt-1">أضِف جدولًا وحدّد تاريخ بداية سريانه.</div></div></div>`;
+    el('sc-grid').innerHTML = ''; el('sc-times').innerHTML = '';
+    return;
+  }
+  el('sc-banner').innerHTML = '';
+
+  const prepared = scRows.filter((r) => r.prepared).length;
+  const total = scRows.length;
+  el('sc-summary').innerHTML = `<div class="grid grid-stats">
+    <div class="card stat-tile"><div class="value">${total}</div><div class="label">حصة هذا الأسبوع</div></div>
+    <div class="card stat-tile"><div class="value" style="color:#15803D;">${prepared}</div><div class="label">✓ تم التحضير</div></div>
+    <div class="card stat-tile"><div class="value" style="color:#B45309;">${total - prepared}</div><div class="label">○ لم يتم التحضير</div></div>
+    <div class="card stat-tile"><div class="value">${scEsc(scVersions.find((v) => v.id === scRows[0].version_id)?.title ?? '—')}</div><div class="label">الجدول السارِي</div></div>
+  </div>`;
+
+  /* أعمدة الجدول: الأولى .. الثالثة ثم الفسحة ثم الرابعة .. السابعة */
+  const cols = [];
+  periods.forEach((t) => {
+    cols.push({ kind: 'period', n: Number(t.period_no), starts: t.starts_at, ends: t.ends_at, label: t.label });
+    if (brk && Number(t.period_no) === breakAfter) {
+      cols.push({ kind: 'break', starts: brk.starts_at, ends: brk.ends_at, label: 'الفسحة' });
+    }
+  });
+
+  const head = `<tr>
+    <th class="sc-daycol">اليوم</th>
+    ${cols.map((c) => c.kind === 'break'
+      ? `<th class="sc-breakhead"><span class="sc-colname">الفسحة</span><span class="sc-coltime">${scHM(c.starts)} – ${scHM(c.ends)}</span></th>`
+      : `<th><span class="sc-colname">${scEsc(c.label)}</span><span class="sc-coltime">${scHM(c.starts)} – ${scHM(c.ends)}</span></th>`).join('')}
+  </tr>`;
+
+  const body = SC_DAYS.map((day, w) => {
+    const dayRows = scRows.filter((r) => Number(r.weekday) === w);
+    const dayDate = dayRows[0]?.day_date ?? '';
+    const cells = cols.map((c) => {
+      if (c.kind === 'break') return '<td class="sc-breakcell" aria-hidden="true"><span>☕</span></td>';
+      const r = dayRows.find((x) => Number(x.period_no) === c.n);
+      if (!r) return '<td class="sc-none"><span class="sc-dash">—</span></td>';
+      const done = !!r.prepared;
+      return `<td class="sc-slotcell">
+        <button type="button" class="sc-slot ${done ? 'is-done' : 'is-todo'}"
+          onclick="atOpenFor('${scEsc(r.class_id)}','${scEsc(r.day_date)}')"
+          title="${done ? 'مراجعة التحضير' : 'بدء التحضير'} — ${scEsc(scClassLabel(r))} · ${scEsc(r.day_date)}">
+          <span class="sc-cls">${scEsc(scClassLabel(r))}</span>
+          <span class="sc-sub">${scEsc(r.subject_name ?? '')}</span>
+          <span class="sc-time">${scHM(r.starts_at)} – ${scHM(r.ends_at)}</span>
+          <span class="sc-state">${done ? '✓ تم التحضير' : '○ لم يتم التحضير'}</span>
+        </button></td>`;
+    }).join('');
+    return `<tr><th class="sc-daycol" scope="row">
+        <span class="sc-dayname">${day}</span>
+        <span class="sc-daydate">${scEsc(dayDate)}</span></th>${cells}</tr>`;
+  }).join('');
+
+  el('sc-grid').innerHTML = `<div class="card sc-card">
+    <div class="sc-scroll"><table class="sc-week">
+      <thead>${head}</thead><tbody>${body}</tbody></table></div>
+    <p class="text-sm text-muted mt-1">اضغط أي حصة لفتح التحضير الخاص بشعبتها في تاريخها.
+      الخانات الفارغة والفسحة غير قابلة للضغط.</p></div>`;
+
+  el('sc-times').innerHTML = `<div class="card">
+    <h3 style="margin-top:0;">⏱️ أوقات الحصص المحسوبة</h3>
+    <p class="text-sm text-muted">تُحسب تلقائيًا من إعدادات الدوام — لا تُدخل يدويًا.
+      الدوام ${cfg.season === 'winter' ? 'الشتوي' : 'الصيفي'} يبدأ
+      ${scHM(cfg.season === 'winter' ? cfg.winter_start_time : cfg.summer_start_time)} ·
+      مدة الحصة ${Number(cfg.period_duration_minutes)} دقيقة ·
+      الفسحة بعد الحصة ${Number(cfg.break_after_period)} لمدة ${Number(cfg.break_duration_minutes)} دقيقة.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>الفترة</th><th>من</th><th>إلى</th></tr></thead>
+      <tbody>${scTimes.map((t) => `<tr${t.is_break ? ' style="opacity:.75;"' : ''}>
+        <td>${t.is_break ? '☕ الفسحة' : scEsc(t.label)}</td>
+        <td>${scHM(t.starts_at)}</td><td>${scHM(t.ends_at)}</td></tr>`).join('')}</tbody>
+    </table></div></div>`;
+}
+
+/* ---------- إعدادات أوقات الدوام ---------- */
+window.scOpenSettings = () => {
+  const c = scCfg;
+  el('sc-modalhost').innerHTML = `<div class="modal-backdrop" id="sc-settingsmodal">
+    <div class="modal">
+      <div class="flex-between"><h3 style="margin:0;">⚙️ إعدادات أوقات الدوام</h3>
+        <button class="btn btn-sm btn-icon" onclick="scCloseModal()">✕</button></div>
+      <div class="field"><label>نوع الدوام</label>
+        <select id="sc-season" onchange="scPreview()">
+          <option value="summer" ${c.season !== 'winter' ? 'selected' : ''}>صيفي</option>
+          <option value="winter" ${c.season === 'winter' ? 'selected' : ''}>شتوي</option>
+        </select></div>
+      <div class="field"><label>بداية الدوام الصيفي</label>
+        <input type="time" id="sc-summer" value="${scHM(c.summer_start_time) || '07:00'}" onchange="scPreview()"></div>
+      <div class="field"><label>بداية الدوام الشتوي</label>
+        <input type="time" id="sc-winter" value="${scHM(c.winter_start_time) || '07:30'}" onchange="scPreview()"></div>
+      <div class="field"><label>مدة الحصة (دقيقة)</label>
+        <input type="number" id="sc-dur" min="5" max="180" value="${Number(c.period_duration_minutes ?? 45)}" oninput="scPreview()"></div>
+      <div class="field"><label>الفسحة بعد الحصة رقم</label>
+        <input type="number" id="sc-brkafter" min="0" max="12" value="${Number(c.break_after_period ?? 3)}" oninput="scPreview()"></div>
+      <div class="field"><label>مدة الفسحة (دقيقة)</label>
+        <input type="number" id="sc-brkdur" min="0" max="180" value="${Number(c.break_duration_minutes ?? 30)}" oninput="scPreview()"></div>
+      <div class="field"><label>عدد الحصص اليومية</label>
+        <input type="number" id="sc-count" min="1" max="12" value="${Number(c.periods_per_day ?? 7)}" oninput="scPreview()"></div>
+      <div id="sc-preview" class="mt-1"></div>
+      <button class="btn btn-primary btn-block mt-2" onclick="scSaveSettings()">💾 حفظ وإعادة الحساب</button>
+      <div id="sc-settingsmsg" class="text-sm mt-1"></div>
+    </div></div>`;
+  scPreview();
+};
+window.scCloseModal = () => { el('sc-modalhost').innerHTML = ''; };
+
+function scReadSettingsForm() {
+  return {
+    season: el('sc-season').value,
+    summer_start_time: el('sc-summer').value || '07:00',
+    winter_start_time: el('sc-winter').value || '07:30',
+    period_duration_minutes: Number(el('sc-dur').value) || 45,
+    break_after_period: Number(el('sc-brkafter').value),
+    break_duration_minutes: Number(el('sc-brkdur').value),
+    periods_per_day: Number(el('sc-count').value) || 7,
+  };
+}
+
+/* المعاينة تنادي دالة الحساب نفسها في الخادم، فلا يوجد منطق حساب ثانٍ في المتصفح */
+window.scPreview = async () => {
+  const host = el('sc-preview'); if (!host) return;
+  try {
+    const { data, error } = await supabase.rpc('schedule_period_times', { p_config: scReadSettingsForm() });
+    if (error) throw new Error(error.message);
+    host.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>الفترة</th><th>من</th><th>إلى</th></tr></thead>
+      <tbody>${(data ?? []).map((t) => `<tr${t.is_break ? ' style="opacity:.7;"' : ''}>
+        <td>${t.is_break ? '☕ الفسحة' : scEsc(t.label)}</td>
+        <td>${scHM(t.starts_at)}</td><td>${scHM(t.ends_at)}</td></tr>`).join('')}</tbody></table></div>`;
+  } catch (err) { host.innerHTML = `<div class="text-sm" style="color:var(--color-danger);">${scEsc(err.message)}</div>`; }
+};
+
+window.scSaveSettings = async () => {
+  el('sc-settingsmsg').textContent = 'جارٍ الحفظ…';
+  try {
+    const { error } = await supabase.rpc('set_schedule_time_config',
+      { p_config: scReadSettingsForm(), p_apply_to_active: true });
+    if (error) throw new Error(error.message);
+    scCloseModal(); await scReload();
+    toast('تم حفظ الإعدادات وإعادة حساب الأوقات', 'success');
+  } catch (err) { el('sc-settingsmsg').textContent = 'خطأ: ' + err.message; }
+};
+
+/* ---------- إدارة الجداول (إصدارات) ---------- */
+window.scOpenVersions = async () => {
+  el('sc-modalhost').innerHTML = `<div class="modal-backdrop" id="sc-vermodal"><div class="modal" style="max-width:720px;">
+    <div class="flex-between"><h3 style="margin:0;">🗂️ إدارة الجداول</h3>
+      <button class="btn btn-sm btn-icon" onclick="scCloseModal()">✕</button></div>
+    <p class="text-sm text-muted">كل جدول له فترة سريان. الجداول السابقة تبقى محفوظة ولا تتأثر بياناتها التاريخية.</p>
+    <div id="sc-verlist"><div class="state-box"><span class="spinner"></span></div></div>
+    <button class="btn btn-primary btn-block mt-2" onclick="scOpenNewVersion()">➕ إضافة جدول جديد</button>
+  </div></div>`;
+  const { data } = await supabase.rpc('list_schedule_versions');
+  scVersions = data ?? [];
+  el('sc-verlist').innerHTML = scVersions.length ? `<div class="table-wrap"><table>
+      <thead><tr><th>الجدول</th><th>يسري من</th><th>إلى</th><th>حصص</th><th>الحالة</th><th></th></tr></thead>
+      <tbody>${scVersions.map((v) => `<tr>
+        <td>${scEsc(v.title)}</td><td>${scEsc(v.effective_from)}</td>
+        <td>${v.effective_to ? scEsc(v.effective_to) : '<span class="text-muted">مفتوح</span>'}</td>
+        <td>${Number(v.entries)}</td>
+        <td>${v.is_current ? '<span class="badge badge-success">سارٍ الآن</span>'
+              : v.is_archived ? '<span class="badge badge-muted">مؤرشف</span>'
+              : '<span class="badge badge-muted">غير سارٍ</span>'}</td>
+        <td><button class="btn btn-sm btn-outline" onclick="scEditVersion('${scEsc(v.id)}')">تعديل الحصص</button></td>
+      </tr>`).join('')}</tbody></table></div>`
+    : '<div class="state-box">لا توجد جداول بعد</div>';
+};
+
+window.scOpenNewVersion = () => {
+  const today = scIso(new Date());
+  el('sc-modalhost').innerHTML = `<div class="modal-backdrop" id="sc-newvermodal"><div class="modal">
+    <div class="flex-between"><h3 style="margin:0;">➕ إضافة جدول جديد</h3>
+      <button class="btn btn-sm btn-icon" onclick="scCloseModal()">✕</button></div>
+    <p class="text-sm text-muted">لن يُحذف الجدول القديم ولن تتغير أي بيانات تحضير أو حضور سابقة.
+      الجدول القديم يُغلق تلقائيًا في اليوم السابق لبداية سريان الجديد.</p>
+    <div class="field"><label>اسم الجدول</label><input type="text" id="sc-newtitle" placeholder="مثال: جدول الفصل الثاني"></div>
+    <div class="field"><label>يسري من</label><input type="date" id="sc-newfrom" value="${today}"></div>
+    <div class="field"><label>ينتهي في (اختياري)</label><input type="date" id="sc-newto"></div>
+    <div class="field"><label>البداية</label>
+      <select id="sc-newcopy">
+        <option value="">جدول فارغ</option>
+        ${scVersions.map((v) => `<option value="${scEsc(v.id)}">نسخة من: ${scEsc(v.title)}</option>`).join('')}
+      </select></div>
+    <button class="btn btn-primary btn-block mt-1" onclick="scCreateVersion()">إنشاء</button>
+    <div id="sc-newvermsg" class="text-sm mt-1"></div>
+  </div></div>`;
+};
+
+window.scCreateVersion = async () => {
+  el('sc-newvermsg').textContent = 'جارٍ الإنشاء…';
+  try {
+    const { data, error } = await supabase.rpc('create_schedule_version', {
+      p_title: el('sc-newtitle').value.trim() || null,
+      p_effective_from: el('sc-newfrom').value || null,
+      p_effective_to: el('sc-newto').value || null,
+      p_copy_from: el('sc-newcopy').value || null,
+      p_time_config: null,
+    });
+    if (error) throw new Error(error.message);
+    scCloseModal(); await scReload();
+    toast('تم إنشاء الجدول الجديد', 'success');
+    window.scEditVersion(data);
+  } catch (err) { el('sc-newvermsg').textContent = 'خطأ: ' + err.message; }
+};
+
+/* ---------- تحرير حصص جدول ---------- */
+let scEditVer = null, scEditRows = [];
+
+window.scEditVersion = async (versionId) => {
+  scEditVer = versionId;
+  const [{ data: entries }, { data: classes }] = await Promise.all([
+    supabase.from('schedule_entries').select('id, weekday, period_no, class_id, subject_label').eq('version_id', versionId),
+    supabase.from('classes').select('id, name').eq('is_active', true).order('name'),
+  ]);
+  scEditRows = entries ?? [];
+  const cfg = scVersions.find((v) => v.id === versionId)?.time_config ?? scCfg;
+  const count = Number(cfg.periods_per_day ?? 7);
+  const opts = (sel) => `<option value="">—</option>` +
+    (classes ?? []).map((c) => `<option value="${scEsc(c.id)}" ${sel === c.id ? 'selected' : ''}>${scEsc(c.name)}</option>`).join('');
+
+  el('sc-modalhost').innerHTML = `<div class="modal-backdrop" id="sc-editmodal"><div class="modal" style="max-width:860px;">
+    <div class="flex-between"><h3 style="margin:0;">✏️ تعديل حصص الجدول</h3>
+      <button class="btn btn-sm btn-icon" onclick="scCloseModal()">✕</button></div>
+    <p class="text-sm text-muted">اترك الخانة «—» لكل حصة انتظار أو خانة فارغة؛ لا تُحفظ ولا تُحتسب حصةً يجب تحضيرها.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>الحصة</th>${SC_DAYS.map((d) => `<th>${d}</th>`).join('')}</tr></thead>
+      <tbody>${Array.from({ length: count }, (_, i) => i + 1).map((n) => `<tr>
+        <td style="white-space:nowrap;">الحصة ${n}</td>
+        ${SC_DAYS.map((_, w) => {
+          const r = scEditRows.find((x) => Number(x.weekday) === w && Number(x.period_no) === n);
+          return `<td><select style="min-width:86px;" onchange="scSetEntry(${w},${n},this.value)">${opts(r?.class_id)}</select></td>`;
+        }).join('')}
+      </tr>`).join('')}</tbody></table></div>
+    <div id="sc-editmsg" class="text-sm mt-1"></div>
+    <button class="btn btn-primary btn-block mt-2" onclick="scCloseModal(); scReload();">تم</button>
+  </div></div>`;
+};
+
+window.scSetEntry = async (weekday, period, classId) => {
+  el('sc-editmsg').textContent = 'جارٍ الحفظ…';
+  try {
+    if (!classId) {
+      const { error } = await supabase.rpc('delete_schedule_entry',
+        { p_version: scEditVer, p_weekday: weekday, p_period: period });
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase.rpc('set_schedule_entry',
+        { p_version: scEditVer, p_weekday: weekday, p_period: period, p_class: classId, p_subject: null, p_label: 'إنجليزي' });
+      if (error) throw new Error(error.message);
+    }
+    el('sc-editmsg').innerHTML = '<span style="color:#1b5e20">تم الحفظ ✓</span>';
+  } catch (err) { el('sc-editmsg').textContent = 'خطأ: ' + err.message; }
+};
+
+/* ================= إحصائيات الزوار (للمعلم وحده) ================= */
+/* السجل يُكتب في الخادم عند كل طلب زائر، ودوالّ قراءته ليست ضمن ما يُسمح للزائر بندائه. */
+
+const VA_ACTION = {
+  login:       ['🔑', 'دخل بالكود'],
+  curricula:   ['📚', 'تصفّح المواد'],
+  units:       ['📂', 'فتح وحدات مادة'],
+  lessons:     ['📄', 'فتح دروس وحدة'],
+  lesson:      ['📖', 'قرأ درسًا'],
+  overview:    ['🗂️', 'لوحة الاطلاع الشامل'],
+  screen:      ['🖥️', 'فتح شاشة معلم'],
+  table:       ['🔎', 'اطّلع على بيانات'],
+  testimonial: ['✍️', 'كتب شهادة'],
+};
+const VA_SCREEN = {
+  stats: '📊 الإحصائيات', exams: '📝 الاختبارات', curriculum: '📚 المنهج والدروس',
+  attendance: '🗓️ التحضير', absence: '📉 متابعة الغياب', followup: '📋 متابعة الدرجات',
+  remedial: '🧩 الخطط العلاجية', styles: '🧠 أنماط التعلم', visitors: '👋 أكواد الزوار',
+  ai: '🤖 المساعد الذكي', home: '🏠 الرئيسية والطلاب',
+};
+const VA_TABLE = {
+  classes: 'الشُّعب', students: 'الطلاب', enrollments: 'التسجيلات', exams: 'الاختبارات',
+  exam_attempts: 'محاولات الاختبارات', units: 'الوحدات', lessons: 'الدروس', vocabulary: 'المفردات',
+  gradebook: 'سجل الدرجات', homework: 'الواجبات', profiles: 'الحسابات', visitor_codes: 'أكواد الزوار',
+};
+
+let vaRows = [], vaOpen = null;
+
+function vaActionText(e) {
+  const [icon, name] = VA_ACTION[e.action] ?? ['•', e.action];
+  let extra = '';
+  if (e.action === 'screen') extra = VA_SCREEN[e.target] ?? e.target ?? '';
+  else if (e.action === 'table') extra = VA_TABLE[e.target] ?? e.target ?? '';
+  else if (e.label) extra = e.label;
+  return `${icon} ${vfEsc(name)}${extra ? ` — <b>${vfEsc(extra)}</b>` : ''}`;
+}
+
+window.vaLoad = async () => {
+  el('va-body').innerHTML = '<div class="state-box"><span class="spinner"></span></div>';
+  try {
+    const [{ data: sum, error: sErr }, { data: rows, error: rErr }] = await Promise.all([
+      supabase.rpc('visitor_activity_summary'),
+      supabase.rpc('visitor_activity_overview'),
+    ]);
+    if (sErr) throw new Error(sErr.message);
+    if (rErr) throw new Error(rErr.message);
+    vaRows = rows ?? [];
+    vaRenderSummary(sum ?? {});
+    vaRenderTable();
+  } catch (err) {
+    el('va-summary').innerHTML = '';
+    el('va-body').innerHTML = `<div class="state-box"><div class="icon">⚠️</div>${vfEsc(err.message)}</div>`;
+  }
+};
+
+function vaRenderSummary(s) {
+  const top = (s.top_actions ?? []).map((a) => {
+    const [icon, name] = VA_ACTION[a.action] ?? ['•', a.action];
+    return `<span class="badge badge-muted" style="margin-inline-end:5px;">${icon} ${vfEsc(name)}: ${a.n}</span>`;
+  }).join('');
+  el('va-summary').innerHTML = `
+    <div class="grid grid-stats">
+      <div class="card stat-tile"><div class="value">${vfNum(s.visits)}</div><div class="label">مرات الدخول</div></div>
+      <div class="card stat-tile"><div class="value">${vfNum(s.events)}</div><div class="label">حركة مسجَّلة</div></div>
+      <div class="card stat-tile"><div class="value" style="color:#2a78d6;">${vfNum(s.visitors_7d)}</div><div class="label">زائر نشط (٧ أيام)</div></div>
+      <div class="card stat-tile"><div class="value">${vfNum(s.active_codes)}</div><div class="label">كود فعّال</div></div>
+    </div>
+    ${top ? `<div class="mt-1 text-sm"><span class="text-muted">الأكثر تكرارًا:</span> ${top}</div>` : ''}
+    ${s.last_seen ? `<div class="text-sm text-muted mt-1">آخر حركة: ${vfEsc(fmtDate(s.last_seen))}</div>` : ''}`;
+}
+
+function vaRenderTable() {
+  if (!vaRows.length) {
+    el('va-body').innerHTML = '<div class="state-box"><div class="icon">📭</div>لا توجد أكواد زوار بعد</div>';
+    return;
+  }
+  const used = vaRows.filter((r) => Number(r.events) || Number(r.logins));
+  if (!used.length) {
+    el('va-body').innerHTML = '<div class="state-box"><div class="icon">👀</div>لم يستخدم أحد أكواد الزيارة بعد</div>';
+    return;
+  }
+  el('va-body').innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th></th><th>الزائر</th><th>الصفة</th><th>دخول</th><th>حركة</th><th>أيام</th><th>دروس</th><th>شاشات</th><th>آخر ظهور</th></tr></thead>
+    <tbody>${used.map((r) => {
+      const open = vaOpen === r.code_id;
+      const who = r.visitor_name || r.label || r.code;
+      return `<tr>
+        <td><button class="btn btn-sm btn-outline" onclick="vaToggle('${vfEsc(r.code_id)}')">${open ? '▾' : '▸'}</button></td>
+        <td><b>${vfEsc(who)}</b><div class="text-sm text-muted" style="letter-spacing:1px;">${vfEsc(r.code)}</div></td>
+        <td>${vfEsc(vtRoleLabel(r.role))}<div class="text-sm text-muted">${vfEsc(vtScopeLabel(r.scope))}</div></td>
+        <td>${vfNum(r.logins)}</td>
+        <td>${vfNum(r.events)}</td>
+        <td>${vfNum(r.days_active)}</td>
+        <td>${vfNum(r.lessons_viewed)}</td>
+        <td>${vfNum(r.screens_viewed)}</td>
+        <td>${r.last_seen ? vfEsc(fmtDate(r.last_seen)) : '—'}</td>
+      </tr>${open ? `<tr class="va-detailrow"><td colspan="9"><div id="va-log-${vfEsc(r.code_id)}">
+        <div class="state-box"><span class="spinner"></span></div></div></td></tr>` : ''}`;
+    }).join('')}</tbody></table></div>`;
+}
+
+window.vaToggle = async (codeId) => {
+  vaOpen = (vaOpen === codeId) ? null : codeId;
+  vaRenderTable();
+  if (vaOpen !== codeId) return;
+  const host = el(`va-log-${codeId}`);
+  if (!host) return;
+  try {
+    const { data, error } = await supabase.rpc('visitor_activity_log', { p_code_id: codeId, p_limit: 200 });
+    if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    if (!rows.length) { host.innerHTML = '<div class="state-box">لا توجد حركة مسجَّلة لهذا الكود</div>'; return; }
+    host.innerHTML = `<div class="text-sm text-muted" style="margin-bottom:7px;">
+        آخر ${rows.length} حركة، الأحدث أولًا</div>
+      <div class="va-timeline">${rows.map((e) => `
+        <div class="va-ev"><span class="t">${vfEsc(fmtDate(e.created_at))}</span>
+          <span class="a">${vaActionText(e)}</span></div>`).join('')}</div>`;
+  } catch (err) {
+    host.innerHTML = `<div class="state-box"><div class="icon">⚠️</div>${vfEsc(err.message)}</div>`;
+  }
+};
+
 /* المدير ووكيل المدرسة والمشرف التربوي: الاطلاع الكامل حقٌّ لهم بحكم الدور —
    الإحصائيات جزء أصيل من عملهم، فلا يُترك ذلك لاختيار عابر عند توليد الكود.
    نفس القاعدة مطبَّقة في الخادم، فالكود القديم لهذه الأدوار يعمل كاملًا كذلك. */
@@ -9756,6 +10399,7 @@ window.lsSSubmit = async () => {
 const VW_SCREENS = [
   ['admin-home', '🏠 الرئيسية والطلاب'],
   ['admin-stats', '📊 الإحصائيات والرسوم البيانية'],
+  ['admin-schedule', '🗓️ الجدول الدراسي'],
   ['admin-curriculum', '📚 المنهج والدروس'],
   ['admin-academic', '🏫 الشُّعب والصفوف'],
   ['admin-exams', '📝 الاختبارات'],
