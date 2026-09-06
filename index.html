@@ -42,13 +42,17 @@ button,input,select,textarea { font-family:inherit; font-size:1rem; }
   .mobile-nav {
     position: fixed; inset-inline: 0; bottom: 0; z-index: 30;
     background: var(--color-surface); border-top: 1px solid var(--color-border);
-    display: flex; justify-content: space-between; gap: 2px; padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    /* كل أقسام المعلم حاضرة هنا؛ ما لا يتّسع للشاشة يُبلغ إليه بالتمرير الأفقي */
+    display: flex; justify-content: flex-start; gap: 2px; padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
     overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    scroll-padding-inline: 24px; overscroll-behavior-x: contain;
   }
   .mobile-nav::-webkit-scrollbar { display: none; }
-  .mobile-nav a { flex: 0 0 auto; min-width: 58px; white-space: nowrap; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.7rem; color:var(--color-text-muted); padding:6px 4px; border-radius:10px; cursor:pointer; }
-  .mobile-nav a.active { color:var(--color-primary); }
+  .mobile-nav a { flex: 0 0 auto; min-width: 56px; white-space: nowrap; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.66rem; color:var(--color-text-muted); padding:6px 4px; border-radius:10px; cursor:pointer; }
+  .mobile-nav a.active { color:var(--color-primary); background:var(--color-primary-bg,#eef3fb); }
   .mobile-nav .icon { font-size:1.15rem; }
+  /* تلميح بصري أن هناك المزيد على الجانبين */
+  .mobile-nav-wrap { position:fixed; inset-inline:0; bottom:0; z-index:30; pointer-events:none; }
   body.has-mobile-nav .app-main { padding-bottom:84px; }
 }
 .card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:18px; box-shadow:var(--shadow-sm); }
@@ -1212,15 +1216,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-home">
     <a class="active" onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -1252,15 +1262,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-curriculum">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a class="active" onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -1375,15 +1391,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-academic">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a class="active" onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a class="active" onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -1458,15 +1480,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
 </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-visitors">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a class="active" onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -1690,15 +1718,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-exams">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a class="active" onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -1824,15 +1858,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-attendance">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a class="active" onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a class="active" onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -1922,13 +1962,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-schedule">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
     <a class="active" onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
+    <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
+    <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
   <div id="sc-modalhost"></div>
 </section>
@@ -2008,15 +2056,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-stats">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a class="active" onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -2205,12 +2259,20 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-ai">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-exams')"><span class="icon">📝</span>اختبارات</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
+    <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
+    <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
+    <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
     <a class="active" onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
@@ -2316,16 +2378,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
     </div>
   </div>
 
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-absence">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
-    <a class="active" onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a class="active" onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 
   <div class="modal-backdrop hidden" id="ab-detailmodal">
@@ -2409,13 +2476,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
     </div>
   </div>
 
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-styles">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
+    <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
     <a class="active" onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
+    <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
   <div id="ls-modalhost"></div>
 </section>
@@ -2624,15 +2699,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
     </div>
   </div>
 
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-followup">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a class="active" onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
     <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
+    <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 
   <div id="fu-modalhost"></div>
@@ -2742,19 +2823,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-remedial">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
-    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
     <a class="active" onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
     <a onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -2840,19 +2923,21 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       </main>
     </div>
   </div>
-  <nav class="mobile-nav">
+  <nav class="mobile-nav" id="mnav-admin-activities">
     <a onclick="go('admin-home')"><span class="icon">🏠</span>الرئيسية</a>
+    <a onclick="go('admin-schedule')"><span class="icon">🗓️</span>الجدول</a>
     <a onclick="go('admin-curriculum')"><span class="icon">📚</span>المنهج</a>
-    <a onclick="go('admin-attendance')"><span class="icon">🗓️</span>التحضير</a>
-    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
+    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
+    <a onclick="go('admin-attendance')"><span class="icon">✅</span>التحضير</a>
     <a onclick="go('admin-exams')"><span class="icon">📝</span>الاختبارات</a>
     <a onclick="go('admin-followup')"><span class="icon">📋</span>الدرجات</a>
+    <a onclick="go('admin-absence')"><span class="icon">📉</span>الغياب</a>
     <a onclick="go('admin-remedial')"><span class="icon">🧩</span>الخطط</a>
+    <a onclick="go('admin-styles')"><span class="icon">🧠</span>الأنماط</a>
     <a class="active" onclick="go('admin-activities')"><span class="icon">🎯</span>الأنشطة</a>
     <a onclick="go('admin-stats')"><span class="icon">📊</span>إحصائيات</a>
-    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
-    <a onclick="go('admin-academic')"><span class="icon">🏫</span>الشُّعب</a>
     <a onclick="go('admin-visitors')"><span class="icon">👋</span>الزوار</a>
+    <a onclick="go('admin-ai')"><span class="icon">🤖</span>المساعد</a>
   </nav>
 </section>
 
@@ -3286,6 +3371,13 @@ window.go = async function go(name) {
   if (name === 'student-plans') await spBoot();
   if (name === 'admin-followup') await fuBoot();
   if (name === 'book') await bkBoot(); else bkLeave();
+  // الشريط السفلي يحوي كل الأقسام، فنُظهر القسم الحالي داخل نطاق الرؤية
+  requestAnimationFrame(() => {
+    const active = document.querySelector(`#screen-${name} .mobile-nav a.active`);
+    if (active?.scrollIntoView) {
+      try { active.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' }); } catch { /* غير حرج */ }
+    }
+  });
   if (name === 'admin-schedule') await scBoot();
   if (name === 'admin-styles') await lsBoot();
   if (name === 'student-styles') await lsStudentBoot();
