@@ -451,7 +451,7 @@ td.num, th.num { text-align:center; }
 
   /* ورقة الشهادة: A4 أفقي عند 96dpi */
   .cert-sheet { width:1123px; height:794px; position:relative; background:#fff; color:var(--c-deep);
-                font-family:inherit; overflow:hidden; }
+                font-family:inherit; overflow:hidden; direction:rtl; letter-spacing:normal; }
   .cert-sheet .cert-corner { position:absolute; width:250px; height:250px; }
   .cert-sheet .cert-corner.tl { top:0; left:0;
     background:linear-gradient(135deg,var(--c-deep) 0 42%,var(--c-gold) 42% 48%,transparent 48%); }
@@ -476,7 +476,10 @@ td.num, th.num { text-align:center; }
                   display:flex; align-items:center; justify-content:center; text-align:center;
                   font-size:.6rem; font-weight:800; letter-spacing:.1em; line-height:1.9; color:var(--c-deep); }
 
-  .cert-title { font-size:3.05rem; font-weight:900; margin:6px 0 0; letter-spacing:-.5px; color:var(--c-deep); }
+  /* لا تضع letter-spacing على أي نص عربي داخل الشهادة:
+     html2canvas يقسّم النص إلى حروف منفصلة عند وجودها فتنقلب الكتابة العربية في ملف PDF. */
+  .cert-title { font-size:3.05rem; font-weight:900; margin:6px 0 0; letter-spacing:normal;
+                direction:rtl; unicode-bidi:isolate; color:var(--c-deep); }
   .cert-orn { color:var(--c-gold); letter-spacing:1.2em; font-size:.7rem; margin:12px 0; }
   .cert-lead { font-size:1.18rem; margin:2px 0 16px; color:var(--c-deep); }
   .cert-name { width:min(620px,100%); text-align:center; font-size:1.7rem; font-weight:900; color:var(--c-deep);
@@ -8801,7 +8804,7 @@ function certHtml(c) {
       <div class="cert-tomorrow">A<br>BRIGHTER<br>TOMORROW</div>
       <div class="cert-seal"><div class="cert-seal-in">ENGLISH<br>MAKES A<br>BRIGHTER<br>WORLD<br><b>★</b></div></div>
 
-      <h1 class="cert-title">شهادة شُكر وتقدير</h1>
+      <h1 class="cert-title" dir="rtl">شهادة شُكر وتقدير</h1>
       <div class="cert-orn">◆</div>
       <p class="cert-lead">تُمنح هذه الشهادة إلى الطالب /</p>
       <div class="cert-name">${certEsc(c.student_name)}</div>
