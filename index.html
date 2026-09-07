@@ -2264,7 +2264,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
             <input type="number" id="acr-threshold" min="1" max="100" value="80" style="width:90px;"></div>
           <button class="btn btn-outline btn-sm no-view" onclick="acrSetThreshold()">حفظ الحد</button>
           <button class="btn btn-primary btn-sm" onclick="acrLoad()">تحديث</button>
-          <button class="btn btn-wa btn-sm no-view" onclick="acrShareWhatsApp(this)">إرسال الشهادات عبر واتساب</button>
+          <button class="btn btn-accent btn-sm" onclick="acrDownloadAll(this)">⬇️ تنزيل جميع الشهادات PDF</button>
           <button class="btn btn-outline btn-sm" onclick="acrCopyNames(this)">📋 نسخ أسماء المتفوقين</button>
         </div>
         <div id="acr-summary" class="mt-1"></div>
@@ -9026,28 +9026,14 @@ window.acrLoad = async () => {
   }
 };
 
-/* ---------- مشاركة الشهادات عبر واتساب ---------- */
-/* مجلّد الشهادات في التخزين: اسمه UUID ثابت لئلا يكسر سياسة قراءة ملفات الدروس
-   (تلك السياسة تحوّل اسم المجلّد الأول إلى uuid، فأي اسم نصّي يُفشل استعلام الطالب). */
-const CERT_FOLDER = '7c1f9a2e-3b64-4d18-9f0a-2c5b8e4d6a71';
+/* ---------- تنزيل جميع الشهادات ملفًا واحدًا ---------- */
+/* يُبنى الملف في متصفح المعلم ويُنزَّل مباشرةً — لا رفع ولا استهلاك لمساحة التخزين. */
 
 function acrFilters() {
   return {
     cls: el('acr-class').selectedOptions[0]?.textContent?.trim() || 'كل الشُّعب',
     unit: el('acr-unit').selectedOptions[0]?.textContent?.trim() || 'كل الوحدات',
   };
-}
-
-function acrCaption(rows, link) {
-  const f = acrFilters();
-  const th = Number(el('acr-threshold').value) || 80;
-  return `🏅 شهادات شكر وتقدير — مادة اللغة الإنجليزية\n`
-    + `${f.cls} · ${f.unit}\n`
-    + `الطلاب الذين حققوا ${th}% فأكثر: ${rows.length}\n\n`
-    + rows.slice(0, 25).map((c, i) => `${i + 1}) ${c.student_name} — ${Math.round(Number(c.percentage))}%`).join('\n')
-    + (rows.length > 25 ? `\n… و${rows.length - 25} طالبًا آخرين في الملف` : '')
-    + (link ? `\n\n📄 ملف الشهادات (PDF):\n${link}` : '')
-    + `\n\nأ. فهد الخالدي — معلم اللغة الإنجليزية`;
 }
 
 /* يبني ملف PDF واحدًا بصفحة لكل شهادة */
@@ -9069,73 +9055,25 @@ async function acrBuildPdf(rows, btn) {
   return pdf;
 }
 
-/* إرسال الشهادات عبر واتساب.
-   كان الخلل أن كتلة المعالجة تُعيد بناء الملف من الصفر عند أي فشل، فيفشل مرة أخرى
-   ولا يُنزَّل شيء ولا يُرسل شيء. الآن يُبنى الملف مرة واحدة ويُحتفظ به،
-   وكل مرحلة تالية تُعالَج على حدة برسالة تقول ما حدث بالضبط. */
-window.acrShareWhatsApp = async (btn) => {
+window.acrDownloadAll = async (btn) => {
   if (!acrRows.length) { toast('لا توجد شهادات في التصفية الحالية', 'error'); return; }
-  const rows = acrRows.slice(0, 60);
+  const rows = acrRows.slice(0, 120);
   const old = btn.textContent;
   btn.disabled = true;
   const f = acrFilters();
-  const fileName = `شهادات-${f.cls}-${new Date().toISOString().slice(0, 10)}.pdf`.replace(/\s+/g, '-');
+  const fileName = `شهادات-${f.cls}-${f.unit}-${new Date().toISOString().slice(0, 10)}.pdf`
+    .replace(/\s+/g, '-').replace(/[\\/:*?"<>|]/g, '');
 
-  let pdf = null, blob = null;
-
-  // (1) تجهيز الملف — إن فشل هنا فلا معنى لبقية الخطوات
   try {
-    pdf = await acrBuildPdf(rows, btn);
-    blob = pdf.output('blob');
+    const pdf = await acrBuildPdf(rows, btn);
+    pdf.save(fileName);
+    toast(`تم تنزيل ${rows.length} شهادة في ملف واحد`, 'success');
   } catch (err) {
     el('cert-stage').innerHTML = '';
+    toast('تعذّر تجهيز الملف: ' + (err?.message ?? 'سبب غير معروف'), 'error');
+  } finally {
     btn.disabled = false; btn.textContent = old;
-    toast('تعذّر تجهيز ملف الشهادات: ' + (err?.message ?? 'سبب غير معروف'), 'error');
-    return;
   }
-
-  const file = new File([blob], fileName, { type: 'application/pdf' });
-
-  // (2) الجوال: تمرير الملف نفسه إلى واتساب عبر مشاركة النظام
-  try {
-    if (navigator.canShare?.({ files: [file] })) {
-      btn.textContent = 'جارٍ الإرسال…';
-      await navigator.share({ files: [file], title: 'شهادات شكر وتقدير', text: acrCaption(rows, null) });
-      toast('تم فتح واتساب لإرسال الملف', 'success');
-      btn.disabled = false; btn.textContent = old;
-      return;
-    }
-  } catch (err) {
-    // المستخدم ألغى نافذة المشاركة: لا نُكمل ولا نُظهر خطأ
-    if (err?.name === 'AbortError') { btn.disabled = false; btn.textContent = old; return; }
-  }
-
-  // (3) الحاسب: رفع الملف وإرسال رابطه العامل داخل الرسالة
-  let link = null, upErr = null;
-  try {
-    btn.textContent = 'جارٍ رفع الملف…';
-    const path = `${CERT_FOLDER}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`;
-    const up = await supabase.storage.from('lesson-files')
-      .upload(path, blob, { contentType: 'application/pdf', upsert: true });
-    if (up.error) throw new Error(up.error.message);
-    const signed = await supabase.storage.from('lesson-files').createSignedUrl(path, 60 * 60 * 24 * 90);
-    if (signed.error || !signed.data?.signedUrl) throw new Error(signed.error?.message ?? 'تعذّر إنشاء الرابط');
-    link = signed.data.signedUrl;
-  } catch (err) { upErr = err?.message ?? 'تعذّر الرفع'; }
-
-  // (4) التسليم — يحدث في كل الأحوال
-  const wa = 'https://wa.me/?text=' + encodeURIComponent(acrCaption(rows, link));
-  const win = window.open(wa, '_blank');
-  if (!win) { location.href = wa; }   // المتصفح منع النافذة المنبثقة
-
-  if (link) {
-    toast('جاهز — الرسالة تحوي رابط ملف الشهادات', 'success');
-  } else {
-    // تعذّر الرفع: ننزّل الملف المبني فعلًا (لا نعيد بناءه) ليرفقه المعلم بنفسه
-    try { pdf.save(fileName); } catch { /* التنزيل غير متاح */ }
-    toast('تعذّر رفع الملف (' + upErr + ') — نُزّل على جهازك، أرفقه في المحادثة', 'error');
-  }
-  btn.disabled = false; btn.textContent = old;
 };
 
 /* نسخ أسماء الطلاب الذين بلغوا حد الاستحقاق */
