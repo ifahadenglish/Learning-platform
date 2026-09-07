@@ -1309,13 +1309,17 @@ h1,h2,h3,h4{ letter-spacing:normal; }
 .field{ margin-bottom:16px; }
 .field > label{ display:block; font-size:.79rem; font-weight:600;
                 color:var(--color-text-muted); margin-bottom:6px; }
+/* شكل الحقول لا يفرض العرض: الحقول داخل أشرطة الأدوات تبقى بحجمها الطبيعي */
 .field input, .field select, .field textarea,
 input[type=text], input[type=number], input[type=date], input[type=time],
 input[type=email], input[type=password], input[type=search], select, textarea{
-  width:100%; padding:0 14px; height:46px; font-family:inherit; font-size:.9rem;
+  padding:0 14px; height:46px; font-family:inherit; font-size:.9rem;
   color:var(--color-text); background:var(--color-surface);
   border:1px solid var(--color-border); border-radius:var(--radius-md);
 }
+.field input, .field select, .field textarea{ width:100%; }
+.date-bar input, .flex-gap input, .flex-gap select,
+.st-filters input, .st-filters select, .fu-select, .fu-input{ width:auto; min-width:150px; }
 textarea{ height:auto; padding:12px 14px; line-height:1.7; }
 input::placeholder, textarea::placeholder{ color:#AEB6C4; }
 input:focus, select:focus, textarea:focus{
@@ -1405,6 +1409,74 @@ tbody tr:hover{ background:var(--color-surface-2); }
 .app-sidebar .nav-link .nav-ic, .mobile-nav a .nav-ic{ color:currentColor; }
 .app-sidebar .nav-link:not(.active) .nav-ic, .mobile-nav a:not(.active) .nav-ic{ opacity:.85; }
 .ic-tile .nav-ic{ color:currentColor; }
+
+/* ============================================================
+   الرئيسية: ترحيب · إجراءات سريعة · حصص اليوم
+   ============================================================ */
+.ah-hero{ display:flex; align-items:center; gap:18px; padding:20px 22px; border-radius:var(--radius-xl);
+          color:#fff; box-shadow:var(--shadow-lg);
+          background:linear-gradient(115deg,var(--color-primary) 0%,var(--navy-600) 58%,var(--navy-500) 100%);
+          position:relative; overflow:hidden; }
+.ah-hero::after{ content:''; position:absolute; inset-inline-end:-50px; top:-70px; width:210px; height:210px;
+                 border-radius:50%; background:rgba(255,255,255,.06); }
+.ah-hero-txt{ flex:1; min-width:0; position:relative; }
+.ah-hero-txt h2{ margin:0 0 4px; font-size:1.3rem; font-weight:700; color:#fff; }
+.ah-hero-txt p{ margin:0; font-size:.82rem; line-height:1.7; opacity:.75; }
+.ah-hero-date{ position:relative; text-align:center; padding-inline-start:18px;
+               border-inline-start:1px solid rgba(255,255,255,.18); flex:none; }
+.ah-hero-date b{ display:block; font-size:1rem; font-weight:700; }
+.ah-hero-date span{ font-size:.72rem; opacity:.7; }
+
+.qa-grid{ display:grid; gap:12px; grid-template-columns:repeat(3,1fr); }
+.qa-tile{ display:flex; align-items:center; gap:12px; text-align:start; cursor:pointer;
+          background:var(--color-surface); border:1px solid var(--color-border);
+          border-radius:var(--radius-lg); padding:14px; box-shadow:var(--shadow-sm);
+          font-family:inherit; color:inherit; }
+.qa-tile:hover{ box-shadow:var(--shadow-md); }
+.qa-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.qa-txt b{ font-size:.92rem; font-weight:600; }
+.qa-txt small{ font-size:.72rem; color:var(--color-text-3); }
+
+.ah-slot{ display:flex; align-items:center; gap:12px; padding:11px 4px; cursor:pointer;
+          border-bottom:1px solid var(--color-border-2); }
+.ah-slot:last-child{ border-bottom:0; }
+.ah-slot:hover{ background:var(--color-surface-2); }
+.ah-slot-no{ width:30px; height:30px; border-radius:9px; flex:none; display:grid; place-items:center;
+             background:var(--color-primary-bg); color:var(--color-primary);
+             font-size:.8rem; font-weight:700; }
+.ah-slot-main{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.ah-slot-main b{ font-size:.88rem; font-weight:600; }
+.ah-slot-main small{ font-size:.74rem; color:var(--color-text-3); font-variant-numeric:tabular-nums; }
+
+
+/* الأيقونة داخل عنوان أو نص: تبقى في نفس السطر */
+h1 .nav-ic, h2 .nav-ic, h3 .nav-ic, h4 .nav-ic,
+p .nav-ic, b .nav-ic, span .nav-ic, label .nav-ic, td .nav-ic, th .nav-ic,
+.row-title .nav-ic, .navrow-label .nav-ic{ display:inline-block; vertical-align:-.18em; }
+h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-primary); opacity:.75; }
+/* ترويسة سجل التحضير ضمن هوية النظام */
+.att-header{ background:linear-gradient(115deg,var(--color-primary) 0%,var(--navy-600) 60%,var(--navy-500) 100%);
+             color:#fff; border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:16px;
+             box-shadow:var(--shadow-lg); }
+.att-header .main{ font-size:1.05rem; font-weight:700; margin-bottom:10px; }
+.att-header .sub{ display:flex; flex-wrap:wrap; gap:8px; font-size:.8rem; align-items:center; }
+.att-header .sub > div{ background:rgba(255,255,255,.12); padding:5px 11px; border-radius:999px; }
+.att-header .at-term{ background:rgba(255,255,255,.12); padding:3px 5px 3px 11px; border-radius:999px; }
+.att-header .at-term .btn-icon{ background:rgba(255,255,255,.16); border-color:transparent; color:#fff; }
+.date-bar{ justify-content:flex-start; }
+
+/* ترويسة الفصل الدراسي في سجل التحضير */
+.at-term{ display:inline-flex; align-items:center; gap:6px; }
+.at-term .btn-icon{ width:28px; height:28px; border-radius:8px; }
+.at-term .btn-icon .nav-ic{ width:15px; height:15px; }
+
+@media (max-width:860px){
+  .ah-hero{ flex-direction:column; align-items:stretch; gap:12px; padding:16px; }
+  .ah-hero-date{ padding-inline-start:0; border-inline-start:0; padding-top:12px;
+                 border-top:1px solid rgba(255,255,255,.18); text-align:start; }
+  .qa-grid{ grid-template-columns:1fr 1fr; gap:10px; }
+  .qa-tile{ flex-direction:column; align-items:flex-start; gap:9px; padding:12px; }
+}
 @media print{ .app-sidebar, .mobile-nav, .app-topbar, #more-sheet, .no-print{ display:none !important; } }
 
 </style>
@@ -1430,6 +1502,7 @@ tbody tr:hover{ background:var(--color-surface-2); }
 <symbol id="nv-mail" viewBox="0 0 24 24"><rect x="3.4" y="5.4" width="17.2" height="13.2" rx="2.2"/><path d="m3.9 7 8.1 5.6L20.1 7"/></symbol>
 <symbol id="nv-more" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h11"/></symbol>
 <symbol id="nv-chev" viewBox="0 0 24 24"><path d="m14.5 5-7 7 7 7"/></symbol>
+<symbol id="nv-user-plus" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.4"/><path d="M3.8 20a6.2 6.2 0 0 1 12.4 0"/><path d="M18.5 8v5"/><path d="M16 10.5h5"/></symbol>
 <symbol id="nv-warn" viewBox="0 0 24 24"><path d="M10.3 4.3 2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6A1.8 1.8 0 0 0 21.4 18L13.7 4.3a1.9 1.9 0 0 0-3.4 0z"/><path d="M12 9.4v4.2"/><path d="M12 17.2h.01"/></symbol>
 <symbol id="nv-close" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11"/><path d="m17.5 6.5-11 11"/></symbol>
 <symbol id="nv-check" viewBox="0 0 24 24"><path d="m5 12.6 4.4 4.4L19 7.4"/></symbol>
@@ -1856,30 +1929,57 @@ tbody tr:hover{ background:var(--color-surface-2); }
     <div style="flex:1; min-width:0;">
       <div class="app-topbar"><div class="brand" style="padding:0;"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-school"/></svg> فهد الخالدي</div><button class="btn btn-outline btn-sm" onclick="doSignOut()">خروج</button></div>
       <main class="app-main">
-        <h2 id="ah-greeting">أهلًا </h2>
-        <div class="grid grid-stats mt-1" id="ah-stats">
+        <div class="ah-hero">
+          <div class="ah-hero-txt">
+            <h2 id="ah-greeting">أهلًا </h2>
+            <p id="ah-herosub">نظرة سريعة على يومك، ثم ابدأ من الإجراء الذي تحتاجه.</p>
+          </div>
+          <div class="ah-hero-date"><b id="ah-today-name">—</b><span id="ah-today-date">—</span></div>
+        </div>
+
+        <div class="grid grid-stats mt-2" id="ah-stats">
           <div class="card stat-tile"><div class="value">—</div><div class="label">الطلاب</div></div>
           <div class="card stat-tile"><div class="value">—</div><div class="label">الشعب</div></div>
           <div class="card stat-tile"><div class="value">—</div><div class="label">الأقسام</div></div>
           <div class="card stat-tile"><div class="value">—</div><div class="label">اختبارات فعّالة</div></div>
         </div>
+
+        <h3 class="section-title">إجراءات سريعة</h3>
+        <div class="qa-grid">
+          <button class="qa-tile" onclick="ahQuickAddStudent()">
+            <span class="ic-tile tile-students"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-user-plus"/></svg></span>
+            <span class="qa-txt"><b>إضافة طالب</b><small>إجراء متكرر</small></span>
+          </button>
+          <button class="qa-tile" onclick="go('admin-exams')">
+            <span class="ic-tile tile-assess"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-assess"/></svg></span>
+            <span class="qa-txt"><b>إضافة اختبار</b><small>إجراء أساسي</small></span>
+          </button>
+          <button class="qa-tile" onclick="go('admin-attendance')">
+            <span class="ic-tile tile-assess"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-attend"/></svg></span>
+            <span class="qa-txt"><b>التحضير</b><small>استخدام يومي</small></span>
+          </button>
+          <button class="qa-tile" onclick="go('admin-schedule')">
+            <span class="ic-tile tile-schedule"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-calendar"/></svg></span>
+            <span class="qa-txt"><b>جدول اليوم</b><small>وصول سريع للحصص</small></span>
+          </button>
+          <button class="qa-tile" onclick="go('admin-absence')">
+            <span class="ic-tile tile-alert"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-absence"/></svg></span>
+            <span class="qa-txt"><b>متابعة الغياب</b><small>إجراء يومي ومهم</small></span>
+          </button>
+          <button class="qa-tile" onclick="go('admin-stats')">
+            <span class="ic-tile tile-reports"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-reports"/></svg></span>
+            <span class="qa-txt"><b>عرض النتائج</b><small>متابعة أداء الطلاب</small></span>
+          </button>
+        </div>
+
         <div class="card mt-2">
           <div class="flex-between">
-            <h3 style="margin:0;">‍ إدارة الطلاب</h3>
-            <div class="flex-gap">
-              <select id="ah-classselect" style="min-width:220px;"></select>
-              <button class="btn btn-outline btn-sm" id="ah-activateall" onclick="ahActivateAllOpen()"> تفعيل جميع الطلاب</button>
-              <button class="btn btn-primary btn-sm" onclick="ahOpenAddModal()">+ إضافة طلاب</button>
-            </div>
+            <h3 style="margin:0;"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-calendar"/></svg> حصص اليوم</h3>
+            <button class="btn btn-outline btn-sm" onclick="go('admin-schedule')">الجدول كاملًا</button>
           </div>
-          <p class="text-sm text-muted mt-1">«تفعيل جميع الطلاب» يُنشئ حساب دخول لكل طالب غير مفعّل دفعةً واحدة، فلا تحتاج لتوليد رمز تفعيل لكل طالب على حدة.</p>
-          <div id="ah-activateprogress" class="progress-line mt-1 hidden"></div>
-          <div class="table-wrap mt-2">
-            <table><thead><tr><th>الرقم</th><th>الاسم</th><th>الحالة</th><th></th></tr></thead>
-            <tbody id="ah-tbody"><tr><td colspan="4"><div class="state-box"><span class="spinner"></span></div></td></tr></tbody></table>
-          </div>
+          <div id="ah-today" class="mt-2"><div class="state-box"><span class="spinner"></span></div></div>
         </div>
-      </main>
+</main>
     </div>
   </div>
   <nav class="mobile-nav">
@@ -1973,6 +2073,23 @@ tbody tr:hover{ background:var(--color-surface-2); }
       <main class="app-main">
         <h2><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-school"/></svg> الشُّعب والصفوف الدراسية</h2>
         <p class="text-sm text-muted">أضِف صفوفًا دراسية (مثل: الصف الأول) ثم أضِف شُعبًا داخل كل صف (مثل: شعبة أ). الشُّعبة الجديدة تُنشأ تلقائيًا ضمن العام والفصل الدراسي الحاليين.</p>
+
+        <div class="card mt-2">
+          <div class="flex-between">
+            <h3 style="margin:0;"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-users"/></svg> إدارة الطلاب</h3>
+            <div class="flex-gap">
+              <select id="ah-classselect" style="min-width:220px;"></select>
+              <button class="btn btn-outline btn-sm" id="ah-activateall" onclick="ahActivateAllOpen()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-check"/></svg> تفعيل جميع الطلاب</button>
+              <button class="btn btn-primary btn-sm" onclick="ahOpenAddModal()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-plus"/></svg> إضافة طلاب</button>
+            </div>
+          </div>
+          <p class="text-sm text-muted mt-1">«تفعيل جميع الطلاب» يُنشئ حساب دخول لكل طالب غير مفعّل دفعةً واحدة، فلا تحتاج لتوليد رمز تفعيل لكل طالب على حدة.</p>
+          <div id="ah-activateprogress" class="progress-line mt-1 hidden"></div>
+          <div class="table-wrap mt-2">
+            <table><thead><tr><th>الرقم</th><th>الاسم</th><th>الحالة</th><th></th></tr></thead>
+            <tbody id="ah-tbody"><tr><td colspan="4"><div class="state-box"><span class="spinner"></span></div></td></tr></tbody></table>
+          </div>
+        </div>
 
         <div id="aa-coverage" class="hidden"></div>
 
@@ -2450,7 +2567,11 @@ tbody tr:hover{ background:var(--color-surface-2); }
           <div class="main">سجل متابعة الطلاب — المعلم: فهد الخالدي · المادة: اللغة الإنجليزية</div>
           <div class="sub">
             <div id="at-school">المدرسة: —</div>
-            <div id="at-semester">الفصل الدراسي: —</div>
+            <div class="at-term">
+              <span id="at-semester">الفصل الدراسي: —</span>
+              <button class="btn btn-icon btn-sm no-print" id="at-termedit" onclick="atOpenTerm()"
+                      title="تعديل الفصل الدراسي والسنة"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-note"/></svg></button>
+            </div>
             <div>التاريخ: <span id="at-greg">—</span></div>
             <div id="at-hijri">—</div>
           </div>
@@ -4506,7 +4627,13 @@ async function ahBoot() {
     if (!profile || !['teacher','assistant'].includes(profile.role) || !profile.is_active) { await supabase.auth.signOut(); return go('admin-login'); }
     el('ah-greeting').textContent = `أهلًا ${profile.full_name} 👋`;
   }
+  ahRenderTodayHeader();
   await ahLoadStats();
+  await ahRenderToday();
+}
+
+/* قائمة الطلاب انتقلت إلى «الشُّعب والصفوف»: تُحمَّل من هناك */
+async function ahBootStudents() {
   ahClasses = await ahListClasses();
   const opts = ahClasses.map((c) => `<option value="${c.id}">${c.department_name} - ${c.grade_name} - ${c.name}</option>`).join('');
   el('ah-classselect').innerHTML = opts;
@@ -4514,6 +4641,61 @@ async function ahBoot() {
   if (ahClasses.length) { ahCurrentClassId = ahClasses[0].id; await ahLoadStudents(); }
   else el('ah-tbody').innerHTML = '<tr><td colspan="4"><div class="state-box">لا توجد شعب بعد</div></td></tr>';
 }
+
+/* ---------- الرئيسية: ترويسة اليوم + حصص اليوم + الإجراءات السريعة ---------- */
+const AH_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const ahIso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function ahRenderTodayHeader() {
+  const now = new Date();
+  el('ah-today-name').textContent = AH_DAYS[now.getDay()];
+  try {
+    el('ah-today-date').textContent = now.toLocaleDateString('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch { el('ah-today-date').textContent = ahIso(now); }
+}
+async function ahRenderToday() {
+  const box = el('ah-today');
+  if (!box) return;
+  try {
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(now.getDate() - now.getDay());          // بداية الأسبوع: الأحد
+    const { data, error } = await supabase.rpc('teacher_week_schedule', { p_week_start: ahIso(start) });
+    if (error) throw new Error(error.message);
+    const today = ahIso(now);
+    const rows = (data ?? []).filter((r) => r.day_date === today)
+      .sort((a, b) => Number(a.period_no) - Number(b.period_no));
+    if (!rows.length) {
+      box.innerHTML = '<div class="state-box">لا توجد حصص مسجّلة لليوم في الجدول</div>';
+      return;
+    }
+    box.innerHTML = rows.map((r) => {
+      const done = r.prepared === true;
+      const badge = done
+        ? '<span class="badge badge-success">حُضّرت</span>'
+        : '<span class="badge badge-muted">لم تُحضّر</span>';
+      const time = (r.starts_at && r.ends_at)
+        ? `<span class="ltr">${String(r.starts_at).slice(0, 5)} — ${String(r.ends_at).slice(0, 5)}</span>` : '';
+      return `<a class="ah-slot" onclick="go('admin-attendance')">
+        <span class="ah-slot-no">${r.period_no}</span>
+        <span class="ah-slot-main">
+          <b>${ahEsc(r.subject_name ?? 'حصة')} · ${ahEsc(r.grade_name ?? '')} ${ahEsc(r.class_name ?? '')}</b>
+          <small>${time}</small>
+        </span>
+        ${badge}
+      </a>`;
+    }).join('');
+  } catch (err) {
+    box.innerHTML = `<div class="state-box">تعذّر تحميل جدول اليوم: ${ahEsc(err.message ?? '')}</div>`;
+  }
+}
+const ahEsc = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* «إضافة طالب» من الرئيسية: ينتقل لقسم الطلاب ثم يفتح النافذة */
+window.ahQuickAddStudent = async () => {
+  await go('admin-academic');
+  if (!ahClasses.length) { toast('أضِف شعبة أولًا', 'error'); return; }
+  ahOpenAddModal();
+};
 el('ah-classselect').addEventListener('change', (e) => { ahCurrentClassId = e.target.value; ahLoadStudents(); });
 
 /* ---------- تفعيل جميع الطلاب (دفعة بعد دفعة) ---------- */
@@ -4977,6 +5159,7 @@ async function aaBoot() {
   await aaLoadClasses();
   await aaLoadLoginMode();
   await aaLoadCoverage();
+  await ahBootStudents();
 }
 window.aaSwitchSection = (section) => {
   document.querySelectorAll('#screen-admin-academic .section-tabs .chip').forEach((c) => c.classList.toggle('active', c.dataset.section === section));
@@ -6864,15 +7047,32 @@ let atClasses = [], atCurrentClass = 'all', atFilter = 'all', atDate = new Date(
 /* «تم التحضير» فعلٌ من المعلم لا مجرد فتح الشاشة:
    لا نحفظ لشعبة إلا إذا عدّل فيها فعلًا. قبل ذلك لا يُكتب أي سجل حضور. */
 let atDirty = new Set();
-let atSettings = { school: 'سعيد بن العاص المتوسطة', semester: '1', academicYear: '١٤٤٦-١٤٤٧هـ' };
+let atSettings = { school: 'سعيد بن العاص المتوسطة', semester: '1', academicYear: '1448-1448هـ' };
 
 function atLoadSettings() {
   try { const raw = localStorage.getItem('fk_attendance_settings'); if (raw) atSettings = { ...atSettings, ...JSON.parse(raw) }; } catch {}
+  if (!atSettings.academicYear || atSettings.academicYear === '١٤٤٦-١٤٤٧هـ') atSettings.academicYear = '1448-1448هـ';
   el('at-schoolinput').value = atSettings.school;
   el('at-semesterselect').value = atSettings.semester;
   el('at-year').value = atSettings.academicYear;
   atRenderHeader();
 }
+window.atOpenTerm = () => {
+  el('at-termsemester').value = atSettings.semester;
+  el('at-termyear').value = atSettings.academicYear;
+  el('at-termmodal').classList.remove('hidden');
+};
+window.atSaveTerm = () => {
+  atSettings.semester = el('at-termsemester').value;
+  atSettings.academicYear = el('at-termyear').value.trim() || '1448-1448هـ';
+  try { localStorage.setItem('fk_attendance_settings', JSON.stringify(atSettings)); } catch {}
+  // نبقي حقول لوحة الإعدادات متوافقة مع القيمة الجديدة
+  if (el('at-semesterselect')) el('at-semesterselect').value = atSettings.semester;
+  if (el('at-year')) el('at-year').value = atSettings.academicYear;
+  atRenderHeader();
+  closeModal('at-termmodal');
+  toast('تم تحديث الفصل الدراسي', 'success');
+};
 window.atSaveSettings = () => {
   atSettings.school = el('at-schoolinput').value.trim() || '—';
   atSettings.semester = el('at-semesterselect').value;
@@ -12068,6 +12268,25 @@ window.vwOpenTeacher = async (screen) => {
   go('landing');
 })();
 </script>
+
+<div class="modal-backdrop hidden" id="at-termmodal">
+  <div class="modal" style="max-width:420px;">
+    <div class="flex-between"><h3 style="margin:0;">تعديل الفصل الدراسي</h3>
+      <button class="btn btn-sm btn-icon" onclick="closeModal('at-termmodal')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-close"/></svg></button></div>
+    <div class="field mt-2"><label>الفصل الدراسي</label>
+      <select id="at-termsemester">
+        <option value="1">الفصل الدراسي الأول</option>
+        <option value="2">الفصل الدراسي الثاني</option>
+        <option value="3">الفصل الدراسي الصيفي</option>
+      </select>
+    </div>
+    <div class="field"><label>السنة الدراسية</label>
+      <input type="text" id="at-termyear" placeholder="1448-1448هـ">
+      <div class="field-hint">اكتبها كما تريد أن تظهر في ترويسة السجل والطباعة.</div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="atSaveTerm()">حفظ</button>
+  </div>
+</div>
 
 <div id="more-sheet" aria-hidden="true">
   <div class="more-scrim" onclick="moreClose()"></div>
