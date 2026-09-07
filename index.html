@@ -2179,7 +2179,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
     <div class="field"><label>مدة الصلاحية (بالساعات)</label><input type="number" id="at-linkhours" value="6" min="1" max="240"></div>
     <div class="field"><label>مهلة التحضير (بالدقائق) — بعدها يصبح كل من لم يحضّر غائبًا تلقائيًا</label>
       <input type="number" id="at-linkwindow" value="30" min="0" max="480">
-      <span class="text-sm text-muted">اكتب 0 لتعطيل الإغلاق التلقائي.</span></div>
+      <span class="text-sm text-muted">بانتهاء المهلة يتوقف الرابط فورًا عن قبول أي تسجيل حتى لو بقيت مدة صلاحيته. اكتب 0 لتعطيل الإغلاق التلقائي، وعندها يظل الرابط مفتوحًا طوال مدة الصلاحية.</span></div>
     <div class="field"><label>وصف (اختياري)</label><input type="text" id="at-linklabel" placeholder="مثال: حصة الأحد عن بُعد"></div>
     <button class="btn btn-primary btn-block" onclick="atCreateLink()">إنشاء الرابط</button>
     <div id="at-linkmsg" class="mt-1 text-sm"></div>
@@ -6860,7 +6860,12 @@ async function atRefreshLinks() {
     el('at-linkstbody').innerHTML = links.map((l) => {
       const url = atLinkUrl(l.token);
       const expired = new Date(l.expires_at).getTime() < Date.now();
-      const status = !l.is_active ? '<span class="badge badge-warning">موقوف</span>' : expired ? '<span class="badge badge-warning">منتهٍ</span>' : '<span class="badge badge-success">فعّال</span>';
+      const windowOver = !!l.closes_at && new Date(l.closes_at).getTime() <= Date.now();
+      /* الرابط لا يقبل أي تسجيل إذا أُغلقت مهلته أو أُوقف أو انتهت صلاحيته */
+      const status = l.auto_closed || windowOver ? '<span class="badge badge-muted">مغلق</span>'
+        : !l.is_active ? '<span class="badge badge-warning">موقوف</span>'
+        : expired ? '<span class="badge badge-warning">منتهٍ</span>'
+        : '<span class="badge badge-success">يقبل التحضير</span>';
       let windowCell = '<span class="text-muted">بلا مهلة</span>';
       if (l.closes_at) {
         const left = Math.round((new Date(l.closes_at).getTime() - Date.now()) / 60000);
@@ -6943,23 +6948,48 @@ window.atCreateLink = async () => {
 
 /* -------- شاشة التحضير العامة (رابط الطالب / عريف الصف) -------- */
 let atPublicInfo = null;
+let atPublicTimer = null;
 async function atCallFn(payload) {
   const res = await fetch(`${SUPABASE_URL}/functions/v1/attendance-link`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY }, body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  if (!res.ok || json.ok === false) throw new Error(json.error || 'تعذّر تنفيذ العملية');
+  if (!res.ok || json.ok === false) {
+    const err = new Error(json.error || 'تعذّر تنفيذ العملية');
+    if (json.closed) err.closed = true;
+    throw err;
+  }
   return json;
 }
+/* إغلاق الشاشة تلقائيًا لحظة انتهاء المهلة حتى لو تركها الطالب مفتوحة (الخادم يرفض أصلًا) */
+function atPublicArmDeadline() {
+  if (atPublicTimer) { clearTimeout(atPublicTimer); atPublicTimer = null; }
+  const at = atPublicInfo?.closes_at ? new Date(atPublicInfo.closes_at).getTime() : 0;
+  if (!at) return;
+  const ms = at - Date.now();
+  if (ms <= 0) { atPublicClosed({ reason: 'انتهت مهلة التحضير لهذه الحصة', closes_at: atPublicInfo.closes_at }); return; }
+  if (ms > 2147483000) return;
+  atPublicTimer = setTimeout(() => atPublicClosed({ reason: 'انتهت مهلة التحضير لهذه الحصة', closes_at: atPublicInfo.closes_at }), ms);
+}
 function atPublicFail(msg) { el('at-publicroot').innerHTML = `<div style="text-align:center;padding:26px 10px;"><div style="font-size:3rem;">⚠️</div><h3>تعذّر فتح الرابط</h3><p class="text-muted">${atEsc(msg)}</p></div>`; }
+function atPublicClosed(info) {
+  const when = info?.closes_at ? new Date(info.closes_at).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }) : '';
+  el('at-publicroot').innerHTML = `<div style="text-align:center;padding:26px 10px;"><div style="font-size:3rem;">⏰</div>
+    <h3>انتهت مهلة التحضير</h3>
+    <p class="text-muted">${atEsc(info?.reason || 'لم يعد هذا الرابط يقبل تسجيل الحضور.')}</p>
+    ${when ? `<p class="text-sm text-muted">أُغلق باب التحضير: ${atEsc(when)}</p>` : ''}
+    <p class="text-sm text-muted">إن كنت حاضرًا فعلًا فراجع معلم المادة لتعديل حالتك يدويًا.</p></div>`;
+}
 function atPublicOk(title, sub) { el('at-publicroot').innerHTML = `<div style="text-align:center;padding:26px 10px;"><div style="font-size:3rem;">✅</div><h3>${atEsc(title)}</h3><p class="text-muted">${atEsc(sub)}</p></div>`; }
 async function atPublicBoot() {
   const token = new URLSearchParams(window.location.search).get('t') || '';
   if (!token) { atPublicFail('الرابط ناقص. اطلب من المعلم إرسال الرابط كاملًا.'); return; }
   try {
     atPublicInfo = await atCallFn({ action: 'info', token });
+    if (atPublicInfo.closed) { atPublicClosed(atPublicInfo); return; }
     if (!atPublicInfo.students.length) { atPublicFail('لا يوجد طلاب مسجّلون في هذه الشعبة بعد.'); return; }
     if (atPublicInfo.kind === 'monitor') atPublicMonitor(token); else atPublicSelf(token);
+    atPublicArmDeadline(token);
   } catch (err) { atPublicFail(err.message); }
 }
 function atPublicSelf(token) {
@@ -6973,7 +7003,10 @@ function atPublicSelf(token) {
     if (!confirm(`تأكيد تسجيل الحضور باسم:\n${name}`)) return;
     btn.disabled = true;
     try { await atCallFn({ action: 'mark', token, student_id: btn.dataset.id }); atPublicOk('تم تسجيل حضورك بنجاح', `${name} — ${atPublicInfo.class_name}`); }
-    catch (err) { btn.disabled = false; toast(err.message, 'error'); }
+    catch (err) {
+      if (err.closed) { atPublicClosed({ reason: err.message, closes_at: atPublicInfo?.closes_at }); return; }
+      btn.disabled = false; toast(err.message, 'error');
+    }
   });
 }
 function atPublicMonitor(token) {
@@ -6998,7 +7031,10 @@ function atPublicMonitor(token) {
     if (!confirm(`إرسال التحضير؟\nحاضر: ${presentCount} — غائب: ${marks.length - presentCount}`)) return;
     el('at-monitorsubmit').disabled = true;
     try { await atCallFn({ action: 'mark', token, marks, label }); atPublicOk('تم إرسال التحضير للمعلم', `${presentCount} حاضرًا من ${marks.length}`); }
-    catch (err) { el('at-monitorsubmit').disabled = false; toast(err.message, 'error'); }
+    catch (err) {
+      if (err.closed) { atPublicClosed({ reason: err.message, closes_at: atPublicInfo?.closes_at }); return; }
+      el('at-monitorsubmit').disabled = false; toast(err.message, 'error');
+    }
   });
 }
 
