@@ -323,6 +323,57 @@ td.num, th.num { text-align:center; }
   .ai-chip.active { background:#2a78d6; color:#fff; border-color:transparent; }
   .ai-quota { font-size:.75rem; color:var(--color-text-muted,#7a7368); margin-top:6px; }
 
+  /* ---------- تحليلات الغياب ---------- */
+  .ab-context { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:.9rem;
+                background:var(--color-primary-bg,#eef3fb); border:1px solid var(--color-border,#dcd6c8);
+                border-radius:var(--radius-sm); padding:10px 14px; }
+  .ab-ctx-main { font-size:1rem; }
+  .ab-ctx-sep { color:var(--color-text-muted,#9aa0a6); }
+
+  .ab-top-row { display:flex; align-items:flex-start; gap:11px; padding:11px 12px; margin-bottom:8px;
+                border:1px solid var(--color-border,#dcd6c8); border-radius:var(--radius-sm); background:#fff;
+                border-inline-start:4px solid #94a3b8; }
+  .ab-top-row.watch { border-inline-start-color:#eab308; }
+  .ab-top-row.warn  { border-inline-start-color:#f97316; }
+  .ab-top-row.crit  { border-inline-start-color:#dc2626; }
+  .ab-rank { min-width:26px; height:26px; border-radius:50%; background:var(--color-primary-bg,#eef3fb);
+             display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.8rem; }
+  .ab-top-name { font-weight:800; line-height:1.6; }
+  .ab-dates { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+  .ab-date-chip { font-size:.7rem; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;
+                  border-radius:999px; padding:2px 8px; direction:ltr; font-variant-numeric:tabular-nums; }
+  .ab-top-nums { text-align:center; min-width:74px; }
+  .ab-top-abs { font-size:1.35rem; font-weight:900; color:#dc2626; font-variant-numeric:tabular-nums; }
+
+  .ab-ins-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:12px; }
+  .ab-ins-card { border:1px solid var(--color-border,#dcd6c8); border-radius:var(--radius-md); background:#fff; padding:14px; }
+  .ab-ins-head { font-weight:800; font-size:.98rem; margin-bottom:3px; }
+  .ab-ins-sub { font-size:.76rem; color:var(--color-text-muted,#7a7368); line-height:1.7; margin-bottom:9px; }
+  .ab-none { font-size:.85rem; color:var(--color-text-muted,#7a7368); padding:8px 0; }
+  .ab-line { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+             padding:7px 0; border-bottom:1px dashed var(--color-border,#e6e0d3); font-size:.86rem; }
+  .ab-line:last-child { border-bottom:none; }
+  .ab-good { color:#15803d; } .ab-bad { color:#b91c1c; }
+  .ab-delta { font-size:.72rem; font-weight:800; border-radius:999px; padding:1px 7px; margin-inline-start:5px; }
+  .ab-delta.good { background:#dcfce7; color:#15803d; } .ab-delta.bad { background:#fee2e2; color:#b91c1c; }
+  .ab-badge { font-size:.72rem; font-weight:800; border-radius:999px; padding:2px 8px; }
+  .ab-badge.crit { background:#fee2e2; color:#b91c1c; }
+  .ab-mini { width:100%; border-collapse:collapse; font-size:.84rem; }
+  .ab-mini th { text-align:start; font-size:.74rem; color:var(--color-text-muted,#7a7368); padding:4px 2px; }
+  .ab-mini td { padding:5px 2px; border-top:1px solid var(--color-border,#e6e0d3); }
+  .ab-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:.82rem; }
+  .ab-bar-row .lbl { min-width:104px; }
+  .ab-bar-row .track { flex:1; height:10px; background:#eef1f4; border-radius:99px; overflow:hidden; }
+  .ab-bar-row .fill { display:block; height:100%; background:#f59e0b; border-radius:99px; }
+  .ab-bar-row .fill.good { background:#22c55e; } .ab-bar-row .fill.bad { background:#dc2626; }
+  .ab-bar-row .val { min-width:34px; text-align:end; font-weight:800; font-variant-numeric:tabular-nums; }
+
+  .btn-wa { background:#25D366; color:#fff; border-color:#25D366; font-weight:800; padding:12px 22px;
+            display:inline-flex; align-items:center; gap:8px; text-decoration:none; border-radius:var(--radius-sm); }
+  .btn-wa:hover { background:#1EBE5A; border-color:#1EBE5A; }
+  .wa-number { margin-top:10px; font-weight:800; letter-spacing:.5px; font-variant-numeric:tabular-nums;
+               color:var(--color-text-muted,#7a7368); }
+
   /* ---------- شهادات الشكر ---------- */
   .cert-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
   .cert-card { border:1px solid var(--color-border,#dcd6c8); border-radius:14px; overflow:hidden;
@@ -1068,15 +1119,15 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
       <div class="role-grid2">
         <button class="role-btn2" onclick="go('admin-login')">
           <span class="icon-circle">👨‍🏫</span>
-          <span><div class="title">أنا المعلم</div><div class="desc">الدخول إلى لوحة التحكم الكاملة</div></span>
+          <span><div class="title">بوابة المعلم 👨‍🏫</div><div class="desc">إدارة الفصول، متابعة الطلاب، تحليل النتائج والخطط التعليمية.</div></span>
         </button>
         <button class="role-btn2" onclick="go('student-login')">
-          <span class="icon-circle">🧑‍🎓</span>
-          <span><div class="title">أنا طالب</div><div class="desc">الدخول أو تفعيل حسابي لأول مرة</div></span>
+          <span class="icon-circle">🎓</span>
+          <span><div class="title">بوابة الطالب 🎓</div><div class="desc">الوصول إلى الدروس، الاختبارات، والنتائج التعليمية.</div></span>
         </button>
         <button class="role-btn2" onclick="go('visitor-login')">
-          <span class="icon-circle">👋</span>
-          <span><div class="title">زائر</div><div class="desc">تصفح تجريبي بكود دخول مؤقت من المعلم</div></span>
+          <span class="icon-circle">🌐</span>
+          <span><div class="title">استكشاف المنصة 🌐</div><div class="desc">تصفح المحتوى والخدمات المتاحة كزائر.</div></span>
         </button>
       </div>
       <p class="text-sm text-muted" style="margin-top:20px;"><a href="#" onclick="go('landing');return false;">⟵ رجوع للرئيسية</a></p>
@@ -1099,8 +1150,13 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
     <div class="box">
       <div class="icon">💬</div>
       <h1>تواصل مع المعلم</h1>
-      <p>هذه الصفحة قيد الإعداد وسيتم تخصيصها قريبًا بطريقة التواصل المباشرة (واتساب / بريد إلكتروني / نموذج رسائل).</p>
-      <button class="btn btn-primary mt-2" onclick="go('landing')">⟵ العودة للرئيسية</button>
+      <p>للاستفسار عن المنصة أو متابعة مستوى الطالب، تواصل مباشرةً عبر واتساب.</p>
+      <a class="btn btn-wa mt-2" href="https://wa.me/966597077245" target="_blank" rel="noopener">
+        <span style="font-size:1.15rem;">💬</span> مراسلة المعلم على واتساب
+      </a>
+      <div class="wa-number" dir="ltr">+966 59 707 7245</div>
+      <p class="text-sm text-muted mt-1">أ. فهد الخالدي — معلم اللغة الإنجليزية</p>
+      <button class="btn btn-outline mt-2" onclick="go('landing')">⟵ العودة للرئيسية</button>
     </div>
   </div>
 </section>
@@ -2087,6 +2143,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
             <input type="number" id="acr-threshold" min="1" max="100" value="80" style="width:90px;"></div>
           <button class="btn btn-outline btn-sm no-view" onclick="acrSetThreshold()">حفظ الحد</button>
           <button class="btn btn-primary btn-sm" onclick="acrLoad()">تحديث</button>
+          <button class="btn btn-wa btn-sm no-view" onclick="acrShareWhatsApp(this)">💬 مشاركة الشهادات عبر واتساب</button>
         </div>
         <div id="acr-summary" class="mt-1"></div>
         <div id="acr-content" class="mt-2"><div class="state-box"><span class="spinner"></span></div></div>
@@ -2539,6 +2596,7 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
         <div id="ab-status"><div class="state-box"><span class="spinner"></span></div></div>
 
         <div id="ab-dash" class="hidden">
+          <div id="ab-context" class="mt-2"></div>
           <div class="card mt-2">
             <h3 style="margin-top:0;">🔔 تنبيهات وتذكيرات</h3>
             <div class="text-sm text-muted">الطلاب الذين تجاوزوا حدود المتابعة، الأشدّ أولًا.</div>
@@ -2546,6 +2604,14 @@ body.viewer-mode .app-main textarea { pointer-events:auto; }
           </div>
 
           <div class="grid grid-stats mt-2" id="ab-tiles"></div>
+
+          <div class="card mt-2">
+            <div class="flex-between"><h3 style="margin:0;">🥇 الأكثر غيابًا</h3>
+              <span class="text-sm text-muted">مرتّبون بعدد أيام الغياب، وتحت كل اسم تواريخ غيابه</span></div>
+            <div id="ab-topbox" class="mt-1"></div>
+          </div>
+
+          <div id="ab-insights" class="ab-ins-grid mt-2"></div>
 
           <div class="chart-card mt-2" id="ab-dailycard">
             <h3>نسبة الغياب عبر الأيام</h3><div class="sub">كل يوم دراسي سُجِّل فيه تحضير خلال المدة المحددة</div>
@@ -7560,13 +7626,123 @@ function abRenderMix() {
 function abRenderAll() {
   Object.values(abCharts).forEach((c) => c?.destroy());
   abCharts = {};
+  abRenderContext();
   abRenderAlerts();
   abRenderTiles();
+  abRenderTopAbsent();
   abRenderDaily();
   abRenderClasses();
   abRenderWeekday();
   abRenderMix();
+  abRenderInsights();
   abRenderTable();
+}
+
+/* ============ سياق العرض: أي شعبة وأي مدة ============ */
+function abRenderContext() {
+  const ins = abState.insights ?? {};
+  const filtered = !!el('ab-class').value;
+  const name = abState.className || ins.class_name || '';
+  el('ab-context').innerHTML = `<div class="ab-context">
+    <span class="ab-ctx-main">${filtered
+      ? `🏫 شعبة <b>${abEsc(name)}</b>`
+      : '🏫 <b>جميع الشُّعب</b>'}</span>
+    <span class="ab-ctx-sep">·</span>
+    <span>من <b>${abEsc(abState.from || '—')}</b> إلى <b>${abEsc(abState.to || '—')}</b></span>
+    <span class="ab-ctx-sep">·</span>
+    <span><b>${Number(ins.students_counted ?? abState.summary.length)}</b> طالبًا</span>
+    <span class="ab-ctx-sep">·</span>
+    <span><b>${Number(ins.days_recorded ?? abState.daily.length)}</b> يوم تحضير</span>
+  </div>`;
+}
+
+/* ============ الأكثر غيابًا + تواريخ غياب كل طالب ============ */
+function abRenderTopAbsent() {
+  const rows = abState.insights?.top_absent ?? [];
+  if (!rows.length) {
+    el('ab-topbox').innerHTML = '<div class="state-box"><div class="icon">✅</div>لا يوجد غياب مسجَّل في هذه المدة</div>';
+    return;
+  }
+  el('ab-topbox').innerHTML = rows.map((r, i) => {
+    const dates = Array.isArray(r.dates) ? r.dates : [];
+    const rate = Number(r.rate ?? 0);
+    const tone = rate >= 50 ? 'crit' : rate >= 25 ? 'warn' : 'watch';
+    return `<div class="ab-top-row ${tone}">
+      <span class="ab-rank">${i + 1}</span>
+      <div style="flex:1; min-width:0;">
+        <div class="ab-top-name">${abEsc(r.student_name)}
+          <span class="text-sm text-muted">· شعبة ${abEsc(r.class_name ?? '—')} · ${abEsc(r.student_code ?? '')}</span></div>
+        <div class="ab-dates">${dates.length
+          ? dates.map((d) => `<span class="ab-date-chip">${abEsc(d)}</span>`).join('')
+          : '<span class="text-sm text-muted">—</span>'}</div>
+      </div>
+      <div class="ab-top-nums">
+        <div class="ab-top-abs">${Number(r.absent)}</div>
+        <div class="text-sm text-muted">من ${Number(r.recorded)} · ${rate}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ تحليلات أعمق ============ */
+function abInsightCard(icon, title, sub, body) {
+  return `<div class="ab-ins-card"><div class="ab-ins-head">${icon} ${title}</div>
+    ${sub ? `<div class="ab-ins-sub">${sub}</div>` : ''}<div>${body}</div></div>`;
+}
+function abRenderInsights() {
+  const ins = abState.insights ?? {};
+  const cards = [];
+
+  const mass = ins.mass_absence_days ?? [];
+  cards.push(abInsightCard('🚨', 'أيام الغياب الجماعي', 'أيام تجاوز فيها الغياب 40٪ من الحاضرين المسجَّلين — غالبًا سبب خارجي لا فردي',
+    mass.length
+      ? `<table class="ab-mini"><thead><tr><th>اليوم</th><th>الغائبون</th><th>النسبة</th></tr></thead><tbody>${
+          mass.map((d) => `<tr><td>${abEsc(d.day)}</td><td class="num">${Number(d.absent_n)} من ${Number(d.marks_n)}</td>
+            <td class="num"><span class="ab-badge crit">${Number(d.rate)}%</span></td></tr>`).join('')}</tbody></table>`
+      : '<div class="ab-none">لا توجد أيام غياب جماعي — الغياب موزَّع طبيعيًا</div>'));
+
+  const pat = ins.weekday_pattern ?? [];
+  cards.push(abInsightCard('🔁', 'نمط الغياب في يوم بعينه', 'طلاب يتركّز 60٪ من غيابهم فأكثر في يوم أسبوعي واحد',
+    pat.length
+      ? pat.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
+          <span class="text-sm text-muted">· ${abEsc(r.class_name ?? '')}</span></span>
+          <span><b>${abEsc(AB_DAYS[Number(r.dow) % 7])}</b> · ${Number(r.n)} مرات (${Number(r.share)}%)</span></div>`).join('')
+      : '<div class="ab-none">لا يوجد نمط أسبوعي واضح لدى أي طالب</div>'));
+
+  const dec = ins.declined ?? [];
+  cards.push(abInsightCard('📉', 'تراجَع حضورهم', 'مقارنة النصف الأول من المدة بالنصف الثاني',
+    dec.length
+      ? dec.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
+          <span class="text-sm text-muted">· ${abEsc(r.class_name ?? '')}</span></span>
+          <span>${Number(r.rate_first)}% ← <b class="ab-bad">${Number(r.rate_second)}%</b>
+          <span class="ab-delta bad">+${Number(r.delta)}</span></span></div>`).join('')
+      : '<div class="ab-none">لا يوجد تراجع ملحوظ</div>'));
+
+  const imp = ins.improved ?? [];
+  cards.push(abInsightCard('📈', 'تحسَّن حضورهم', 'يستحقون تعزيزًا — انخفض غيابهم في النصف الثاني',
+    imp.length
+      ? imp.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
+          <span class="text-sm text-muted">· ${abEsc(r.class_name ?? '')}</span></span>
+          <span>${Number(r.rate_first)}% ← <b class="ab-good">${Number(r.rate_second)}%</b>
+          <span class="ab-delta good">${Number(r.delta)}</span></span></div>`).join('')
+      : '<div class="ab-none">لا يوجد تحسّن ملحوظ بعد</div>'));
+
+  const hist = ins.histogram ?? [];
+  const order = ['0', '1-2', '3-5', '6-9', '10+'];
+  const labels = { '0': 'بلا غياب', '1-2': 'يوم أو يومان', '3-5': '٣ إلى ٥ أيام', '6-9': '٦ إلى ٩ أيام', '10+': '١٠ أيام فأكثر' };
+  const total = hist.reduce((a, x) => a + Number(x.n), 0) || 1;
+  cards.push(abInsightCard('📊', 'توزيع الطلاب حسب أيام الغياب', `${Number(ins.perfect ?? 0)} طالبًا بلا أي غياب`,
+    hist.length
+      ? order.filter((k) => hist.some((h) => h.bucket === k)).map((k) => {
+          const n = Number(hist.find((h) => h.bucket === k).n);
+          const pct = Math.round((n / total) * 100);
+          return `<div class="ab-bar-row"><span class="lbl">${labels[k]}</span>
+            <span class="track"><span class="fill ${k === '0' ? 'good' : k === '10+' ? 'bad' : ''}" style="width:${pct}%"></span></span>
+            <span class="val">${n}</span></div>`;
+        }).join('')
+      : '<div class="ab-none">لا توجد بيانات</div>'));
+
+  el('ab-insights').innerHTML = cards.join('');
 }
 
 /* ============ التحميل ============ */
@@ -7577,13 +7753,16 @@ window.abLoad = async () => {
   const to = el('ab-to').value || null;
   const classId = el('ab-class').value || null;
   try {
-    const [summary, daily, byClass, weekday] = await Promise.all([
+    const [summary, daily, byClass, weekday, insightsRaw] = await Promise.all([
       abRpc('teacher_absence_summary', { p_from: from, p_to: to, p_class_id: classId }),
       abRpc('teacher_absence_daily', { p_from: from, p_to: to, p_class_id: classId }),
       abRpc('teacher_absence_by_class', { p_from: from, p_to: to }),
       abRpc('teacher_absence_weekday', { p_from: from, p_to: to, p_class_id: classId }),
+      abRpc('teacher_absence_insights', { p_from: from, p_to: to, p_class_id: classId }),
     ]);
-    abState = { summary, daily, byClass, weekday, from: from ?? '', to: to ?? '' };
+    const insights = Array.isArray(insightsRaw) ? (insightsRaw[0] ?? {}) : (insightsRaw ?? {});
+    abState = { summary, daily, byClass, weekday, insights, from: from ?? '', to: to ?? '',
+                className: el('ab-class').selectedOptions[0]?.textContent?.trim() || '' };
     if (!summary.length && !daily.length) {
       el('ab-status').innerHTML = '<div class="state-box"><div class="icon">📭</div>لا يوجد تحضير مسجَّل في هذه المدة. سجّل التحضير أولًا من صفحة «التحضير» ثم عد إلى هنا.</div>';
       return;
@@ -8709,6 +8888,64 @@ window.acrLoad = async () => {
       : `<div class="card"><div class="state-box"><div class="icon">🏅</div>لا توجد شهادات في هذه التصفية</div></div>`;
   } catch (err) {
     el('acr-content').innerHTML = `<div class="card"><div class="state-box"><div class="icon">⚠️</div>${certEsc(err.message)}</div></div>`;
+  }
+};
+
+/* مشاركة الشهادات عبر واتساب:
+   نبني ملف PDF واحدًا بصفحة لكل شهادة، ثم نمرّره لواجهة المشاركة في النظام
+   (يظهر واتساب ضمن خيارات المشاركة). وإن لم تدعمها المنصة، ننزّل الملف
+   ونفتح واتساب برسالة جاهزة ليُرفق الملف يدويًا. */
+window.acrShareWhatsApp = async (btn) => {
+  if (!acrRows.length) { toast('لا توجد شهادات في التصفية الحالية', 'error'); return; }
+  const MAX = 60;
+  const rows = acrRows.slice(0, MAX);
+  const old = btn.textContent;
+  btn.disabled = true;
+
+  const clsName = el('acr-class').selectedOptions[0]?.textContent?.trim() || 'كل الشُّعب';
+  const unitName = el('acr-unit').selectedOptions[0]?.textContent?.trim() || 'كل الوحدات';
+  const caption = `🏅 شهادات شكر وتقدير — مادة اللغة الإنجليزية\n`
+    + `${clsName} · ${unitName}\n`
+    + `عدد الشهادات: ${rows.length}${acrRows.length > MAX ? ` (من ${acrRows.length})` : ''}\n\n`
+    + rows.slice(0, 25).map((c, i) => `${i + 1}) ${c.student_name} — ${Math.round(Number(c.percentage))}%`).join('\n')
+    + (rows.length > 25 ? `\n… و${rows.length - 25} طالبًا آخرين في الملف` : '')
+    + `\n\nأ. فهد الخالدي — معلم اللغة الإنجليزية`;
+
+  const stage = el('cert-stage');
+  try {
+    await certLoadLibs();
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    const w = pdf.internal.pageSize.getWidth(), h = pdf.internal.pageSize.getHeight();
+
+    for (let i = 0; i < rows.length; i++) {
+      btn.textContent = `جارٍ التجهيز ${i + 1}/${rows.length}…`;
+      stage.innerHTML = certHtml(rows[i]);
+      const canvas = await window.html2canvas(stage.firstElementChild, { scale: 1.6, backgroundColor: '#ffffff', logging: false });
+      if (i > 0) pdf.addPage('a4', 'landscape');
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, w, h);
+    }
+    stage.innerHTML = '';
+
+    const name = `شهادات-${clsName}-${new Date().toISOString().slice(0, 10)}.pdf`.replace(/\s+/g, '-');
+    const blob = pdf.output('blob');
+    const file = new File([blob], name, { type: 'application/pdf' });
+
+    if (navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'شهادات شكر وتقدير', text: caption });
+      toast('تم فتح خيارات المشاركة', 'success');
+    } else {
+      pdf.save(name);
+      window.open('https://wa.me/?text=' + encodeURIComponent(caption), '_blank');
+      toast('نُزّل ملف الشهادات — أرفقه في محادثة واتساب التي فُتحت', 'success');
+    }
+  } catch (err) {
+    // آخر ملاذ: مشاركة القائمة نصًّا على الأقل
+    stage.innerHTML = '';
+    window.open('https://wa.me/?text=' + encodeURIComponent(caption), '_blank');
+    toast('تعذّر تجهيز ملف PDF — شاركنا القائمة نصًّا', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = old;
   }
 };
 
