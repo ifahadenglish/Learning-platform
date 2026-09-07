@@ -1454,6 +1454,237 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic, h4 .nav-ic,
 p .nav-ic, b .nav-ic, span .nav-ic, label .nav-ic, td .nav-ic, th .nav-ic,
 .row-title .nav-ic, .navrow-label .nav-ic{ display:inline-block; vertical-align:-.18em; }
 h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-primary); opacity:.75; }
+
+/* ============================================================================
+   لوحة متابعة الغياب — Attendance Analytics Dashboard
+   ============================================================================ */
+.ab-page{ display:flex; flex-direction:column; gap:18px; }
+
+/* ---------- الترويسة ---------- */
+.ab-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.ab-head-title{ display:flex; align-items:center; gap:13px; }
+.ab-head-ic{ width:46px; height:46px; border-radius:14px; flex:none; display:grid; place-items:center;
+             background:var(--a-students-t); color:var(--a-students); }
+.ab-head-ic .nav-ic{ width:23px; height:23px; }
+.ab-head-title h2{ margin:0; font-size:1.32rem; font-weight:700; }
+.ab-head-title p{ margin:2px 0 0; font-size:.82rem; color:var(--color-text-3); }
+.ab-head-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+/* ---------- شريط الفلاتر ---------- */
+.ab-toolbar{ display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;
+             background:var(--color-surface); border:1px solid var(--color-border);
+             border-radius:var(--radius-lg); padding:12px 14px; box-shadow:var(--shadow-sm); }
+.ab-filter{ display:flex; flex-direction:column; gap:5px; }
+.ab-filter > label{ font-size:.7rem; font-weight:600; color:var(--color-text-3); }
+.ab-filter input, .ab-filter select{ height:38px; min-width:140px; font-size:.83rem;
+                                     border-radius:var(--radius-sm); padding:0 11px; }
+.ab-toolbar .btn{ height:38px; }
+.ab-tb-sep{ width:1px; align-self:stretch; background:var(--color-border); margin:0 2px; }
+.ab-ctx{ flex:1 1 100%; display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+         font-size:.78rem; color:var(--color-text-muted);
+         border-top:1px solid var(--color-border-2); padding-top:10px; margin-top:2px; }
+.ab-ctx b{ color:var(--color-text); font-weight:600; }
+.ab-ctx-sep{ color:var(--color-text-3); opacity:.55; }
+
+/* ---------- عنوان القسم ---------- */
+.ab-sec{ display:flex; flex-direction:column; gap:12px; }
+.ab-sechead{ display:flex; align-items:center; gap:11px; }
+.ab-secnum{ font-size:.7rem; font-weight:700; color:var(--color-text-3);
+            font-variant-numeric:tabular-nums; letter-spacing:normal; }
+.ab-sechead .ic-tile{ width:32px; height:32px; border-radius:9px; }
+.ab-sechead .ic-tile .nav-ic{ width:17px; height:17px; }
+.ab-sechead h3{ margin:0; font-size:1.02rem; font-weight:700; }
+.ab-sechead p{ margin:1px 0 0; font-size:.75rem; color:var(--color-text-3); }
+.ab-sechead .grow{ flex:1; }
+
+/* ---------- 01 يحتاج انتباهك ---------- */
+.ab-attention{ background:linear-gradient(180deg,#FDF6F7 0%,var(--color-surface) 62%);
+               border:1px solid var(--a-alert-b); border-radius:var(--radius-xl);
+               padding:16px; box-shadow:var(--shadow-sm); }
+.ab-alert-grid{ display:grid; gap:12px; grid-template-columns:repeat(4,1fr); margin-top:12px; }
+.ab-acard{ background:var(--color-surface); border:1px solid var(--color-border);
+           border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; }
+.ab-acard-hd{ display:flex; align-items:center; gap:9px; padding:11px 13px;
+              border-bottom:1px solid var(--color-border-2); }
+.ab-acard-hd .nav-ic{ width:17px; height:17px; flex:none; }
+.ab-acard-hd b{ font-size:.83rem; font-weight:700; flex:1; min-width:0; }
+.ab-acard-n{ font-size:.72rem; font-weight:700; border-radius:999px; padding:2px 8px;
+             font-variant-numeric:tabular-nums; }
+.ab-acard-bd{ flex:1; padding:4px 0; min-height:96px; }
+.ab-acard-ft{ padding:9px 13px; border-top:1px solid var(--color-border-2); }
+.ab-acard-ft a{ display:inline-flex; align-items:center; gap:5px; font-size:.75rem;
+                font-weight:600; cursor:pointer; }
+.ab-acard-ft .nav-ic{ width:13px; height:13px; }
+
+.ab-a-crit  .ab-acard-hd{ background:var(--a-alert-t); color:var(--a-alert); }
+.ab-a-crit  .ab-acard-n{ background:var(--a-alert); color:#fff; }
+.ab-a-crit  .ab-acard-ft a{ color:var(--a-alert); }
+.ab-a-warn  .ab-acard-hd{ background:var(--a-schedule-t); color:var(--a-schedule); }
+.ab-a-warn  .ab-acard-n{ background:var(--a-schedule); color:#fff; }
+.ab-a-warn  .ab-acard-ft a{ color:var(--a-schedule); }
+.ab-a-down  .ab-acard-hd{ background:#FDEEF0; color:#B33A52; }
+.ab-a-down  .ab-acard-n{ background:#B33A52; color:#fff; }
+.ab-a-down  .ab-acard-ft a{ color:#B33A52; }
+.ab-a-up    .ab-acard-hd{ background:var(--a-assess-t); color:var(--a-assess); }
+.ab-a-up    .ab-acard-n{ background:var(--a-assess); color:#fff; }
+.ab-a-up    .ab-acard-ft a{ color:var(--a-assess); }
+
+.ab-arow{ display:flex; align-items:center; gap:9px; padding:7px 13px; }
+.ab-arow + .ab-arow{ border-top:1px solid var(--color-border-2); }
+.ab-ava{ width:28px; height:28px; border-radius:50%; flex:none; display:grid; place-items:center;
+         font-size:.66rem; font-weight:700; background:var(--navy-050); color:var(--navy-600);
+         border:1px solid var(--color-border-2); }
+.ab-arow-main{ flex:1; min-width:0; }
+.ab-arow-name{ font-size:.8rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ab-arow-sub{ font-size:.68rem; color:var(--color-text-3); }
+.ab-arow-val{ font-size:.75rem; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.ab-arow-val.up{ color:var(--a-assess); } .ab-arow-val.down{ color:#B33A52; }
+
+
+/* صفوف القائمة الكاملة داخل النافذة */
+.ab-listrow{ background:var(--color-surface); border:1px solid var(--color-border);
+             border-radius:var(--radius-md); padding:11px 13px; margin-bottom:9px; }
+.ab-listrow-hd{ display:flex; align-items:center; gap:9px; font-size:.9rem; }
+.ab-listrow-meta{ display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:7px;
+                  font-size:.76rem; color:var(--color-text-muted); }
+.ab-listrow-meta b{ color:var(--color-text); font-weight:600; }
+.ab-listrow-act{ margin-top:8px; padding-top:8px; border-top:1px dashed var(--color-border);
+                 font-size:.76rem; color:var(--color-text-3); }
+#ab-listbody .ab-line{ display:flex; align-items:center; justify-content:space-between; gap:12px;
+                       flex-wrap:wrap; padding:10px 12px; font-size:.82rem;
+                       background:var(--color-surface); border:1px solid var(--color-border);
+                       border-radius:var(--radius-md); margin-bottom:8px; }
+#ab-listbody .ab-top-row{ margin-bottom:9px; }
+
+/* ---------- 02 المؤشرات ---------- */
+.ab-kpis{ display:grid; gap:12px; grid-template-columns:repeat(6,1fr); }
+.ab-kpi{ background:var(--color-surface); border:1px solid var(--color-border);
+         border-radius:var(--radius-lg); padding:14px; box-shadow:var(--shadow-sm); }
+.ab-kpi-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.ab-kpi .ic-tile{ width:34px; height:34px; border-radius:10px; }
+.ab-kpi .ic-tile .nav-ic{ width:17px; height:17px; }
+.ab-kpi-val{ font-size:1.5rem; font-weight:700; line-height:1.15; margin-top:11px;
+             font-variant-numeric:tabular-nums; }
+.ab-kpi-lbl{ font-size:.74rem; color:var(--color-text-3); margin-top:3px; }
+.ab-kpi-dlt{ font-size:.7rem; font-weight:600; margin-top:6px; display:inline-flex;
+             align-items:center; gap:4px; font-variant-numeric:tabular-nums; }
+.ab-kpi-dlt.good{ color:var(--a-assess); } .ab-kpi-dlt.bad{ color:var(--a-alert); }
+.ab-kpi-dlt.flat{ color:var(--color-text-3); }
+
+/* ---------- 04 اللوحات ---------- */
+.ab-panels{ display:grid; gap:14px; grid-template-columns:repeat(3,1fr); }
+.ab-two{ display:grid; gap:14px; grid-template-columns:1.25fr 1fr; }
+.ab-panel{ background:var(--color-surface); border:1px solid var(--color-border);
+           border-radius:var(--radius-lg); padding:15px; box-shadow:var(--shadow-sm);
+           display:flex; flex-direction:column; }
+.ab-panel > h4{ margin:0 0 2px; font-size:.9rem; font-weight:700; display:flex;
+                align-items:center; gap:7px; }
+.ab-panel > h4 .nav-ic{ width:16px; height:16px; color:var(--color-text-3); }
+.ab-panel > .ab-psub{ font-size:.72rem; color:var(--color-text-3); margin-bottom:11px; }
+.ab-panel > .ab-pbody{ flex:1; min-width:0; max-width:100%; overflow-x:auto; }
+/* عناصر الشبكة لا تتمدّد بعرض محتواها */
+.ab-panel, .ab-acard, .ab-kpi, .ab-chg, .ab-two > *, .ab-panels > *,
+.ab-alert-grid > *, .ab-kpis > *, .ab-change > *{ min-width:0; }
+.ab-ptable{ table-layout:fixed; }
+.ab-ptable td, .ab-ptable th{ overflow:hidden; text-overflow:ellipsis; }
+.ab-ptable td:first-child, .ab-ptable th:first-child{ width:38%; }
+
+/* شريط أفقي داخل لوحة */
+.ab-hbar{ display:flex; align-items:center; gap:10px; padding:6px 0; }
+.ab-hbar-lbl{ width:66px; flex:none; font-size:.76rem; font-weight:600; }
+.ab-hbar-track{ flex:1; height:9px; border-radius:99px; background:var(--color-border-2); overflow:hidden; }
+.ab-hbar-fill{ display:block; height:100%; border-radius:99px; }
+.ab-hbar-val{ width:44px; flex:none; text-align:end; font-size:.76rem; font-weight:700;
+              font-variant-numeric:tabular-nums; }
+
+/* جدول مصغّر داخل لوحة */
+.ab-ptable{ width:100%; border-collapse:collapse; font-size:.78rem; }
+.ab-ptable th{ text-align:start; font-size:.68rem; font-weight:600; color:var(--color-text-3);
+               padding:6px 4px; border-bottom:1px solid var(--color-border-2); background:transparent; }
+.ab-ptable td{ padding:7px 4px; border-bottom:1px solid var(--color-border-2); }
+.ab-ptable tr:last-child td{ border-bottom:0; }
+.ab-ptable tbody tr:hover{ background:transparent; }
+
+/* أعمدة رأسية لتوزيع أيام الغياب */
+.ab-cols{ display:flex; align-items:flex-end; gap:9px; height:132px; padding-top:6px; }
+.ab-col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%;
+         justify-content:flex-end; }
+.ab-col-n{ font-size:.74rem; font-weight:700; font-variant-numeric:tabular-nums; }
+.ab-col-bar{ width:100%; border-radius:6px 6px 0 0; min-height:4px; }
+.ab-col-lbl{ font-size:.66rem; color:var(--color-text-3); text-align:center; line-height:1.35; }
+
+/* ---------- 06 تغير الحضور ---------- */
+.ab-change{ display:grid; gap:12px; grid-template-columns:1fr 1fr; }
+.ab-chg{ display:flex; align-items:center; gap:14px; cursor:pointer;
+         background:var(--color-surface); border:1px solid var(--color-border);
+         border-radius:var(--radius-lg); padding:16px; box-shadow:var(--shadow-sm); }
+.ab-chg:hover{ box-shadow:var(--shadow-md); }
+.ab-chg .ic-tile{ width:44px; height:44px; border-radius:13px; }
+.ab-chg-main{ flex:1; min-width:0; }
+.ab-chg-val{ font-size:1.5rem; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
+.ab-chg-lbl{ font-size:.8rem; font-weight:600; margin-top:2px; }
+.ab-chg-sub{ font-size:.71rem; color:var(--color-text-3); margin-top:2px; }
+
+/* ---------- 07 الجدول ---------- */
+.ab-tbar{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:12px; }
+.ab-tbar input, .ab-tbar select{ height:36px; font-size:.8rem; border-radius:var(--radius-sm);
+                                 padding:0 11px; width:auto; min-width:150px; flex:0 0 auto; }
+.ab-tbar .grow{ flex:1 1 200px; min-width:160px; }
+/* الجدول: صف واحد لكل طالب بلا التفاف */
+.ab-tablewrap table{ font-size:.79rem; }
+.ab-tablewrap th, .ab-tablewrap td{ white-space:nowrap; padding:9px 9px; }
+.ab-tablewrap th{ font-size:.7rem; }
+.ab-tablewrap .ab-ava{ width:26px; height:26px; font-size:.6rem; }
+.ab-tablewrap td:first-child{ position:sticky; inset-inline-start:0; background:var(--color-surface); }
+.ab-tablewrap th:first-child{ position:sticky; inset-inline-start:0; background:var(--color-surface-2); }
+.ab-tablewrap tbody tr:hover td:first-child{ background:var(--color-surface-2); }
+.ab-pager{ display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+           padding-top:12px; margin-top:4px; border-top:1px solid var(--color-border-2); }
+.ab-pager .grow{ flex:1; }
+.ab-pg{ min-width:32px; height:32px; padding:0 9px; border-radius:9px; cursor:pointer;
+        border:1px solid var(--color-border); background:var(--color-surface);
+        font-family:inherit; font-size:.78rem; font-weight:600; color:var(--color-text-muted);
+        font-variant-numeric:tabular-nums; }
+.ab-pg.on{ background:var(--color-primary); border-color:var(--color-primary); color:#fff; }
+.ab-pg:disabled{ opacity:.4; cursor:default; }
+.ab-pgcount{ font-size:.76rem; color:var(--color-text-3); }
+.ab-tname{ display:flex; align-items:center; gap:9px; }
+
+/* بطاقات الطلاب على الجوال */
+.ab-scards{ display:none; flex-direction:column; gap:10px; }
+.ab-scard{ background:var(--color-surface); border:1px solid var(--color-border);
+           border-radius:var(--radius-lg); padding:13px; box-shadow:var(--shadow-sm); }
+.ab-scard-top{ display:flex; align-items:center; gap:10px; }
+.ab-scard-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:11px; }
+.ab-scard-cell{ background:var(--color-surface-2); border-radius:var(--radius-sm); padding:8px;
+                text-align:center; }
+.ab-scard-cell b{ display:block; font-size:.92rem; font-variant-numeric:tabular-nums; }
+.ab-scard-cell span{ font-size:.66rem; color:var(--color-text-3); }
+
+/* ---------- الاستجابة ---------- */
+@media (max-width:1200px){
+  .ab-alert-grid{ grid-template-columns:1fr 1fr; }
+  .ab-kpis{ grid-template-columns:repeat(3,1fr); }
+  .ab-panels{ grid-template-columns:1fr; }
+  .ab-two{ grid-template-columns:1fr; }
+}
+@media (max-width:860px){
+  .ab-head-title h2{ font-size:1.12rem; }
+  .ab-toolbar{ padding:11px; }
+  .ab-filter{ flex:1 1 calc(50% - 5px); }
+  .ab-filter input, .ab-filter select{ min-width:0; width:100%; }
+  .ab-toolbar .btn{ flex:1 1 calc(50% - 5px); }
+  .ab-tb-sep{ display:none; }
+  .ab-alert-grid{ grid-template-columns:1fr; }
+  .ab-kpis{ grid-template-columns:1fr 1fr; }
+  .ab-change{ grid-template-columns:1fr; }
+  .ab-attention{ padding:12px; }
+  .ab-tbar input, .ab-tbar select{ flex:1 1 calc(50% - 5px); min-width:0; }
+  /* الجدول يتحوّل إلى بطاقات */
+  .ab-tablewrap{ display:none; }
+  .ab-scards{ display:flex; }
+}
+
 /* ترويسة سجل التحضير ضمن هوية النظام */
 .att-header{ background:linear-gradient(115deg,var(--color-primary) 0%,var(--navy-600) 60%,var(--navy-500) 100%);
              color:#fff; border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:16px;
@@ -1503,6 +1734,8 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
 <symbol id="nv-more" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h11"/></symbol>
 <symbol id="nv-chev" viewBox="0 0 24 24"><path d="m14.5 5-7 7 7 7"/></symbol>
 <symbol id="nv-user-plus" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.4"/><path d="M3.8 20a6.2 6.2 0 0 1 12.4 0"/><path d="M18.5 8v5"/><path d="M16 10.5h5"/></symbol>
+<symbol id="nv-trendup" viewBox="0 0 24 24"><path d="M3.5 16.5 9 11l3.6 3.6L20.5 6.5"/><path d="M15.6 6.5h4.9v4.9"/></symbol>
+<symbol id="nv-trenddown" viewBox="0 0 24 24"><path d="M3.5 7.5 9 13l3.6-3.6L20.5 17.5"/><path d="M15.6 17.5h4.9v-4.9"/></symbol>
 <symbol id="nv-warn" viewBox="0 0 24 24"><path d="M10.3 4.3 2.6 18a1.8 1.8 0 0 0 1.6 2.7h15.6A1.8 1.8 0 0 0 21.4 18L13.7 4.3a1.9 1.9 0 0 0-3.4 0z"/><path d="M12 9.4v4.2"/><path d="M12 17.2h.01"/></symbol>
 <symbol id="nv-close" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11"/><path d="m17.5 6.5-11 11"/></symbol>
 <symbol id="nv-check" viewBox="0 0 24 24"><path d="m5 12.6 4.4 4.4L19 7.4"/></symbol>
@@ -3221,86 +3454,188 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
         <button class="btn btn-outline btn-sm" onclick="doSignOut()">خروج</button>
       </div>
       <main class="app-main">
-        <div class="flex-between"><h2 class="page-title"><svg class="head-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l6.5 6.5 3.5-3.5L21 17"/><path d="M21 12v5h-5"/><path d="M3 21h18"/></svg><span>متابعة الغياب</span></h2>
-          <div class="flex-gap no-print">
-            <button class="btn btn-outline btn-sm" onclick="abExport()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-download"/></svg> تصدير Excel</button>
-            <button class="btn btn-outline btn-sm" onclick="window.print()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-print"/></svg> طباعة</button>
-          </div></div>
-        <p class="text-sm text-muted">رصد الطلاب المتكرر غيابهم، اتجاه الغياب عبر الأيام والشُّعب وأيام الأسبوع، مع تنبيهات وإجراءات مقترحة.</p>
 
-        <div class="st-filters no-print">
-          <div class="field"><label>من تاريخ</label><input type="date" id="ab-from"></div>
-          <div class="field"><label>إلى تاريخ</label><input type="date" id="ab-to"></div>
-          <div class="field"><label>الشعبة</label><select id="ab-class"><option value="">كل الشُّعب</option></select></div>
-          <button class="btn btn-primary btn-sm" onclick="abLoad()">تحديث</button>
-          <button class="btn btn-outline btn-sm" onclick="abYear()">السنة كاملة</button>
+        <div class="ab-page">
+
+          <!-- ============ الترويسة ============ -->
+          <div class="ab-head">
+            <div class="ab-head-title">
+              <span class="ab-head-ic"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-attend"/></svg></span>
+              <div><h2>متابعة الغياب</h2><p>تحليل شامل لحضور الطلاب وغيابهم</p></div>
+            </div>
+            <div class="ab-head-actions no-print">
+              <button class="btn btn-outline btn-sm" onclick="abOpenThresholds()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-gear"/></svg> حدود التنبيه</button>
+              <button class="btn btn-outline btn-sm" onclick="window.print()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-print"/></svg> طباعة</button>
+              <button class="btn btn-primary btn-sm" onclick="abExport()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-download"/></svg> تصدير التقرير</button>
+            </div>
+          </div>
+
+          <!-- ============ الفلاتر ============ -->
+          <div class="ab-toolbar no-print">
+            <div class="ab-filter"><label>من تاريخ</label><input type="date" id="ab-from"></div>
+            <div class="ab-filter"><label>إلى تاريخ</label><input type="date" id="ab-to"></div>
+            <div class="ab-filter"><label>الشعبة</label>
+              <select id="ab-class"><option value="">كل الشُّعب</option></select></div>
+            <span class="ab-tb-sep"></span>
+            <button class="btn btn-primary btn-sm" onclick="abLoad()">تحديث</button>
+            <button class="btn btn-outline btn-sm" onclick="abYear()">السنة كاملة</button>
+            <div class="ab-ctx" id="ab-context"></div>
+          </div>
+
+          <div id="ab-status"><div class="state-box"><span class="spinner"></span></div></div>
+
+          <div id="ab-dash" class="hidden ab-page">
+
+            <!-- ============ 01 يحتاج انتباهك ============ -->
+            <section class="ab-sec">
+              <div class="ab-attention">
+                <div class="ab-sechead">
+                  <span class="ab-secnum">01</span>
+                  <span class="ic-tile tile-alert"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-bell"/></svg></span>
+                  <div class="grow"><h3>يحتاج انتباهك</h3>
+                    <p>طلاب يحتاجون إلى متابعة أو إجراء</p></div>
+                </div>
+                <div class="ab-alert-grid">
+                  <div class="ab-acard ab-a-crit">
+                    <div class="ab-acard-hd"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-warn"/></svg><b>تجاوزوا حد المتابعة</b>
+                      <span class="ab-acard-n" id="ab-n-alerts">0</span></div>
+                    <div class="ab-acard-bd" id="ab-alertsbox"></div>
+                    <div class="ab-acard-ft"><a onclick="abOpenList('alerts')">عرض القائمة الكاملة <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-chev"/></svg></a></div>
+                  </div>
+                  <div class="ab-acard ab-a-warn">
+                    <div class="ab-acard-hd"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-users"/></svg><b>الأكثر غيابًا</b>
+                      <span class="ab-acard-n" id="ab-n-top">0</span></div>
+                    <div class="ab-acard-bd" id="ab-topbox"></div>
+                    <div class="ab-acard-ft"><a onclick="abOpenList('top')">عرض القائمة الكاملة <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-chev"/></svg></a></div>
+                  </div>
+                  <div class="ab-acard ab-a-down">
+                    <div class="ab-acard-hd"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-trenddown"/></svg><b>تراجع حضورهم</b>
+                      <span class="ab-acard-n" id="ab-n-declined">0</span></div>
+                    <div class="ab-acard-bd" id="ab-declined"></div>
+                    <div class="ab-acard-ft"><a onclick="abOpenList('declined')">عرض القائمة <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-chev"/></svg></a></div>
+                  </div>
+                  <div class="ab-acard ab-a-up">
+                    <div class="ab-acard-hd"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-trendup"/></svg><b>تحسّن حضورهم</b>
+                      <span class="ab-acard-n" id="ab-n-improved">0</span></div>
+                    <div class="ab-acard-bd" id="ab-improved"></div>
+                    <div class="ab-acard-ft"><a onclick="abOpenList('improved')">عرض القائمة <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-chev"/></svg></a></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============ 02 ملخص الحضور والغياب ============ -->
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">02</span>
+                <span class="ic-tile tile-students"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-chart"/></svg></span>
+                <div class="grow"><h3>ملخص الحضور والغياب</h3>
+                  <p>أهم المؤشرات للفترة المحددة</p></div>
+              </div>
+              <div class="ab-kpis" id="ab-tiles"></div>
+            </section>
+
+            <!-- ============ 03 تحليل الغياب عبر الأيام ============ -->
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">03</span>
+                <span class="ic-tile tile-reports"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-pattern"/></svg></span>
+                <div class="grow"><h3>تحليل الغياب</h3>
+                  <p>نسبة الغياب عبر الأيام خلال الفترة المحددة</p></div>
+              </div>
+              <div class="chart-card" id="ab-dailycard"><h3>نسبة الغياب عبر الأيام</h3><div class="sub">كل يوم دراسي سُجِّل فيه تحضير خلال المدة المحددة</div><div class="chart-box"><canvas id="ab-daily"></canvas></div></div>
+            </section>
+
+            <!-- ============ 04 تحليل الأيام والأنماط ============ -->
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">04</span>
+                <span class="ic-tile tile-schedule"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-calendar"/></svg></span>
+                <div class="grow"><h3>تحليل الأيام والأنماط</h3>
+                  <p>متى يقع الغياب، وكيف يتوزّع على الطلاب</p></div>
+              </div>
+              <div class="ab-panels">
+                <div class="ab-panel" id="ab-masscard"></div>
+                <div class="ab-panel" id="ab-weekdaycard"></div>
+                <div class="ab-panel" id="ab-histcard"></div>
+              </div>
+              <div class="ab-panel" id="ab-patterncard"></div>
+            </section>
+
+            <!-- ============ 05 مقارنة الشعب + توزيع الحالات ============ -->
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">05</span>
+                <span class="ic-tile tile-neutral"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-layers"/></svg></span>
+                <div class="grow"><h3>مقارنة الشُّعب</h3>
+                  <p>أي الشُّعب أكثر تأثرًا، وكيف تتوزّع حالات التحضير</p></div>
+              </div>
+              <div class="ab-two">
+                <div class="chart-card" id="ab-classcard"><h3>مقارنة الشُّعب بنسبة الغياب</h3><div class="sub">نسبة الغياب في كل شعبة خلال المدة</div><div class="chart-box short"><canvas id="ab-classes"></canvas></div></div>
+                <div class="chart-card" id="ab-mixcard"><h3>توزيع حالات التحضير</h3><div class="sub">حاضر / غائب / متأخر / بعذر</div><div class="chart-box short"><canvas id="ab-mix"></canvas></div></div>
+              </div>
+            </section>
+
+            <!-- ============ 06 تغير الحضور ============ -->
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">06</span>
+                <span class="ic-tile tile-assess"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-trendup"/></svg></span>
+                <div class="grow"><h3>تغيّر الحضور</h3>
+                  <p>مقارنة النصف الأول من الفترة بالنصف الثاني</p></div>
+              </div>
+              <div class="ab-change" id="ab-changebox"></div>
+            </section>
+
+            <!-- ============ 07 جدول الطلاب ============ -->
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">07</span>
+                <span class="ic-tile tile-students"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-users"/></svg></span>
+                <div class="grow"><h3>جدول الطلاب</h3>
+                  <p>تفاصيل الحضور والغياب لجميع الطلاب</p></div>
+              </div>
+              <div class="card">
+                <div class="ab-tbar no-print">
+                  <input type="search" id="ab-tsearch" class="grow" placeholder="ابحث عن طالب…"
+                         oninput="abTableRefresh()">
+                  <select id="ab-tclass" onchange="abTableRefresh()"><option value="">كل الشُّعب</option></select>
+                  <select id="ab-tlevel" onchange="abTableRefresh()">
+                    <option value="">كل الحالات</option>
+                    <option value="critical">حالة حرجة</option>
+                    <option value="warn">تحذير</option>
+                    <option value="watch">متابعة</option>
+                    <option value="ok">منتظم</option>
+                  </select>
+                  <select id="ab-tsort" onchange="abTableRefresh()">
+                    <option value="level">ترتيب: الحالة</option>
+                    <option value="rate">ترتيب: نسبة الغياب</option>
+                    <option value="days">ترتيب: أيام الغياب</option>
+                    <option value="streak">ترتيب: أطول تتابع</option>
+                    <option value="name">ترتيب: الاسم</option>
+                  </select>
+                  <button class="btn btn-outline btn-sm" onclick="abExport()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-download"/></svg> تصدير</button>
+                </div>
+
+                <div class="table-wrap ab-tablewrap"><table>
+                  <thead><tr>
+                    <th>الطالب</th><th>الشعبة</th><th class="num">أيام مسجّلة</th><th class="num">حضور</th>
+                    <th class="num">غياب</th><th class="num">تأخر</th><th class="num">بعذر</th>
+                    <th class="num">نسبة الغياب</th><th class="num">أطول تتابع</th><th class="num">آخر غياب</th>
+                    <th class="num">الحالة</th><th class="num no-print">إجراءات</th>
+                  </tr></thead>
+                  <tbody id="ab-studenttbody"></tbody>
+                </table></div>
+
+                <div class="ab-scards" id="ab-studentcards"></div>
+
+                <div class="ab-pager no-print" id="ab-pager"></div>
+              </div>
+            </section>
+
+          </div>
         </div>
 
-        <div id="ab-status"><div class="state-box"><span class="spinner"></span></div></div>
-
-        <div id="ab-dash" class="hidden">
-          <div id="ab-context" class="mt-2"></div>
-          <div class="card mt-2">
-            <h3 style="margin-top:0;"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-bell"/></svg> تنبيهات وتذكيرات</h3>
-            <div class="text-sm text-muted">الطلاب الذين تجاوزوا حدود المتابعة، الأشدّ أولًا.</div>
-            <div id="ab-alertsbox" class="mt-1"></div>
-          </div>
-
-          <div class="grid grid-stats mt-2" id="ab-tiles"></div>
-
-          <div class="card mt-2">
-            <div class="flex-between"><h3 style="margin:0;"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-medal"/></svg> الأكثر غيابًا</h3>
-              <span class="text-sm text-muted">مرتّبون بعدد أيام الغياب، وتحت كل اسم تواريخ غيابه</span></div>
-            <div id="ab-topbox" class="mt-1"></div>
-          </div>
-
-          <div id="ab-insights" class="ab-ins-grid mt-2"></div>
-
-          <div class="chart-card mt-2" id="ab-dailycard">
-            <h3>نسبة الغياب عبر الأيام</h3><div class="sub">كل يوم دراسي سُجِّل فيه تحضير خلال المدة المحددة</div>
-            <div class="chart-box"><canvas id="ab-daily"></canvas></div>
-          </div>
-
-          <div class="grid-2c">
-            <div class="chart-card" id="ab-classcard">
-              <h3>مقارنة الشُّعب بنسبة الغياب</h3><div class="sub">نسبة الغياب في كل شعبة خلال المدة</div>
-              <div class="chart-box short"><canvas id="ab-classes"></canvas></div>
-            </div>
-            <div class="chart-card" id="ab-weekdaycard">
-              <h3>الغياب حسب يوم الأسبوع</h3><div class="sub">أي أيام الأسبوع يكثر فيها الغياب</div>
-              <div class="chart-box short"><canvas id="ab-weekday"></canvas></div>
-            </div>
-          </div>
-
-          <div class="chart-card" id="ab-mixcard">
-            <h3>توزيع حالات التحضير</h3><div class="sub">حاضر / غائب / متأخر / بعذر</div>
-            <div class="chart-box short"><canvas id="ab-mix"></canvas></div>
-          </div>
-
-          <div class="card mt-2 no-print">
-            <h3 style="margin-top:0;"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-gear"/></svg> حدود التنبيه</h3>
-            <p class="text-sm text-muted">عدد أيام الغياب الذي يبدأ عنده كل مستوى.</p>
-            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
-              <div class="field" style="margin:0; min-width:120px; max-width:170px;"><label>متابعة</label><input type="number" id="ab-thrwatch" min="1" max="200" value="3"></div>
-              <div class="field" style="margin:0; min-width:120px; max-width:170px;"><label>تحذير</label><input type="number" id="ab-thrwarn" min="1" max="200" value="5"></div>
-              <div class="field" style="margin:0; min-width:120px; max-width:170px;"><label>حالة حرجة</label><input type="number" id="ab-thrcritical" min="1" max="200" value="8"></div>
-              <button class="btn btn-primary btn-sm" id="ab-savethr" onclick="abSaveThresholds()">حفظ</button>
-            </div>
-          </div>
-
-          <div class="card mt-2">
-            <h3 style="margin-top:0;">جدول الطلاب</h3>
-            <div class="table-wrap mt-1"><table>
-              <thead><tr>
-                <th>الاسم</th><th>الشعبة</th><th class="num">أيام مسجّلة</th><th class="num">حضور</th>
-                <th class="num">غياب</th><th class="num">تأخر</th><th class="num">بعذر</th>
-                <th class="num">نسبة الغياب</th><th class="num">أطول تتابع</th><th class="num">آخر غياب</th>
-                <th class="num">الحالة</th><th class="num no-print"></th>
-              </tr></thead>
-              <tbody id="ab-studenttbody"></tbody>
-            </table></div>
-          </div>
-        </div>
       </main>
     </div>
   </div>
@@ -8231,48 +8566,292 @@ function abSortedStudents() {
 }
 
 /* ============ العرض ============ */
+/* ============ 01 · يحتاج انتباهك ============ */
+const abInitials = (n) => String(n ?? '').trim().split(/\s+/).slice(0, 2).map((w) => w[0] ?? '').join('.');
+const abAvatar = (n) => `<span class="ab-ava">${abEsc(abInitials(n))}</span>`;
+const abEmptyMini = (txt) => `<div style="padding:16px 13px; font-size:.76rem; color:var(--color-text-3); text-align:center;">${txt}</div>`;
+
+function abAttRow(name, sub, val, tone) {
+  return `<div class="ab-arow">${abAvatar(name)}
+    <span class="ab-arow-main"><span class="ab-arow-name">${abEsc(name)}</span>
+      <span class="ab-arow-sub">${abEsc(sub)}</span></span>
+    <span class="ab-arow-val ${tone || ''}">${val}</span></div>`;
+}
+
 function abRenderAlerts() {
   const rows = abAlertRows();
-  if (!rows.length) {
-    el('ab-alertsbox').innerHTML = '<div class="state-box"><div class="icon">✅</div>لا يوجد طالب تجاوز حدود المتابعة في هذه المدة. الحضور منتظم — أحسنت!</div>';
-    return;
-  }
-  el('ab-alertsbox').innerHTML = rows.map((r) => {
-    const lvl = abLevel(r.alert_level);
-    return `<div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; border:1px solid var(--color-border,#dcd6c8); border-inline-start:4px solid ${AB_LEVELS[lvl].bar}; border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:8px; background:#fff;">
-      <div style="font-weight:800; min-width:150px;">${abEsc(r.full_name)} ${abPill(lvl)}</div>
-      <div style="font-size:.8rem; color:#52514e; display:flex; flex-wrap:wrap; gap:10px;">
-        <span>الشعبة: <b>${abEsc(r.class_name ?? '—')}</b></span>
-        <span>أيام الغياب: <b>${abNum(r.absent_days)}</b></span>
-        <span>أطول تتابع: <b>${abNum(r.longest_streak)}</b></span>
-        <span>آخر غياب: <b>${abEsc(abDash(r.last_absent))}</b></span>
-        <span>نسبة الغياب: <b>${abPct(r.absent_rate)}</b></span>
-      </div>
-      <div style="flex-basis:100%; font-size:.82rem; color:var(--color-text-muted,#6b7280);">الإجراء المقترح: ${AB_LEVELS[lvl].action}</div>
-    </div>`;
-  }).join('');
+  el('ab-n-alerts').textContent = rows.length;
+  el('ab-alertsbox').innerHTML = rows.length
+    ? rows.slice(0, 3).map((r) => abAttRow(r.full_name,
+        `${abDash(r.class_name)} · ${AB_LEVELS[abLevel(r.alert_level)].label}`,
+        `${abNum(r.absent_days)} أيام`)).join('')
+    : abEmptyMini('لا يوجد طالب تجاوز حدود المتابعة');
+}
+
+function abRenderTopAbsent() {
+  const rows = abState.insights?.top_absent ?? [];
+  el('ab-n-top').textContent = rows.length;
+  el('ab-topbox').innerHTML = rows.length
+    ? rows.slice(0, 3).map((r) => abAttRow(r.student_name,
+        `${abDash(r.class_name)} · ${Number(r.rate ?? 0)}%`,
+        `${Number(r.absent)} أيام`)).join('')
+    : abEmptyMini('لا يوجد غياب مسجَّل في هذه المدة');
+}
+
+function abRenderChangeCards() {
+  const dec = abState.insights?.declined ?? [];
+  const imp = abState.insights?.improved ?? [];
+  el('ab-n-declined').textContent = dec.length;
+  el('ab-n-improved').textContent = imp.length;
+  el('ab-declined').innerHTML = dec.length
+    ? dec.slice(0, 3).map((r) => abAttRow(r.student_name, abDash(r.class_name),
+        `+${Number(r.delta)}%`, 'down')).join('')
+    : abEmptyMini('لا يوجد تراجع ملحوظ');
+  el('ab-improved').innerHTML = imp.length
+    ? imp.slice(0, 3).map((r) => abAttRow(r.student_name, abDash(r.class_name),
+        `${Number(r.delta)}%`, 'up')).join('')
+    : abEmptyMini('لا يوجد تحسّن ملحوظ بعد');
+}
+
+/* القوائم الكاملة — بلا حذف أي معلومة كانت معروضة سابقًا */
+const AB_LISTS = {
+  alerts: {
+    title: 'الطلاب الذين تجاوزوا حد المتابعة',
+    body: () => {
+      const rows = abAlertRows();
+      if (!rows.length) return '<div class="state-box">لا يوجد طالب تجاوز حدود المتابعة في هذه المدة. الحضور منتظم — أحسنت!</div>';
+      return rows.map((r) => {
+        const lvl = abLevel(r.alert_level);
+        return `<div class="ab-listrow" style="border-inline-start:4px solid ${AB_LEVELS[lvl].bar};">
+          <div class="ab-listrow-hd"><b>${abEsc(r.full_name)}</b> ${abPill(lvl)}</div>
+          <div class="ab-listrow-meta">
+            <span>الشعبة: <b>${abEsc(abDash(r.class_name))}</b></span>
+            <span>أيام الغياب: <b>${abNum(r.absent_days)}</b></span>
+            <span>أطول تتابع: <b>${abNum(r.longest_streak)}</b></span>
+            <span>آخر غياب: <b>${abEsc(abDash(r.last_absent))}</b></span>
+            <span>نسبة الغياب: <b>${abPct(r.absent_rate)}</b></span>
+          </div>
+          <div class="ab-listrow-act">الإجراء المقترح: ${AB_LEVELS[lvl].action}</div>
+        </div>`;
+      }).join('');
+    },
+  },
+  top: {
+    title: 'الطلاب الأكثر غيابًا · مع تواريخ الغياب',
+    body: () => {
+      const rows = abState.insights?.top_absent ?? [];
+      if (!rows.length) return '<div class="state-box">لا يوجد غياب مسجَّل في هذه المدة</div>';
+      return rows.map((r, i) => {
+        const dates = Array.isArray(r.dates) ? r.dates : [];
+        const rate = Number(r.rate ?? 0);
+        const tone = rate >= 50 ? 'crit' : rate >= 25 ? 'warn' : 'watch';
+        return `<div class="ab-top-row ${tone}">
+          <span class="ab-rank">${i + 1}</span>
+          <div style="flex:1; min-width:0;">
+            <div class="ab-top-name">${abEsc(r.student_name)}
+              <span class="text-sm text-muted">· شعبة ${abEsc(abDash(r.class_name))} · ${abEsc(r.student_code ?? '')}</span></div>
+            <div class="ab-dates">${dates.length
+              ? dates.map((d) => `<span class="ab-date-chip">${abEsc(d)}</span>`).join('')
+              : '<span class="text-sm text-muted">—</span>'}</div>
+          </div>
+          <div class="ab-top-nums">
+            <div class="ab-top-abs">${Number(r.absent)}</div>
+            <div class="text-sm text-muted">من ${Number(r.recorded)} · ${rate}%</div>
+          </div>
+        </div>`;
+      }).join('');
+    },
+  },
+  declined: {
+    title: 'طلاب تراجَع حضورهم',
+    body: () => {
+      const rows = abState.insights?.declined ?? [];
+      if (!rows.length) return '<div class="state-box">لا يوجد تراجع ملحوظ</div>';
+      return rows.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
+        <span class="text-sm text-muted">· ${abEsc(abDash(r.class_name))}</span></span>
+        <span>${Number(r.rate_first)}% ← <b class="ab-bad">${Number(r.rate_second)}%</b>
+        <span class="ab-delta bad">+${Number(r.delta)}</span></span></div>`).join('');
+    },
+  },
+  improved: {
+    title: 'طلاب تحسَّن حضورهم',
+    body: () => {
+      const rows = abState.insights?.improved ?? [];
+      if (!rows.length) return '<div class="state-box">لا يوجد تحسّن ملحوظ بعد</div>';
+      return rows.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
+        <span class="text-sm text-muted">· ${abEsc(abDash(r.class_name))}</span></span>
+        <span>${Number(r.rate_first)}% ← <b class="ab-good">${Number(r.rate_second)}%</b>
+        <span class="ab-delta good">${Number(r.delta)}</span></span></div>`).join('');
+    },
+  },
+};
+window.abOpenList = (kind) => {
+  const c = AB_LISTS[kind];
+  if (!c) return;
+  el('ab-listtitle').textContent = c.title;
+  el('ab-listbody').innerHTML = c.body();
+  el('ab-listmodal').classList.remove('hidden');
+};
+window.abOpenThresholds = () => { el('ab-thrmodal').classList.remove('hidden'); };
+
+/* ============ 02 · المؤشرات ============ */
+function abSum(field) { return abState.summary.reduce((a, r) => a + abNum(r[field]), 0); }
+
+function abKpiDelta(cur, prev, lowerIsBetter = true) {
+  if (prev === null || prev === undefined || !Number.isFinite(Number(prev))) return '';
+  const d = abFmt(Number(cur) - Number(prev));
+  if (Math.abs(d) < 0.05) return '<span class="ab-kpi-dlt flat">بلا تغيّر عن الفترة السابقة</span>';
+  const good = lowerIsBetter ? d < 0 : d > 0;
+  const arrow = d < 0 ? '↓' : '↑';
+  return `<span class="ab-kpi-dlt ${good ? 'good' : 'bad'}">${arrow} ${Math.abs(d)} عن الفترة السابقة</span>`;
+}
+
+function abKpi(icon, tone, val, label, delta) {
+  return `<div class="ab-kpi"><div class="ab-kpi-top"><span class="ic-tile tile-${tone}">${icon}</span></div>
+    <div class="ab-kpi-val">${val}</div><div class="ab-kpi-lbl">${label}</div>${delta || ''}</div>`;
 }
 
 function abRenderTiles() {
   const t = abTotals();
-  const flagged = abState.summary.filter((r) => abLevel(r.alert_level) !== 'ok').length;
+  const p = abState.prev || {};
   const w = abWorstWeekday();
-  const worstText = w ? AB_DAYS[Number(w.dow) % 7] : '—';
-  const worstSub = w ? `نسبة الغياب ${abPct(w.absent_rate)}` : 'لا توجد بيانات كافية';
-  el('ab-tiles').innerHTML = `
-    <div class="card stat-tile"><div class="value" style="color:#2a78d6;">${abState.daily.length}</div><div class="label">إجمالي أيام التحضير المسجّلة</div></div>
-    <div class="card stat-tile"><div class="value" style="color:#eb6834;">${t.rate}%</div><div class="label">نسبة الغياب العامة</div></div>
-    <div class="card stat-tile"><div class="value" style="color:${flagged ? '#d03b3b' : '#0ca30c'};">${flagged}</div><div class="label">طلاب تجاوزوا حد التنبيه</div></div>
-    <div class="card stat-tile"><div class="value" style="font-size:1.3rem;">${abEsc(worstText)}</div><div class="label">أكثر يوم غيابًا · ${abEsc(worstSub)}</div></div>`;
+  const affected = abState.summary.filter((r) => abNum(r.absent_days) > 0).length;
+  const streak = abState.summary.reduce((m, r) => Math.max(m, abNum(r.longest_streak)), 0);
+  const I = (n) => `<svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-${n}"/></svg>`;
+  el('ab-tiles').innerHTML = [
+    abKpi(I('chart'), 'alert', `${t.rate}%`, 'نسبة الغياب', abKpiDelta(t.rate, p.rate)),
+    abKpi(I('calendar'), 'schedule', abSum('absent_days'), 'إجمالي أيام الغياب', abKpiDelta(abSum('absent_days'), p.absentDays)),
+    abKpi(I('users'), 'students', affected, 'الطلاب المتأثرون', abKpiDelta(affected, p.affected)),
+    abKpi(I('clock'), 'neutral', abSum('late_days'), 'حالات التأخر', abKpiDelta(abSum('late_days'), p.lateDays)),
+    abKpi(I('link'), 'reports', streak, 'أطول تتابع غياب (أيام)', ''),
+    abKpi(I('attend'), 'assess', abEsc(w ? AB_DAYS[Number(w.dow) % 7] : '—'), 'أكثر أيام الأسبوع غيابًا',
+      w ? `<span class="ab-kpi-dlt flat">نسبة الغياب ${abPct(w.absent_rate)}</span>` : ''),
+  ].join('');
+}
+
+/* ============ 04 · اللوحات ============ */
+function abPanel(id, icon, title, sub, body) {
+  el(id).innerHTML = `<h4><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-${icon}"/></svg> ${title}</h4>
+    <div class="ab-psub">${sub}</div><div class="ab-pbody">${body}</div>`;
+}
+
+function abRenderMass() {
+  const mass = abState.insights?.mass_absence_days ?? [];
+  abPanel('ab-masscard', 'warn', 'أيام الغياب الجماعي',
+    'أيام تجاوز فيها الغياب 40٪ من الحاضرين المسجَّلين — غالبًا سبب خارجي لا فردي',
+    mass.length
+      ? `<table class="ab-ptable"><thead><tr><th>التاريخ</th><th>الغائبون</th><th style="text-align:end">النسبة</th></tr></thead><tbody>${
+          mass.map((d) => `<tr><td>${abEsc(d.day)}</td><td>${Number(d.absent_n)} من ${Number(d.marks_n)}</td>
+            <td style="text-align:end"><span class="ab-badge crit">${Number(d.rate)}%</span></td></tr>`).join('')}</tbody></table>`
+      : '<div class="ab-none">لا توجد أيام غياب جماعي — الغياب موزَّع طبيعيًا</div>');
+}
+
+function abRenderWeekday() {
+  const rows = abState.weekday.filter((w) => abNum(w.total_marks) > 0).sort((a, b) => Number(a.dow) - Number(b.dow));
+  const max = rows.reduce((m, w) => Math.max(m, abNum(w.absent_rate)), 0) || 1;
+  abPanel('ab-weekdaycard', 'calendar', 'الغياب حسب أيام الأسبوع',
+    'أي أيام الأسبوع يكثر فيها الغياب',
+    rows.length
+      ? rows.map((w) => {
+          const v = abNum(w.absent_rate);
+          const col = v >= 20 ? 'var(--a-alert)' : v >= 10 ? 'var(--a-schedule)' : 'var(--a-assess)';
+          return `<div class="ab-hbar" title="${abNum(w.absent_marks)} حالة غياب من ${abNum(w.total_marks)}">
+            <span class="ab-hbar-lbl">${AB_DAYS[Number(w.dow) % 7]}</span>
+            <span class="ab-hbar-track"><span class="ab-hbar-fill" style="width:${Math.round((v / max) * 100)}%; background:${col};"></span></span>
+            <span class="ab-hbar-val">${v}%</span></div>`;
+        }).join('')
+      : '<div class="ab-none">لا توجد بيانات كافية لتحليل أيام الأسبوع</div>');
+}
+
+function abRenderHist() {
+  const hist = abState.insights?.histogram ?? [];
+  const order = ['0', '1-2', '3-5', '6-9', '10+'];
+  const labels = { '0': 'بلا غياب', '1-2': 'يوم أو يومان', '3-5': '٣ إلى ٥ أيام', '6-9': '٦ إلى ٩ أيام', '10+': '١٠ فأكثر' };
+  const tones = { '0': 'var(--a-assess)', '1-2': 'var(--a-students)', '3-5': 'var(--a-schedule)', '6-9': '#C7893F', '10+': 'var(--a-alert)' };
+  const present = order.filter((k) => hist.some((h) => h.bucket === k));
+  const max = present.reduce((m, k) => Math.max(m, Number(hist.find((h) => h.bucket === k).n)), 0) || 1;
+  abPanel('ab-histcard', 'reports', 'توزيع الطلاب حسب أيام الغياب',
+    `${Number(abState.insights?.perfect ?? 0)} طالبًا بلا أي غياب`,
+    present.length
+      ? `<div class="ab-cols">${present.map((k) => {
+          const n = Number(hist.find((h) => h.bucket === k).n);
+          return `<div class="ab-col"><span class="ab-col-n">${n}</span>
+            <span class="ab-col-bar" style="height:${Math.max(4, Math.round((n / max) * 100))}%; background:${tones[k]};"></span>
+            <span class="ab-col-lbl">${labels[k]}</span></div>`;
+        }).join('')}</div>`
+      : '<div class="ab-none">لا توجد بيانات</div>');
+}
+
+function abRenderPattern() {
+  const pat = abState.insights?.weekday_pattern ?? [];
+  abPanel('ab-patterncard', 'pattern', 'نمط الغياب في يوم بعينه',
+    'طلاب يتركّز 60٪ من غيابهم فأكثر في يوم أسبوعي واحد',
+    pat.length
+      ? pat.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
+          <span class="text-sm text-muted">· ${abEsc(abDash(r.class_name))}</span></span>
+          <span><b>${abEsc(AB_DAYS[Number(r.dow) % 7])}</b> · ${Number(r.n)} مرات (${Number(r.share)}%)</span></div>`).join('')
+      : '<div class="ab-none">لا يوجد نمط أسبوعي واضح لدى أي طالب</div>');
+}
+
+/* ============ 06 · تغيّر الحضور ============ */
+function abRenderChange() {
+  const dec = abState.insights?.declined ?? [];
+  const imp = abState.insights?.improved ?? [];
+  const I = (n) => `<svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-${n}"/></svg>`;
+  el('ab-changebox').innerHTML = `
+    <div class="ab-chg" onclick="abOpenList('improved')">
+      <span class="ic-tile tile-assess">${I('trendup')}</span>
+      <span class="ab-chg-main"><span class="ab-chg-val">${imp.length}</span>
+        <span class="ab-chg-lbl">تحسَّن حضورهم</span>
+        <span class="ab-chg-sub">انخفض غيابهم 15 نقطة فأكثر — يستحقون تعزيزًا</span></span>
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--color-text-3)"><use href="#nv-chev"/></svg>
+    </div>
+    <div class="ab-chg" onclick="abOpenList('declined')">
+      <span class="ic-tile tile-alert">${I('trenddown')}</span>
+      <span class="ab-chg-main"><span class="ab-chg-val">${dec.length}</span>
+        <span class="ab-chg-lbl">تراجَع حضورهم</span>
+        <span class="ab-chg-sub">ارتفع غيابهم 15 نقطة فأكثر — يحتاجون تدخّلًا</span></span>
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--color-text-3)"><use href="#nv-chev"/></svg>
+    </div>`;
+}
+
+/* ============ 07 · جدول الطلاب ============ */
+let abPage = 1;
+const AB_PER_PAGE = 10;
+
+function abTableRows() {
+  const q = (el('ab-tsearch')?.value ?? '').trim();
+  const cls = el('ab-tclass')?.value ?? '';
+  const lvl = el('ab-tlevel')?.value ?? '';
+  const sort = el('ab-tsort')?.value ?? 'level';
+  let rows = abState.summary.filter((r) => {
+    if (q && !String(r.full_name ?? '').includes(q) && !String(r.student_code ?? '').includes(q)) return false;
+    if (cls && String(r.class_id ?? '') !== cls) return false;
+    if (lvl && abLevel(r.alert_level) !== lvl) return false;
+    return true;
+  });
+  const cmp = {
+    level: (a, b) => (AB_LEVELS[abLevel(b.alert_level)].rank - AB_LEVELS[abLevel(a.alert_level)].rank)
+                     || (abNum(b.absent_rate) - abNum(a.absent_rate)),
+    rate: (a, b) => abNum(b.absent_rate) - abNum(a.absent_rate),
+    days: (a, b) => abNum(b.absent_days) - abNum(a.absent_days),
+    streak: (a, b) => abNum(b.longest_streak) - abNum(a.longest_streak),
+    name: (a, b) => String(a.full_name ?? '').localeCompare(String(b.full_name ?? ''), 'ar'),
+  };
+  return [...rows].sort(cmp[sort] ?? cmp.level);
 }
 
 function abRenderTable() {
-  const rows = abSortedStudents();
-  el('ab-studenttbody').innerHTML = rows.length ? rows.map((r) => {
+  const rows = abTableRows();
+  const pages = Math.max(1, Math.ceil(rows.length / AB_PER_PAGE));
+  if (abPage > pages) abPage = pages;
+  const slice = rows.slice((abPage - 1) * AB_PER_PAGE, abPage * AB_PER_PAGE);
+
+  el('ab-studenttbody').innerHTML = slice.length ? slice.map((r) => {
     const lvl = abLevel(r.alert_level);
     return `<tr>
-      <td>${abEsc(r.full_name)}</td>
-      <td>${abEsc(r.class_name ?? '—')}</td>
+      <td><span class="ab-tname">${abAvatar(r.full_name)}<b style="font-weight:600">${abEsc(r.full_name)}</b></span></td>
+      <td>${abEsc(abDash(r.class_name))}</td>
       <td class="num">${abNum(r.days_recorded)}</td>
       <td class="num">${abNum(r.present_days)}</td>
       <td class="num">${abNum(r.absent_days)}</td>
@@ -8284,12 +8863,51 @@ function abRenderTable() {
       <td class="num">${abPill(lvl)}</td>
       <td class="num no-print"><button class="btn btn-outline btn-sm" data-id="${abEsc(r.student_id)}" data-name="${abEsc(r.full_name)}" onclick="abDetail(this)">تفاصيل</button></td>
     </tr>`;
-  }).join('') : '<tr><td colspan="12"><div class="state-box"><div class="icon">📭</div>لا يوجد طلاب مسجَّل لهم تحضير في هذه المدة</div></td></tr>';
-}
+  }).join('') : '<tr><td colspan="12"><div class="state-box">لا يوجد طلاب مطابقون لهذه التصفية</div></td></tr>';
 
+  el('ab-studentcards').innerHTML = slice.length ? slice.map((r) => {
+    const lvl = abLevel(r.alert_level);
+    return `<div class="ab-scard">
+      <div class="ab-scard-top">${abAvatar(r.full_name)}
+        <span style="flex:1; min-width:0;"><b style="font-size:.86rem; font-weight:600;">${abEsc(r.full_name)}</b>
+          <div class="ab-arow-sub">${abEsc(abDash(r.class_name))} · آخر غياب ${abEsc(abDash(r.last_absent))}</div></span>
+        ${abPill(lvl)}</div>
+      <div class="ab-scard-grid">
+        <span class="ab-scard-cell"><b>${abNum(r.absent_days)}</b><span>غياب</span></span>
+        <span class="ab-scard-cell"><b>${abPct(r.absent_rate)}</b><span>النسبة</span></span>
+        <span class="ab-scard-cell"><b>${abNum(r.longest_streak)}</b><span>أطول تتابع</span></span>
+        <span class="ab-scard-cell"><b>${abNum(r.present_days)}</b><span>حضور</span></span>
+        <span class="ab-scard-cell"><b>${abNum(r.late_days)}</b><span>تأخر</span></span>
+        <span class="ab-scard-cell"><b>${abNum(r.excused_days)}</b><span>بعذر</span></span>
+      </div>
+      <button class="btn btn-outline btn-sm btn-block mt-1" data-id="${abEsc(r.student_id)}" data-name="${abEsc(r.full_name)}" onclick="abDetail(this)">تفاصيل الغياب</button>
+    </div>`;
+  }).join('') : '<div class="state-box">لا يوجد طلاب مطابقون لهذه التصفية</div>';
+
+  const nums = [];
+  for (let i = 1; i <= pages; i++) {
+    if (pages > 7 && i > 2 && i < pages - 1 && Math.abs(i - abPage) > 1) {
+      if (nums[nums.length - 1] !== '…') nums.push('…');
+      continue;
+    }
+    nums.push(i);
+  }
+  el('ab-pager').innerHTML = `
+    <span class="ab-pgcount">عرض ${slice.length} من ${rows.length} طالبًا</span>
+    <span class="grow"></span>
+    <button class="ab-pg" onclick="abGoPage(${abPage - 1})" ${abPage <= 1 ? 'disabled' : ''}>السابق</button>
+    ${nums.map((n) => (n === '…'
+      ? '<span class="ab-pgcount">…</span>'
+      : `<button class="ab-pg ${n === abPage ? 'on' : ''}" onclick="abGoPage(${n})">${n}</button>`)).join('')}
+    <button class="ab-pg" onclick="abGoPage(${abPage + 1})" ${abPage >= pages ? 'disabled' : ''}>التالي</button>`;
+}
+window.abGoPage = (n) => { abPage = Math.max(1, n); abRenderTable(); };
+window.abTableRefresh = () => { abPage = 1; abRenderTable(); };
+
+/* ============ الرسوم ============ */
 function abRenderDaily() {
   if (!abState.daily.length) {
-    abEmptyCard('ab-dailycard', '🗓️', 'لم يُسجَّل تحضير في هذه المدة بعد');
+    abEmptyCard('ab-dailycard', '', 'لم يُسجَّل تحضير في هذه المدة بعد');
     return;
   }
   abChartShell('ab-dailycard');
@@ -8297,46 +8915,40 @@ function abRenderDaily() {
     type: 'line',
     data: { labels: abState.daily.map((d) => d.day), datasets: [{
       label: 'نسبة الغياب', data: abState.daily.map((d) => abNum(d.absent_rate)),
-      borderColor: '#eb6834', backgroundColor: '#eb6834',
-      borderWidth: 2, pointRadius: abState.daily.length > 40 ? 0 : 4, pointHoverRadius: 6, tension: 0.25, spanGaps: true }] },
+      borderColor: '#BE7118', backgroundColor: 'rgba(190,113,24,.10)', fill: true,
+      borderWidth: 2.4, pointRadius: abState.daily.length > 40 ? 0 : 3.5, pointHoverRadius: 6,
+      pointBackgroundColor: '#fff', pointBorderColor: '#BE7118', pointBorderWidth: 2,
+      tension: 0.3, spanGaps: true }] },
     options: abBaseOptions(),
   });
 }
 
 function abRenderClasses() {
   if (!abState.byClass.length) {
-    abEmptyCard('ab-classcard', '🏫', 'لا توجد شُعب مسجَّل لها تحضير في هذه المدة');
+    abEmptyCard('ab-classcard', '', 'لا توجد شُعب مسجَّل لها تحضير في هذه المدة');
     return;
   }
   abChartShell('ab-classcard');
+  const rows = [...abState.byClass].sort((a, b) => abNum(b.absent_rate) - abNum(a.absent_rate));
   const opts = abBaseOptions();
+  opts.indexAxis = 'y';
   opts.plugins.legend = { display: false };
-  opts.plugins.tooltip.callbacks = { label: (c) => ` نسبة الغياب: ${c.parsed.y}% · ${abNum(abState.byClass[c.dataIndex].students)} طالب` };
+  opts.plugins.tooltip.callbacks = { label: (c) => ` نسبة الغياب: ${c.parsed.x}% · ${abNum(rows[c.dataIndex].students)} طالب` };
+  opts.scales = {
+    x: { beginAtZero: true, grid: { color: '#EFF1F4', drawTicks: false }, border: { display: false },
+         ticks: { color: '#8B94A6', callback: (v) => v + '%', font: { size: 11 } } },
+    y: { grid: { display: false }, border: { display: false },
+         ticks: { color: '#59647A', font: { size: 12 } } },
+  };
   abCharts.classes = new Chart(el('ab-classes'), {
     type: 'bar',
-    data: { labels: abState.byClass.map((r) => r.class_name), datasets: [{
-      label: 'نسبة الغياب', data: abState.byClass.map((r) => abNum(r.absent_rate)),
-      backgroundColor: abState.byClass.map((r) => (abNum(r.absent_rate) >= 20 ? '#d03b3b' : '#2a78d6')),
-      borderRadius: 4, borderSkipped: false, barPercentage: 0.8, categoryPercentage: 0.7 }] },
-    options: opts,
-  });
-}
-
-function abRenderWeekday() {
-  const rows = abState.weekday.filter((w) => abNum(w.total_marks) > 0).sort((a, b) => Number(a.dow) - Number(b.dow));
-  if (!rows.length) {
-    abEmptyCard('ab-weekdaycard', '📆', 'لا توجد بيانات كافية لتحليل أيام الأسبوع');
-    return;
-  }
-  abChartShell('ab-weekdaycard');
-  const opts = abBaseOptions();
-  opts.plugins.legend = { display: false };
-  opts.plugins.tooltip.callbacks = { label: (c) => ` نسبة الغياب: ${c.parsed.y}% · ${abNum(rows[c.dataIndex].absent_marks)} حالة غياب` };
-  abCharts.weekday = new Chart(el('ab-weekday'), {
-    type: 'bar',
-    data: { labels: rows.map((w) => AB_DAYS[Number(w.dow) % 7]), datasets: [{
-      label: 'نسبة الغياب', data: rows.map((w) => abNum(w.absent_rate)),
-      backgroundColor: '#eb6834', borderRadius: 4, borderSkipped: false, barPercentage: 0.7 }] },
+    data: { labels: rows.map((r) => r.class_name), datasets: [{
+      label: 'نسبة الغياب', data: rows.map((r) => abNum(r.absent_rate)),
+      backgroundColor: rows.map((r) => {
+        const v = abNum(r.absent_rate);
+        return v >= 20 ? '#C13F58' : v >= 10 ? '#BE7118' : '#0D8A6C';
+      }),
+      borderRadius: 6, borderSkipped: false, barPercentage: 0.72, categoryPercentage: 0.78 }] },
     options: opts,
   });
 }
@@ -8344,7 +8956,7 @@ function abRenderWeekday() {
 function abRenderMix() {
   const t = abTotals();
   if (!t.marks) {
-    abEmptyCard('ab-mixcard', '📊', 'لا توجد حالات تحضير مسجَّلة في هذه المدة');
+    abEmptyCard('ab-mixcard', '', 'لا توجد حالات تحضير مسجَّلة في هذه المدة');
     return;
   }
   abChartShell('ab-mixcard');
@@ -8352,13 +8964,14 @@ function abRenderMix() {
     type: 'doughnut',
     data: { labels: ['حاضر', 'غائب', 'متأخر', 'بعذر'], datasets: [{
       data: [t.present, t.absent, t.late, t.excused],
-      backgroundColor: ['#0ca30c', '#d03b3b', '#eb6834', '#2a78d6'],
-      borderColor: '#fcfcfb', borderWidth: 2, hoverOffset: 6 }] },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '62%',
+      backgroundColor: ['#0D8A6C', '#C13F58', '#BE7118', '#2F62C4'],
+      borderColor: '#fff', borderWidth: 3, hoverOffset: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '66%',
       plugins: {
         legend: { position: 'bottom', rtl: true, textDirection: 'rtl',
-          labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'circle', color: '#52514e' } },
-        tooltip: { rtl: true, textDirection: 'rtl', backgroundColor: '#1f2430', padding: 10, cornerRadius: 8,
+          labels: { boxWidth: 9, boxHeight: 9, usePointStyle: true, pointStyle: 'circle',
+                    color: '#59647A', padding: 14, font: { size: 12 } } },
+        tooltip: { rtl: true, textDirection: 'rtl', backgroundColor: '#0F1E36', padding: 10, cornerRadius: 8,
           callbacks: { label: (c) => ` ${c.label}: ${c.parsed} (${t.marks ? Math.round((c.parsed / t.marks) * 100) : 0}%)` } },
       } },
   });
@@ -8369,14 +8982,31 @@ function abRenderAll() {
   abCharts = {};
   abRenderContext();
   abRenderAlerts();
-  abRenderTiles();
   abRenderTopAbsent();
+  abRenderChangeCards();
+  abRenderTiles();
   abRenderDaily();
-  abRenderClasses();
+  abRenderMass();
   abRenderWeekday();
+  abRenderHist();
+  abRenderPattern();
+  abRenderClasses();
   abRenderMix();
-  abRenderInsights();
+  abRenderChange();
+  abPage = 1;
+  abSyncTableClasses();
   abRenderTable();
+}
+
+function abSyncTableClasses() {
+  const sel = el('ab-tclass');
+  if (!sel) return;
+  const seen = new Map();
+  abState.summary.forEach((r) => { if (r.class_id && !seen.has(r.class_id)) seen.set(r.class_id, r.class_name); });
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">كل الشُّعب</option>' +
+    [...seen.entries()].map(([id, name]) => `<option value="${abEsc(id)}">${abEsc(abDash(name))}</option>`).join('');
+  if ([...seen.keys()].includes(cur)) sel.value = cur;
 }
 
 /* ============ سياق العرض: أي شعبة وأي مدة ============ */
@@ -8384,106 +9014,45 @@ function abRenderContext() {
   const ins = abState.insights ?? {};
   const filtered = !!el('ab-class').value;
   const name = abState.className || ins.class_name || '';
-  el('ab-context').innerHTML = `<div class="ab-context">
-    <span class="ab-ctx-main">${filtered
-      ? `🏫 شعبة <b>${abEsc(name)}</b>`
-      : '🏫 <b>جميع الشُّعب</b>'}</span>
+  el('ab-context').innerHTML = `
+    <span>${filtered ? `شعبة <b>${abEsc(name)}</b>` : '<b>جميع الشُّعب</b>'}</span>
     <span class="ab-ctx-sep">·</span>
     <span>من <b>${abEsc(abState.from || '—')}</b> إلى <b>${abEsc(abState.to || '—')}</b></span>
     <span class="ab-ctx-sep">·</span>
     <span><b>${Number(ins.students_counted ?? abState.summary.length)}</b> طالبًا</span>
     <span class="ab-ctx-sep">·</span>
-    <span><b>${Number(ins.days_recorded ?? abState.daily.length)}</b> يوم تحضير</span>
-  </div>`;
+    <span><b>${Number(ins.days_recorded ?? abState.daily.length)}</b> يوم تحضير مسجَّل</span>`;
 }
 
-/* ============ الأكثر غيابًا + تواريخ غياب كل طالب ============ */
-function abRenderTopAbsent() {
-  const rows = abState.insights?.top_absent ?? [];
-  if (!rows.length) {
-    el('ab-topbox').innerHTML = '<div class="state-box"><div class="icon">✅</div>لا يوجد غياب مسجَّل في هذه المدة</div>';
-    return;
-  }
-  el('ab-topbox').innerHTML = rows.map((r, i) => {
-    const dates = Array.isArray(r.dates) ? r.dates : [];
-    const rate = Number(r.rate ?? 0);
-    const tone = rate >= 50 ? 'crit' : rate >= 25 ? 'warn' : 'watch';
-    return `<div class="ab-top-row ${tone}">
-      <span class="ab-rank">${i + 1}</span>
-      <div style="flex:1; min-width:0;">
-        <div class="ab-top-name">${abEsc(r.student_name)}
-          <span class="text-sm text-muted">· شعبة ${abEsc(r.class_name ?? '—')} · ${abEsc(r.student_code ?? '')}</span></div>
-        <div class="ab-dates">${dates.length
-          ? dates.map((d) => `<span class="ab-date-chip">${abEsc(d)}</span>`).join('')
-          : '<span class="text-sm text-muted">—</span>'}</div>
-      </div>
-      <div class="ab-top-nums">
-        <div class="ab-top-abs">${Number(r.absent)}</div>
-        <div class="text-sm text-muted">من ${Number(r.recorded)} · ${rate}%</div>
-      </div>
-    </div>`;
-  }).join('');
-}
 
-/* ============ تحليلات أعمق ============ */
-function abInsightCard(icon, title, sub, body) {
-  return `<div class="ab-ins-card"><div class="ab-ins-head">${icon} ${title}</div>
-    ${sub ? `<div class="ab-ins-sub">${sub}</div>` : ''}<div>${body}</div></div>`;
-}
-function abRenderInsights() {
-  const ins = abState.insights ?? {};
-  const cards = [];
-
-  const mass = ins.mass_absence_days ?? [];
-  cards.push(abInsightCard('🚨', 'أيام الغياب الجماعي', 'أيام تجاوز فيها الغياب 40٪ من الحاضرين المسجَّلين — غالبًا سبب خارجي لا فردي',
-    mass.length
-      ? `<table class="ab-mini"><thead><tr><th>اليوم</th><th>الغائبون</th><th>النسبة</th></tr></thead><tbody>${
-          mass.map((d) => `<tr><td>${abEsc(d.day)}</td><td class="num">${Number(d.absent_n)} من ${Number(d.marks_n)}</td>
-            <td class="num"><span class="ab-badge crit">${Number(d.rate)}%</span></td></tr>`).join('')}</tbody></table>`
-      : '<div class="ab-none">لا توجد أيام غياب جماعي — الغياب موزَّع طبيعيًا</div>'));
-
-  const pat = ins.weekday_pattern ?? [];
-  cards.push(abInsightCard('🔁', 'نمط الغياب في يوم بعينه', 'طلاب يتركّز 60٪ من غيابهم فأكثر في يوم أسبوعي واحد',
-    pat.length
-      ? pat.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
-          <span class="text-sm text-muted">· ${abEsc(r.class_name ?? '')}</span></span>
-          <span><b>${abEsc(AB_DAYS[Number(r.dow) % 7])}</b> · ${Number(r.n)} مرات (${Number(r.share)}%)</span></div>`).join('')
-      : '<div class="ab-none">لا يوجد نمط أسبوعي واضح لدى أي طالب</div>'));
-
-  const dec = ins.declined ?? [];
-  cards.push(abInsightCard('📉', 'تراجَع حضورهم', 'مقارنة النصف الأول من المدة بالنصف الثاني',
-    dec.length
-      ? dec.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
-          <span class="text-sm text-muted">· ${abEsc(r.class_name ?? '')}</span></span>
-          <span>${Number(r.rate_first)}% ← <b class="ab-bad">${Number(r.rate_second)}%</b>
-          <span class="ab-delta bad">+${Number(r.delta)}</span></span></div>`).join('')
-      : '<div class="ab-none">لا يوجد تراجع ملحوظ</div>'));
-
-  const imp = ins.improved ?? [];
-  cards.push(abInsightCard('📈', 'تحسَّن حضورهم', 'يستحقون تعزيزًا — انخفض غيابهم في النصف الثاني',
-    imp.length
-      ? imp.map((r) => `<div class="ab-line"><span>${abEsc(r.student_name)}
-          <span class="text-sm text-muted">· ${abEsc(r.class_name ?? '')}</span></span>
-          <span>${Number(r.rate_first)}% ← <b class="ab-good">${Number(r.rate_second)}%</b>
-          <span class="ab-delta good">${Number(r.delta)}</span></span></div>`).join('')
-      : '<div class="ab-none">لا يوجد تحسّن ملحوظ بعد</div>'));
-
-  const hist = ins.histogram ?? [];
-  const order = ['0', '1-2', '3-5', '6-9', '10+'];
-  const labels = { '0': 'بلا غياب', '1-2': 'يوم أو يومان', '3-5': '٣ إلى ٥ أيام', '6-9': '٦ إلى ٩ أيام', '10+': '١٠ أيام فأكثر' };
-  const total = hist.reduce((a, x) => a + Number(x.n), 0) || 1;
-  cards.push(abInsightCard('📊', 'توزيع الطلاب حسب أيام الغياب', `${Number(ins.perfect ?? 0)} طالبًا بلا أي غياب`,
-    hist.length
-      ? order.filter((k) => hist.some((h) => h.bucket === k)).map((k) => {
-          const n = Number(hist.find((h) => h.bucket === k).n);
-          const pct = Math.round((n / total) * 100);
-          return `<div class="ab-bar-row"><span class="lbl">${labels[k]}</span>
-            <span class="track"><span class="fill ${k === '0' ? 'good' : k === '10+' ? 'bad' : ''}" style="width:${pct}%"></span></span>
-            <span class="val">${n}</span></div>`;
-        }).join('')
-      : '<div class="ab-none">لا توجد بيانات</div>'));
-
-  el('ab-insights').innerHTML = cards.join('');
+/* مقارنة بالفترة السابقة: نفس الدوال الخادمية بمدة سابقة مساوية في الطول.
+   لا يوجد أي حساب جديد — مجرد نداء إضافي غير حاجب، وإن فشل تُخفى المؤشرات فقط. */
+async function abLoadPrevious(from, to, classId) {
+  if (!from || !to) return;
+  try {
+    const f = new Date(from), t = new Date(to);
+    const span = Math.max(1, Math.round((t - f) / 86400000) + 1);
+    const pTo = new Date(f); pTo.setDate(pTo.getDate() - 1);
+    const pFrom = new Date(pTo); pFrom.setDate(pFrom.getDate() - (span - 1));
+    const iso = (d) => d.toISOString().slice(0, 10);
+    const key = `${from}|${to}|${classId}`;
+    const [pSummary, pDaily] = await Promise.all([
+      abRpc('teacher_absence_summary', { p_from: iso(pFrom), p_to: iso(pTo), p_class_id: classId }),
+      abRpc('teacher_absence_daily', { p_from: iso(pFrom), p_to: iso(pTo), p_class_id: classId }),
+    ]);
+    if (abState.prevKey !== key) return;            // تغيّرت الفلاتر أثناء الجلب
+    if (!pSummary.length && !pDaily.length) return; // لا توجد فترة سابقة للمقارنة
+    const marks = pDaily.reduce((a, d) => a + abNum(d.present) + abNum(d.absent) + abNum(d.late) + abNum(d.excused), 0);
+    const absentMarks = pDaily.reduce((a, d) => a + abNum(d.absent), 0);
+    abState.prev = {
+      from: iso(pFrom), to: iso(pTo),
+      rate: marks ? abFmt((absentMarks / marks) * 100) : 0,
+      absentDays: pSummary.reduce((a, r) => a + abNum(r.absent_days), 0),
+      lateDays: pSummary.reduce((a, r) => a + abNum(r.late_days), 0),
+      affected: pSummary.filter((r) => abNum(r.absent_days) > 0).length,
+    };
+    abRenderTiles();
+  } catch { /* المقارنة اختيارية: تُترك المؤشرات بلا دلتا */ }
 }
 
 /* ============ التحميل ============ */
@@ -8499,10 +9068,13 @@ window.abLoad = async () => {
       abRpc('teacher_absence_daily', { p_from: from, p_to: to, p_class_id: classId }),
       abRpc('teacher_absence_by_class', { p_from: from, p_to: to }),
       abRpc('teacher_absence_weekday', { p_from: from, p_to: to, p_class_id: classId }),
-      abRpc('teacher_absence_insights', { p_from: from, p_to: to, p_class_id: classId }),
+      // التحليلات المعمّقة غير متاحة لحساب الزائر: لا تُسقط بقية اللوحة معها
+      abRpc('teacher_absence_insights', { p_from: from, p_to: to, p_class_id: classId }).catch(() => ({})),
     ]);
     const insights = Array.isArray(insightsRaw) ? (insightsRaw[0] ?? {}) : (insightsRaw ?? {});
     abState = { summary, daily, byClass, weekday, insights, from: from ?? '', to: to ?? '',
+                prev: abState.prev && abState.prevKey === `${from}|${to}|${classId}` ? abState.prev : null,
+                prevKey: `${from}|${to}|${classId}`,
                 className: el('ab-class').selectedOptions[0]?.textContent?.trim() || '' };
     if (!summary.length && !daily.length) {
       el('ab-status').innerHTML = '<div class="state-box"><div class="icon">📭</div>لا يوجد تحضير مسجَّل في هذه المدة. سجّل التحضير أولًا من صفحة «التحضير» ثم عد إلى هنا.</div>';
@@ -8511,6 +9083,7 @@ window.abLoad = async () => {
     el('ab-status').innerHTML = '';
     el('ab-dash').classList.remove('hidden');
     abRenderAll();
+    abLoadPrevious(from, to, classId);
   } catch (err) {
     el('ab-status').innerHTML = `<div class="state-box"><div class="icon">⚠️</div>تعذّر تحميل بيانات الغياب: ${abEsc(err.message)}</div>`;
   }
@@ -8552,6 +9125,7 @@ window.abSaveThresholds = async () => {
     const { error } = await supabase.rpc('set_absence_thresholds', { p_watch: watch, p_warn: warn, p_critical: critical });
     if (error) throw new Error(error.message);
     toast('تم حفظ حدود التنبيه', 'success');
+    closeModal('ab-thrmodal');
     await window.abLoad();
   } catch (err) {
     toast('تعذّر الحفظ: ' + err.message, 'error');
@@ -12285,6 +12859,31 @@ window.vwOpenTeacher = async (screen) => {
       <div class="field-hint">اكتبها كما تريد أن تظهر في ترويسة السجل والطباعة.</div>
     </div>
     <button class="btn btn-primary btn-block" onclick="atSaveTerm()">حفظ</button>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="ab-listmodal">
+  <div class="modal" style="max-width:760px; max-height:86dvh; overflow-y:auto;">
+    <div class="flex-between"><h3 style="margin:0;" id="ab-listtitle">القائمة</h3>
+      <button class="btn btn-sm btn-icon" onclick="closeModal('ab-listmodal')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-close"/></svg></button></div>
+    <div class="mt-2" id="ab-listbody"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="ab-thrmodal">
+  <div class="modal" style="max-width:460px;">
+    <div class="flex-between"><h3 style="margin:0;">حدود التنبيه</h3>
+      <button class="btn btn-sm btn-icon" onclick="closeModal('ab-thrmodal')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-close"/></svg></button></div>
+    <p class="text-sm text-muted mt-1">عدد أيام الغياب الذي يبدأ عنده كل مستوى.</p>
+    <div class="g3" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+      <div class="field" style="margin:0;"><label>متابعة</label>
+        <input type="number" id="ab-thrwatch" min="1" max="200" value="3"></div>
+      <div class="field" style="margin:0;"><label>تحذير</label>
+        <input type="number" id="ab-thrwarn" min="1" max="200" value="5"></div>
+      <div class="field" style="margin:0;"><label>حالة حرجة</label>
+        <input type="number" id="ab-thrcritical" min="1" max="200" value="8"></div>
+    </div>
+    <button class="btn btn-primary btn-block mt-2" id="ab-savethr" onclick="abSaveThresholds()">حفظ</button>
   </div>
 </div>
 
