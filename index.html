@@ -1320,6 +1320,11 @@ input[type=email], input[type=password], input[type=search], select, textarea{
 .field input, .field select, .field textarea{ width:100%; }
 .date-bar input, .flex-gap input, .flex-gap select,
 .st-filters input, .st-filters select, .fu-select, .fu-input{ width:auto; min-width:150px; }
+/* مربعات الاختيار والراديو ليست حقول نص: لا تأخذ عرض الحقل ولا ارتفاعه */
+input[type=checkbox], input[type=radio]{
+  width:18px; min-width:18px; height:18px; padding:0; flex:0 0 auto;
+  accent-color:var(--color-primary); border-radius:4px;
+}
 textarea{ height:auto; padding:12px 14px; line-height:1.7; }
 input::placeholder, textarea::placeholder{ color:#AEB6C4; }
 input:focus, select:focus, textarea:focus{
@@ -4315,6 +4320,17 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
     <div class="field"><label>ملاحظة للطلاب (اختياري)</label><input type="text" id="ae-assignnote" placeholder="مثال: الاختبار يوم الأحد في الحصة الثالثة"></div>
     <button class="btn btn-primary btn-block" onclick="aeAssignSend()">إرسال</button>
     <div id="ae-assignmsg" class="mt-1 text-sm"></div>
+    <div class="mt-2" style="border-top:1px solid var(--color-border); padding-top:10px;">
+      <label class="text-sm" style="font-weight:700;">موعد إغلاق الاختبار</label>
+      <p class="text-sm text-muted" style="margin:4px 0 8px;">يسري على كل من أُرسل له الاختبار. بعد هذا الموعد لا يستطيع أي طالب بدءه، ومن بدأ محاولته قبله يُكملها ويسلّمها.</p>
+      <div class="flex-gap" style="flex-wrap:wrap; gap:8px; align-items:center;">
+        <input type="datetime-local" id="ae-duedate" style="flex:1 1 200px;">
+        <button class="btn btn-outline btn-sm" onclick="aeSetDue()">حفظ الموعد</button>
+        <button class="btn btn-outline btn-sm" onclick="aeSetDue(true)">بلا موعد</button>
+        <button class="btn btn-danger btn-sm" onclick="aeCloseExamNow()">إغلاق الآن</button>
+      </div>
+      <div id="ae-duemsg" class="mt-1 text-sm"></div>
+    </div>
     <div id="ae-assigncurrent" class="mt-2"></div>
   </div>
 </div>
@@ -6309,14 +6325,19 @@ const seAnswers = new Map();
 const seFmtDue = (iso) => { if (!iso) return ''; try { return new Date(iso).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; } };
 // اختبار خاص بالطالب وحده: لا ينتمي لوحدة، لذا يُعرض في قسم مستقل
 const seIsPersonal = (e) => e.is_personal === true || e.scope === 'personal';
-// إذن إعادة فتح ساري من المعلم لمن لم يسلّم
-const seReopened = (e) => !e.solved && e.reopened_until && new Date(e.reopened_until) > new Date();
+// إذن إعادة فتح ساري من المعلم — ويشمل الآن من سلّم إذا أعاد المعلم إرسال الاختبار له
+const seReopened = (e) => !!e.reopened_until && new Date(e.reopened_until) > new Date();
+// محاولة بدأها الطالب ولم يسلّمها: يعود لإكمالها، ولا تُحتسب محاولةً مستهلكة
+const seOpenAttempt = (e) => !!e.open_attempt_id;
+// انتهى الموعد الذي حدده المعلم (الخادم يحسبه بعد استثناء إذن إعادة الفتح)
+const sePastDue = (e) => !!e.past_due;
 const seLeft = (e) => {
   const left = Math.max(0, Number(e.max_attempts ?? 0) - Number(e.attempts_used ?? 0));
   return (left === 0 && seReopened(e)) ? 1 : left;   // المعلم أعاد فتحه له، فله محاولة
 };
-// اختبار مُسلَّم = مغلق ما لم يسمح المعلم بالإعادة
-const seCanStart = (e) => !e.locked && (!e.solved || (e.allow_retake && seLeft(e) > 0));
+// المحاولة القائمة تُستأنف دائمًا؛ وما عداها يخضع للإغلاق والموعد وعدد المحاولات
+const seCanStart = (e) => seOpenAttempt(e)
+  || (!e.locked && !sePastDue(e) && seLeft(e) > 0 && (!e.solved || seReopened(e) || e.allow_retake));
 const seMatches = (e) => {
   if (seFilter === 'todo') return !e.solved;
   if (seFilter === 'assigned') return !!e.assigned;
@@ -6459,6 +6480,8 @@ function seExamRow(q) {
   if (seIsPersonal(q)) tags.push('<span class="badge badge-primary">⭐ خاص بي</span>');
   if (q.solved) tags.push('<span class="badge badge-muted">✅ مكتمل</span>');
   if (q.locked && !q.solved) tags.push('<span class="badge badge-muted">🔒 مغلق</span>');
+  if (seOpenAttempt(q)) tags.push('<span class="badge badge-warning">⏸️ محاولة لم تُسلَّم — أكملها</span>');
+  if (sePastDue(q) && !q.solved && !seOpenAttempt(q)) tags.push('<span class="badge badge-danger">⏰ انتهى الموعد</span>');
   if (seReopened(q)) tags.push(`<span class="badge badge-success">🔓 أعاد المعلم فتحه لك حتى ${seFmtDue(q.reopened_until)}</span>`);
   if (q.due_at) tags.push(`<span class="text-sm text-muted">آخر موعد: ${seFmtDue(q.due_at)}</span>`);
 
@@ -6467,12 +6490,18 @@ function seExamRow(q) {
     : '<span class="badge badge-muted">لم يُحل</span>';
 
   const acts = [];
-  if (q.solved) {
+  if (seOpenAttempt(q)) {
+    // أولوية مطلقة: محاولة بدأها ولم يسلّمها — يُكملها ولو انقطعت شبكته أو مضى الموعد
+    acts.push(`<button class="btn btn-primary btn-sm" onclick="seAct('start','${q.id}')">▶ أكمل الاختبار</button>`);
+    if (q.last_attempt_id) acts.push(`<button class="btn btn-outline btn-sm" onclick="seAct('review','${q.id}')">📄 نتيجة سابقة</button>`);
+  } else if (q.solved) {
     // اختبار مُسلَّم = مغلق: لا زر «ابدأ الاختبار» إطلاقًا
     if (q.last_attempt_id) acts.push(`<button class="btn btn-outline btn-sm" onclick="seAct('review','${q.id}')">📄 عرض النتيجة والتصحيح</button>`);
-    if (q.allow_retake && !q.locked && left > 0) acts.push(`<button class="btn btn-primary btn-sm" onclick="seAct('retake','${q.id}')">🔁 إعادة المحاولة</button>`);
+    if (!q.locked && (seReopened(q) || (q.allow_retake && left > 0))) acts.push(`<button class="btn btn-primary btn-sm" onclick="seAct('retake','${q.id}')">🔁 إعادة المحاولة</button>`);
   } else if (q.locked) {
     acts.push('<button class="btn btn-outline btn-sm" disabled>🔒 مغلق</button>');
+  } else if (sePastDue(q)) {
+    acts.push('<button class="btn btn-outline btn-sm" disabled>⏰ انتهى الموعد</button>');
   } else if (left > 0) {
     acts.push(`<button class="btn btn-primary btn-sm" onclick="seAct('start','${q.id}')">ابدأ الاختبار</button>`);
   } else {
@@ -6480,9 +6509,11 @@ function seExamRow(q) {
   }
   if (!acts.length) acts.push('<button class="btn btn-outline btn-sm" disabled>✅ مكتمل</button>');
 
-  const attemptsTxt = q.solved
-    ? (q.allow_retake && left > 0 ? `متبقٍ ${left} محاولة` : 'مغلق بعد التسليم')
-    : (left > 0 ? `متبقٍ ${left} محاولة` : 'انتهت المحاولات');
+  const attemptsTxt = seOpenAttempt(q)
+    ? 'محاولة قائمة لم تُسلَّم'
+    : q.solved
+      ? ((seReopened(q) || (q.allow_retake && left > 0)) ? `متبقٍ ${left} محاولة` : 'مغلق بعد التسليم')
+      : sePastDue(q) ? 'انتهى الموعد' : (left > 0 ? `متبقٍ ${left} محاولة` : 'انتهت المحاولات');
 
   return `<div class="quiz-row${q.solved ? ' done' : ''}">
     <div class="meta">
@@ -6527,7 +6558,13 @@ window.seOpenExam = async (examId) => {
   if (!seCanStart(seExam)) {
     if (seExam.last_attempt_id) return seRenderResult(seExam.last_attempt_id);
     seBreadcrumb('taking');
-    el('se-content').innerHTML = `<div class="state-box"><div class="icon">🔒</div>هذا الاختبار مغلق حاليًا.</div>
+    const late = sePastDue(seExam);
+    const why = late
+      ? `انتهى الموعد المحدد لهذا الاختبار${seExam.due_at ? ` (${seFmtDue(seExam.due_at)})` : ''}. راجع معلمك إن احتجت فرصة أخرى.`
+      : seLeft(seExam) === 0
+        ? 'استنفدت عدد المحاولات المسموح بها في هذا الاختبار. راجع معلمك إن احتجت محاولة أخرى.'
+        : 'هذا الاختبار مغلق حاليًا.';
+    el('se-content').innerHTML = `<div class="state-box"><div class="icon">${late ? '⏰' : '🔒'}</div>${exEsc(why)}</div>
       <button class="btn btn-outline btn-block mt-2" onclick="seNav('quizzes')">رجوع</button>`;
     return;
   }
@@ -6914,6 +6951,7 @@ window.aeStuAssignSend = async () => {
     if (res.new) bits.push(`${res.new} إرسال جديد`);
     if (res.updated) bits.push(`${res.updated} تذكير لمن سبق إرساله له`);
     if (res.by_class) bits.push(`${res.by_class} يصلهم الاختبار عبر شعبهم أصلًا`);
+    if (res.reopened) bits.push(`${res.reopened} أُعيد فتح الاختبار لهم بعد استنفاد محاولاتهم`);
     const summary = bits.join(' · ') || 'لا تغيير';
     el('ae-stuassignmsg').innerHTML = `<span style="color:#1b5e20">تم ✓ — ${exEsc(summary)}</span>`;
     toast(summary, 'success');
@@ -7040,6 +7078,8 @@ window.aeAssignOpen = async (examId, title) => {
   el('ae-assignmsg').textContent = '';
   el('ae-assignnote').value = '';
   el('ae-assigncurrent').innerHTML = '';
+  el('ae-duemsg').textContent = '';
+  el('ae-duedate').value = '';
   el('ae-assignmodal').classList.remove('hidden');
   try {
     await aeEnsureClasses();
@@ -7060,7 +7100,53 @@ async function aeAssignRefresh() {
         <tbody>${active.map((r) => `<tr><td>${exEsc(r.class_name)}</td><td>${r.students}</td><td>${aeFmt(r.due_at)}</td>
           <td><button class="btn btn-sm btn-danger" onclick="aeUnassign('${r.class_id}')">إلغاء</button></td></tr>`).join('')}</tbody></table></div>`
     : '<p class="text-sm text-muted">لم يُرسل هذا الاختبار لأي شعبة بعد.</p>';
+  // يُعبَّأ الحقل فقط إذا كان الموعد واحدًا لكل الشُّعب، وإلا تُرك فارغًا لئلا يُوهم بموعد غير قائم
+  const dues = active.map((r) => r.due_at).filter(Boolean);
+  const one = active.length > 0 && dues.length === active.length && new Set(dues).size === 1;
+  el('ae-duedate').value = one ? aeLocalDT(dues[0]) : '';
 }
+
+// ISO إلى صيغة datetime-local بالتوقيت المحلي للمتصفح
+const aeLocalDT = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const p = (v) => String(v).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+
+// ضبط موعد إغلاق الاختبار لكل إسناداته النشطة دفعةً واحدة (أو رفعه)
+window.aeSetDue = async (clear) => {
+  const raw = clear ? '' : el('ae-duedate').value;
+  if (!clear && !raw) { el('ae-duemsg').textContent = 'حدّد التاريخ والوقت أولًا'; return; }
+  el('ae-duemsg').textContent = 'جارٍ الحفظ...';
+  try {
+    const { data, error } = await supabase.rpc('set_exam_due_at', {
+      p_exam_id: aeAssignExamId,
+      p_due_at: clear ? null : new Date(raw).toISOString(),
+      p_only_classes: false,
+    });
+    if (error) throw new Error(error.message);
+    const total = Number(data?.total ?? 0);
+    el('ae-duemsg').innerHTML = `<span style="color:#1b5e20">تم ✓ — ${clear ? 'رُفع الموعد عن' : 'سرى الموعد على'} ${total} إرسالًا</span>`;
+    toast(clear ? 'أصبح الاختبار بلا موعد انتهاء' : 'تم ضبط موعد إغلاق الاختبار', 'success');
+    await aeAssignRefresh(); await aeLoadSent();
+  } catch (err) { el('ae-duemsg').textContent = 'خطأ: ' + err.message; }
+};
+
+// إغلاق فوري: يضبط الموعد على الآن ويُلغي أذون إعادة الفتح السارية
+window.aeCloseExamNow = async () => {
+  if (!confirm('إغلاق الاختبار الآن؟\nلن يتمكن أي طالب من بدئه بعد الآن، ومن بدأ محاولته يُكملها ويسلّمها.')) return;
+  el('ae-duemsg').textContent = 'جارٍ الإغلاق...';
+  try {
+    const { data, error } = await supabase.rpc('close_exam_now', { p_exam_id: aeAssignExamId });
+    if (error) throw new Error(error.message);
+    const open = Number(data?.still_in_progress ?? 0);
+    el('ae-duemsg').innerHTML = `<span style="color:#1b5e20">أُغلق الاختبار ✓${open ? ` — ${open} محاولة قائمة ستُكمَل وتُسلَّم` : ''}</span>`;
+    toast('تم إغلاق الاختبار', 'success');
+    await aeAssignRefresh(); await aeLoadSent();
+  } catch (err) { el('ae-duemsg').textContent = 'خطأ: ' + err.message; }
+};
 window.aeUnassign = async (classId) => {
   try {
     const { error } = await supabase.rpc('unassign_exam_from_class', { p_exam_id: aeAssignExamId, p_class_id: classId });
