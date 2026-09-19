@@ -12167,6 +12167,25 @@ function fuExportModel() {
   return { students, exams, cells };
 }
 
+/* تصنيف الطالب في عمود «التقدير».
+   حالة واحدة تخرج عن سُلّم التقديرات: طالب شارك في اختبار أو أكثر، ولم يبلغ
+   درجة النجاح في أيٍّ منها، ثم انقطع عن الاختبارات التي تليه في الكشف — هذا
+   تصنيفه «يحتاج متابعة»، لأن الرقم وحده لا يُظهر أنه توقّف عن المحاولة.
+   الترتيب المعتمد هو ترتيب الاختبارات في الكشف نفسه (لا تُخزَّن تواريخ إسناد).
+   لا يغيّر هذا شيئًا في الدرجات ولا النسب ولا المجاميع. */
+const FU_PASS = 50;
+const FU_FOLLOW_UP = 'يحتاج متابعة';
+function fuStudentBand(m, s, pct) {
+  const seq = m.exams
+    .map((e) => m.cells.get(`${s.id}|${e.id}`))
+    .filter((c) => c && c.assigned);
+  const lastTaken = seq.reduce((k, c, i) => (c.graded ? i : k), -1);
+  const tookAny = lastTaken >= 0;
+  const nonePassed = seq.every((c) => !c.graded || c.pct < FU_PASS);
+  const stoppedAfterwards = lastTaken < seq.length - 1;   // بقي اختبار أو أكثر لم يشارك فيه
+  return (tookAny && nonePassed && stoppedAfterwards) ? FU_FOLLOW_UP : fuBand(pct);
+}
+
 /* ---------- الورقة 1: كشف الدرجات (طلاب × اختبارات) ---------- */
 function fuSheetMatrix(m, meta) {
   const S = XW_S;
@@ -12209,7 +12228,7 @@ function fuSheetMatrix(m, meta) {
     row.push({ v: fuR2(got), t: 'n', s: S.totalNum },
              { v: fuR2(max), t: 'n', s: S.totalNum },
              fuPctCell(pct),
-             { v: fuBand(pct), s: S.totalText });
+             { v: fuStudentBand(m, s, pct), s: S.totalText });
     rows.push(row);
   });
 
