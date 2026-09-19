@@ -12227,11 +12227,23 @@ function fuSheetMatrix(m, meta) {
   rows.push(foot);
 
   const cols = [6, 32, 15, ...m.exams.map(() => 17), 12, 26, 11, 13];
+
+  /* ترتيب أعمدة عربي مضمون في كل برنامج:
+     تُقلب الأعمدة فعليًا بدل الاعتماد على راية rightToLeft التي تتجاهلها
+     بعض البرامج (Numbers وبعض عارضات الجوال)، فتُقلب الورقة عندها.
+     النتيجة بعد القلب — قراءةً من اليمين إلى اليسار:
+       م ← الطالب ← رمز الطالب ← الاختبارات بترتيبها ← المجموع ← مجموع الدرجات ← النسبة ← التقدير
+     صفوف العنوان الأربعة تبقى كما هي (خلية واحدة مدموجة محاذاة لليمين). */
+  const TITLE_ROWS = 5;
+  for (let i = TITLE_ROWS; i < rows.length; i++) rows[i].reverse();
+  cols.reverse();
+
   return {
     name: 'كشف الدرجات',
     rows,
+    // الأعمدة مقلوبة فعليًا، فلا تُضاف راية الاتجاه حتى لا يُقلب الترتيب مرتين
     opts: {
-      cols, freeze: { x: 3, y: 6 },
+      cols, rtl: false, freeze: { x: 0, y: 6 },
       autoFilter: `A6:${lastRef}${6 + m.students.length}`,
       merges: [`A1:${lastRef}1`, `A2:${lastRef}2`, `A3:${lastRef}3`, `A4:${lastRef}4`],
     },
