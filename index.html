@@ -1690,6 +1690,107 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
   .ab-scards{ display:flex; }
 }
 
+/* ============================================================
+   صفحة التقييم: شريط الوحدات الأفقي + شبكة بطاقات الاختبارات
+   ============================================================ */
+.ae-units{ display:flex; gap:9px; overflow-x:auto; overflow-y:hidden; padding:2px 1px 9px;
+           scrollbar-width:thin; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity;
+           max-width:100%; }
+.ae-units::-webkit-scrollbar{ height:6px; }
+.ae-units::-webkit-scrollbar-track{ background:transparent; }
+.ae-units::-webkit-scrollbar-thumb{ background:var(--color-border); border-radius:99px; }
+.ae-unit{ flex:0 0 auto; scroll-snap-align:start; cursor:pointer; user-select:none;
+          background:var(--color-surface); border:1px solid var(--color-border);
+          border-radius:var(--radius-md); padding:9px 14px; text-align:start;
+          display:flex; flex-direction:column; gap:1px; transition:background .15s, border-color .15s, color .15s; }
+.ae-unit:hover{ border-color:var(--a-assess); }
+.ae-unit b{ font-size:.81rem; font-weight:700; white-space:nowrap; line-height:1.5; }
+.ae-unit span{ font-size:.66rem; color:var(--color-text-3); white-space:nowrap;
+               max-width:170px; overflow:hidden; text-overflow:ellipsis; }
+.ae-unit.on{ background:var(--color-primary); border-color:var(--color-primary); color:#fff;
+             box-shadow:var(--shadow-md); }
+.ae-unit.on span{ color:rgba(255,255,255,.74); }
+
+.ae-groups{ display:flex; flex-direction:column; gap:20px; }
+.ae-unitblock{ display:flex; flex-direction:column; gap:15px; }
+.ae-unittitle{ margin:0; font-size:1rem; font-weight:700; display:flex; align-items:center; gap:8px; }
+.ae-unittitle .nav-ic{ width:17px; height:17px; color:var(--a-assess); }
+.ae-group{ display:flex; flex-direction:column; gap:10px; }
+.ae-group > h4{ margin:0; font-size:.83rem; font-weight:700; color:var(--color-text-muted);
+                display:flex; align-items:center; gap:7px; }
+.ae-group > h4 .nav-ic{ width:15px; height:15px; color:var(--color-text-3); }
+.ae-group-final > h4{ color:var(--a-schedule); }
+.ae-group-final > h4 .nav-ic{ color:var(--a-schedule); }
+
+.ae-cards{ display:grid; gap:12px; grid-template-columns:repeat(3,1fr); }
+.ae-cards > *{ min-width:0; }
+.ae-card{ background:var(--color-surface); border:1px solid var(--color-border);
+          border-radius:var(--radius-lg); padding:14px; box-shadow:var(--shadow-sm);
+          display:flex; flex-direction:column; gap:10px; }
+.ae-card-t{ font-size:.85rem; font-weight:700; line-height:1.5; direction:ltr; text-align:left;
+            overflow-wrap:anywhere; }
+.ae-card-tags{ display:flex; flex-wrap:wrap; gap:5px; }
+.ae-card-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.ae-cell{ background:var(--color-surface-2); border-radius:var(--radius-sm); padding:7px 4px;
+          text-align:center; min-width:0; }
+.ae-cell b{ display:block; font-size:.88rem; font-weight:700; font-variant-numeric:tabular-nums; }
+.ae-cell span{ display:block; font-size:.61rem; color:var(--color-text-3); line-height:1.4;
+               overflow:hidden; text-overflow:ellipsis; }
+.ae-avg-top{ display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+             font-size:.73rem; color:var(--color-text-3); margin-bottom:5px; }
+.ae-avg-top b{ font-size:.92rem; color:var(--color-text); font-variant-numeric:tabular-nums; }
+.ae-card .bar{ min-width:0; }
+.ae-avg-none{ font-size:.7rem; color:var(--color-text-3); }
+.ae-card-last{ font-size:.7rem; color:var(--color-text-3); }
+.ae-card-ft{ display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; }
+.ae-card-ft .btn{ flex:1 1 auto; white-space:nowrap; }
+.ae-card .retake-toggle{ align-self:flex-start; }
+.ae-empty{ grid-column:1/-1; }
+
+@media (max-width:1100px){ .ae-cards{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:700px){
+  .ae-cards{ grid-template-columns:1fr; }
+  .ae-unit span{ max-width:130px; }
+  .ae-card-ft .btn{ flex:1 1 calc(50% - 3px); }
+}
+
+/* ============================================================
+   صفحة التقارير: لوحة مضغوطة بدل الصفحة الطويلة
+   ============================================================ */
+.st-kpis{ display:grid; gap:11px; grid-template-columns:repeat(4,1fr); }
+.st-kpis > *{ min-width:0; }
+.st-tables{ display:grid; gap:14px; grid-template-columns:1fr 1fr; }
+.st-tables > *{ min-width:0; }
+.st-cardhd{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+.st-cardhd .grow{ flex:1; min-width:0; }
+.st-cardhd h4{ margin:0; font-size:.9rem; font-weight:700; }
+.st-cardhd select{ height:34px; font-size:.76rem; min-width:0; max-width:190px;
+                   border-radius:var(--radius-sm); }
+.st-more{ margin-top:11px; }
+/* الجداول المصغّرة تتّسع للأعمدة الأربعة بلا تمرير أفقي حتى على 375px */
+.st-tables .ab-ptable{ width:100%; min-width:0; table-layout:fixed; }
+.st-tables .ab-ptable th, .st-tables .ab-ptable td{ padding:7px 3px; font-size:.73rem;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.st-tables .ab-ptable th{ font-size:.66rem; }
+.st-tables .ab-ptable th:first-child, .st-tables .ab-ptable td:first-child{ width:40%; }
+.st-tables .ab-ptable .pill{ padding:1px 5px; font-size:.68rem; }
+.st-tables .ab-pbody{ overflow-x:hidden; }
+/* داخل الجداول المصغّرة يكون .num للمحاذاة فقط، لا لتكبير الخط */
+.ab-ptable td.num, .ab-ptable th.num{ font-size:inherit; font-weight:inherit; color:inherit; }
+/* الجداول الكاملة تبقى في الصفحة لأجل الطباعة والتصدير، وتُعرض على الشاشة داخل نافذة */
+.st-fulltables{ display:none; }
+@media print{
+  .st-fulltables{ display:block; }
+  .st-tables{ display:none; }
+  .ab-secnum{ display:none; }
+}
+@media (max-width:1100px){ .st-kpis{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:860px){
+  .st-kpis{ grid-template-columns:repeat(2,1fr); }
+  .st-tables{ grid-template-columns:1fr; }
+  .st-cardhd select{ max-width:none; flex:1 1 100%; }
+}
+
 /* ترويسة سجل التحضير ضمن هوية النظام */
 .att-header{ background:linear-gradient(115deg,var(--color-primary) 0%,var(--navy-600) 60%,var(--navy-500) 100%);
              color:#fff; border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:16px;
@@ -2688,12 +2789,16 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
         <p class="text-sm text-muted">لكل درس 3 اختبارات مرقّمة (صح/خطأ واختيار متعدد بالإنجليزية). التصحيح واحتساب الدرجة يتمّان آليًا فور تسليم الطالب.</p>
         <div class="grid grid-stats mt-2" id="ae-tiles"></div>
         <div class="card mt-2">
-          <div class="field" style="margin-bottom:10px;">
-            <label>عرض وحدة</label>
-            <select id="ae-unitfilter" onchange="aeLoad()"><option value="">كل الوحدات</option></select>
+          <div class="st-cardhd">
+            <span class="ic-tile tile-assess"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-book"/></svg></span>
+            <div class="grow"><h4>الوحدات الدراسية</h4>
+              <div class="text-sm text-muted">اختر وحدة لعرض اختباراتها</div></div>
           </div>
+          <!-- الاختيار الفعلي يبقى في هذا الحقل: الشرائح تكتب فيه ثم تستدعي aeLoad() -->
+          <select id="ae-unitfilter" class="hidden" onchange="aeLoad()"><option value="">كل الوحدات</option></select>
+          <div class="ae-units mt-1" id="ae-units"></div>
           <p class="text-sm text-muted"> كل اختبار <b>محاولة واحدة فقط</b> افتراضيًا: بعد أن يسلّم الطالب لا يستطيع إعادته إطلاقًا. إن أردت السماح له بمحاولة أخرى فعّل «السماح بالإعادة» بجانب الاختبار.</p>
-          <div id="ae-list"><div class="state-box"><span class="spinner"></span></div></div>
+          <div id="ae-list" class="ae-groups"><div class="state-box"><span class="spinner"></span></div></div>
         </div>
 
         <div class="card mt-2">
@@ -3152,51 +3257,123 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
         <button class="btn btn-outline btn-sm" onclick="doSignOut()">خروج</button>
       </div>
       <main class="app-main">
-        <div class="flex-between"><h2><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-chart"/></svg> الإحصائيات الشاملة</h2>
-          <div class="flex-gap no-print">
-            <button class="btn btn-outline btn-sm" onclick="stExport()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-download"/></svg> تصدير Excel</button>
-            <button class="btn btn-outline btn-sm" onclick="window.print()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-print"/></svg> طباعة</button>
-          </div></div>
-        <p class="text-sm text-muted">الحضور والواجبات والمشروعات والأنشطة والمشاركة، مع نتائج الاختبارات المصحَّحة آليًا.</p>
-        <div class="st-filters no-print">
-          <div class="field"><label>من تاريخ</label><input type="date" id="st-from"></div>
-          <div class="field"><label>إلى تاريخ</label><input type="date" id="st-to"></div>
-          <div class="field"><label>الشعبة</label><select id="st-class"><option value="">كل الشُّعب</option></select></div>
-          <button class="btn btn-primary btn-sm" onclick="stLoad()">تحديث</button>
-          <button class="btn btn-outline btn-sm" onclick="stTerm()">الفصل كامل</button>
-        </div>
-        <div id="st-status"><div class="state-box"><span class="spinner"></span></div></div>
-        <div id="st-dash" class="hidden">
-          <div class="grid grid-stats" id="st-tiles"></div>
-          <div class="chart-card mt-2">
-            <h3>تطوّر الأداء عبر الأيام</h3><div class="sub">نسبة الحضور والواجبات والمشاركة في كل يوم دراسي مسجَّل</div>
-            <div class="chart-box"><canvas id="st-trend"></canvas></div>
+        <div class="ab-page">
+          <div class="ab-head">
+            <div class="ab-head-title">
+              <span class="ab-head-ic"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-reports"/></svg></span>
+              <div><h2>تقرير الشعبة</h2>
+                <p>الحضور والواجبات والمشروعات والأنشطة والمشاركة، مع نتائج الاختبارات المصحَّحة آليًا.</p></div>
+            </div>
           </div>
-          <div class="grid-2c">
-            <div class="chart-card"><h3>مقارنة الشُّعب</h3><div class="sub">متوسط كل شعبة خلال المدة المحددة</div>
-              <div class="chart-box short"><canvas id="st-classes"></canvas></div></div>
-            <div class="chart-card"><h3>الحضور مقابل الغياب</h3><div class="sub">إجمالي حالات الحضور والغياب المسجَّلة</div>
-              <div class="chart-box short"><canvas id="st-presence"></canvas></div></div>
-          </div>
-          <div class="chart-card" id="st-examcard">
-            <h3>متوسط درجات الاختبارات حسب الوحدة</h3><div class="sub">الخط المتقطع = حد النجاح 50%</div>
-            <div class="chart-box short"><canvas id="st-exams"></canvas></div>
-          </div>
-          <div class="card mt-2"><h3 style="margin-top:0;">جدول الشُّعب</h3>
-            <div class="table-wrap"><table>
-              <thead><tr><th>الشعبة</th><th class="num">طلاب</th><th class="num">الحضور</th><th class="num">الواجبات</th><th class="num">المشروعات</th><th class="num">الأنشطة</th><th class="num">المشاركة</th><th class="num"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-star"/></svg></th></tr></thead>
-              <tbody id="st-classtbody"></tbody></table></div></div>
-          <div class="card mt-2">
-            <div class="flex-between"><h3 style="margin:0;">جدول الطلاب</h3>
-              <select id="st-sort" onchange="stRenderStudents()" style="max-width:200px;">
-                <option value="attendance_desc">الأعلى حضورًا</option>
-                <option value="attendance_asc">الأقل حضورًا (يحتاجون متابعة)</option>
-                <option value="exam_desc">الأعلى في الاختبارات</option>
-                <option value="stars_desc">الأكثر تميزًا </option>
+
+          <div class="ab-toolbar no-print">
+            <div class="ab-filter"><label>الفصل الدراسي</label>
+              <select id="st-term" onchange="stTermPick()">
+                <option value="current">الفصل الحالي</option>
+                <option value="30">آخر ٣٠ يومًا</option>
+                <option value="60">آخر ٦٠ يومًا</option>
+                <option value="custom">مدة مخصصة</option>
               </select></div>
-            <div class="table-wrap mt-1"><table>
-              <thead><tr><th>الطالب</th><th>الشعبة</th><th class="num">الحضور</th><th class="num">الواجبات</th><th class="num">المشاركة</th><th class="num"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-star"/></svg></th><th class="num">متوسط الاختبارات</th></tr></thead>
-              <tbody id="st-studenttbody"></tbody></table></div></div>
+            <div class="ab-filter"><label>الشعبة</label>
+              <select id="st-class"><option value="">كل الشُّعب</option></select></div>
+            <div class="ab-filter"><label>من تاريخ</label><input type="date" id="st-from" onchange="stCustom()"></div>
+            <div class="ab-filter"><label>إلى تاريخ</label><input type="date" id="st-to" onchange="stCustom()"></div>
+            <span class="ab-tb-sep"></span>
+            <button class="btn btn-primary btn-sm" onclick="stLoad()">تحديث</button>
+            <button class="btn btn-outline btn-sm" onclick="window.print()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-print"/></svg> طباعة</button>
+            <button class="btn btn-outline btn-sm" onclick="stExport()"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-download"/></svg> تصدير Excel</button>
+          </div>
+
+          <div id="st-status"><div class="state-box"><span class="spinner"></span></div></div>
+
+          <div id="st-dash" class="hidden ab-page">
+
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">01</span>
+                <span class="ic-tile tile-reports"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-chart"/></svg></span>
+                <div class="grow"><h3>المؤشرات الرئيسية</h3><p>ملخّص المدة المحددة</p></div>
+              </div>
+              <div class="st-kpis" id="st-tiles"></div>
+            </section>
+
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">02</span>
+                <span class="ic-tile tile-students"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-pattern"/></svg></span>
+                <div class="grow"><h3>تطوّر الأداء عبر الأيام</h3>
+                  <p>نسبة الحضور والواجبات والمشاركة في كل يوم دراسي مسجَّل</p></div>
+              </div>
+              <div class="chart-card" style="margin-bottom:0;">
+                <div class="chart-box"><canvas id="st-trend"></canvas></div>
+              </div>
+            </section>
+
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">03</span>
+                <span class="ic-tile tile-neutral"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-layers"/></svg></span>
+                <div class="grow"><h3>الرسوم التحليلية</h3><p>مقارنة الشُّعب، والحضور مقابل الغياب، ونتائج الوحدات</p></div>
+              </div>
+              <div class="ab-two">
+                <div class="chart-card" style="margin-bottom:0;"><h3>مقارنة الشُّعب</h3>
+                  <div class="sub">متوسط كل شعبة خلال المدة المحددة</div>
+                  <div class="chart-box short"><canvas id="st-classes"></canvas></div></div>
+                <div class="chart-card" style="margin-bottom:0;"><h3>الحضور مقابل الغياب</h3>
+                  <div class="sub">إجمالي حالات الحضور والغياب المسجَّلة</div>
+                  <div class="chart-box short"><canvas id="st-presence"></canvas></div></div>
+              </div>
+              <div class="chart-card" id="st-examcard" style="margin-bottom:0;">
+                <h3>متوسط درجات الاختبارات حسب الوحدة</h3><div class="sub">الخط المتقطع = حد النجاح 50%</div>
+                <div class="chart-box short"><canvas id="st-exams"></canvas></div>
+              </div>
+            </section>
+
+            <section class="ab-sec">
+              <div class="ab-sechead">
+                <span class="ab-secnum">04</span>
+                <span class="ic-tile tile-schedule"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-users"/></svg></span>
+                <div class="grow"><h3>الجداول</h3><p>ملخّص سريع هنا، والتفاصيل الكاملة بضغطة «عرض الكل»</p></div>
+              </div>
+              <div class="st-tables">
+                <div class="ab-panel">
+                  <h4><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-layers"/></svg> جدول الشُّعب</h4>
+                  <div class="ab-psub">أعلى الشُّعب حضورًا في المدة المحددة</div>
+                  <div class="ab-pbody" id="st-classpreview"></div>
+                  <button class="btn btn-outline btn-sm btn-block st-more no-print"
+                          onclick="stOpenAll('classes')">عرض الكل</button>
+                </div>
+                <div class="ab-panel">
+                  <div class="st-cardhd">
+                    <div class="grow"><h4><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-users"/></svg> الطلاب</h4>
+                      <div class="ab-psub" style="margin:0;">حسب الترتيب المحدد</div></div>
+                    <select id="st-sort" onchange="stRenderStudents()">
+                      <option value="attendance_desc">الأعلى حضورًا</option>
+                      <option value="attendance_asc">الأقل حضورًا (يحتاجون متابعة)</option>
+                      <option value="exam_desc">الأعلى في الاختبارات</option>
+                      <option value="stars_desc">الأكثر تميزًا</option>
+                    </select>
+                  </div>
+                  <div class="ab-pbody mt-1" id="st-studentpreview"></div>
+                  <button class="btn btn-outline btn-sm btn-block st-more no-print"
+                          onclick="stOpenAll('students')">عرض الكل</button>
+                </div>
+              </div>
+
+              <!-- الجداول الكاملة تبقى في الصفحة: مخفيّة على الشاشة، كاملةً عند الطباعة -->
+              <div class="st-fulltables">
+                <div class="card"><h3 style="margin-top:0;">جدول الشُّعب</h3>
+                  <div class="table-wrap"><table>
+                    <thead><tr><th>الشعبة</th><th class="num">طلاب</th><th class="num">الحضور</th><th class="num">الواجبات</th><th class="num">المشروعات</th><th class="num">الأنشطة</th><th class="num">المشاركة</th><th class="num"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-star"/></svg></th></tr></thead>
+                    <tbody id="st-classtbody"></tbody></table></div></div>
+                <div class="card mt-2"><h3 style="margin-top:0;">جدول الطلاب</h3>
+                  <div class="table-wrap"><table>
+                    <thead><tr><th>الطالب</th><th>الشعبة</th><th class="num">الحضور</th><th class="num">الواجبات</th><th class="num">المشاركة</th><th class="num"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-star"/></svg></th><th class="num">متوسط الاختبارات</th></tr></thead>
+                    <tbody id="st-studenttbody"></tbody></table></div></div>
+              </div>
+            </section>
+
+          </div>
         </div>
       </main>
     </div>
@@ -6747,6 +6924,7 @@ async function aeBoot() {
     const { data } = await supabase.from('units').select('id, title, sort_order').is('deleted_at', null).order('sort_order');
     sel.insertAdjacentHTML('beforeend', (data ?? []).map((u, i) => `<option value="${u.id}">Unit ${i + 1}: ${exEsc(u.title)}</option>`).join(''));
   }
+  aeRenderUnits();
   try { await aeEnsureClasses(); aeFillClassSelect(el('ae-peclass')); } catch { toast('تعذّر تحميل قائمة الشُّعب'); }
   await aeLoad();
   await aeLoadSent();
@@ -6774,6 +6952,34 @@ function aeRenderTiles() {
     <div class="card stat-tile"><div class="value">${avg === null ? '—' : avg + '%'}</div><div class="label">متوسط الدرجات</div></div>`;
 }
 
+/* شرائح الوحدات: عرض فقط فوق حقل الاختيار نفسه — لا مصدر بيانات جديد.
+   تُبنى من خيارات الحقل ae-unitfilter نفسه حتى لا تفترق عنه أبدًا. */
+function aeRenderUnits() {
+  const sel = el('ae-unitfilter');
+  const host = el('ae-units');
+  if (!sel || !host) return;
+  const cur = sel.value;
+  host.innerHTML = [...sel.options].map((o) => {
+    const txt = o.textContent.trim();
+    const i = txt.indexOf(':');
+    const head = i > 0 ? txt.slice(0, i) : txt;
+    const tail = i > 0 ? txt.slice(i + 1).trim() : '';
+    return `<button type="button" class="ae-unit${o.value === cur ? ' on' : ''}"
+      onclick="aePickUnit('${o.value}')" title="${exEsc(txt)}">
+      <b>${exEsc(head)}</b>${tail ? `<span>${exEsc(tail)}</span>` : '<span>جميع الاختبارات</span>'}</button>`;
+  }).join('');
+  const on = host.querySelector('.ae-unit.on');
+  if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
+window.aePickUnit = (unitId) => {
+  const sel = el('ae-unitfilter');
+  if (sel.value === unitId) return;
+  sel.value = unitId;
+  aeRenderUnits();
+  aeLoad();            // نفس المسار السابق تمامًا
+};
+
 function aeFmt(iso) {
   if (!iso) return '—';
   try { return new Date(iso).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; }
@@ -6790,39 +6996,49 @@ function aeRenderList() {
     u.lessons.get(s.lesson_id).rows.push(s);
   });
 
-  const rowHtml = (r) => {
+  // بطاقة واحدة لكل اختبار: تحمل كل ما كان في صف الجدول، بلا نقصان
+  const cardHtml = (r) => {
     const avg = r.avg_percentage === null ? null : Number(r.avg_percentage);
-    const bar = avg === null ? '<span class="text-muted">—</span>' : `<div class="bar"><i style="width:${avg}%;"></i></div>`;
-    const sent = Number(r.assigned_classes) > 0 ? `<span class="badge badge-success">مُرسل لـ ${r.assigned_classes} شعبة</span>` : '';
+    const sent = Number(r.assigned_classes) > 0
+      ? `<span class="badge badge-success">مُرسل لـ ${r.assigned_classes} شعبة</span>`
+      : '<span class="badge badge-muted">لم يُرسل بعد</span>';
     const safeTitle = exEsc(r.exam_title).replace(/'/g, "\\'");
     const retake = aeRetakeOn(r);
-    return `<tr><td class="ltr">${exEsc(r.exam_title)} ${sent}</td><td>${r.total_points}</td><td>${r.attempts_graded}</td>
-      <td>${r.students_count}</td><td>${avg === null ? '—' : avg + '%'} ${bar}</td><td>${r.pass_count}</td>
-      <td>${aeFmt(r.last_attempt_at)}</td>
-      <td>
-        <div class="flex-gap">
-          <button class="btn btn-sm btn-outline" onclick="aeDetail('${r.exam_id}', '${safeTitle}')">تفاصيل</button>
-          <button class="btn btn-sm btn-primary" onclick="aeAssignOpen('${r.exam_id}', '${safeTitle}')">📤 إرسال لشعبة</button>
-          <button class="btn btn-sm btn-outline" onclick="aeStuAssignOpen('${r.exam_id}', '${safeTitle}')">👤 إرسال لطالب محدد</button>
-        </div>
-        <label class="retake-toggle mt-1${retake ? ' on' : ''}"
-               title="${retake ? 'الطالب يستطيع إعادة هذا الاختبار' : 'الطالب لا يستطيع إعادة هذا الاختبار — محاولة واحدة فقط'}">
-          <input type="checkbox" data-retake="${r.exam_id}"${retake ? ' checked' : ''} onchange="aeToggleRetake(this)">
-          🔁 السماح بالإعادة
-        </label>
-      </td></tr>`;
+    return `<article class="ae-card">
+      <div class="ae-card-t">${exEsc(r.exam_title)}</div>
+      <div class="ae-card-tags">${sent}</div>
+      <div class="ae-card-stats">
+        <div class="ae-cell"><b>${r.total_points}</b><span>أسئلة</span></div>
+        <div class="ae-cell"><b>${r.students_count}</b><span>طلاب</span></div>
+        <div class="ae-cell"><b>${r.attempts_graded}</b><span>مُصحَّحة</span></div>
+        <div class="ae-cell"><b>${r.pass_count}</b><span>ناجح ≥50%</span></div>
+      </div>
+      <div>
+        <div class="ae-avg-top"><span>المتوسط</span><b>${avg === null ? '—' : avg + '%'}</b></div>
+        ${avg === null ? '<div class="ae-avg-none">لم تُصحَّح أي محاولة بعد</div>'
+                       : `<div class="bar"><i style="width:${avg}%;"></i></div>`}
+      </div>
+      <div class="ae-card-last">آخر محاولة: ${aeFmt(r.last_attempt_at)}</div>
+      <label class="retake-toggle${retake ? ' on' : ''}"
+             title="${retake ? 'الطالب يستطيع إعادة هذا الاختبار' : 'الطالب لا يستطيع إعادة هذا الاختبار — محاولة واحدة فقط'}">
+        <input type="checkbox" data-retake="${r.exam_id}"${retake ? ' checked' : ''} onchange="aeToggleRetake(this)">
+        السماح بالإعادة
+      </label>
+      <div class="ae-card-ft">
+        <button class="btn btn-sm btn-outline" onclick="aeDetail('${r.exam_id}', '${safeTitle}')">تفاصيل</button>
+        <button class="btn btn-sm btn-primary" onclick="aeAssignOpen('${r.exam_id}', '${safeTitle}')">إرسال لشعبة</button>
+        <button class="btn btn-sm btn-outline" onclick="aeStuAssignOpen('${r.exam_id}', '${safeTitle}')">إرسال لطالب</button>
+      </div>
+    </article>`;
   };
-  const tableHtml = (rows) => `<div class="table-wrap"><table>
-    <thead><tr><th>الاختبار</th><th>أسئلة</th><th>مُصحَّحة</th><th>طلاب</th><th>المتوسط</th><th>ناجح (≥50%)</th><th>آخر محاولة</th><th></th></tr></thead>
-    <tbody>${rows.map(rowHtml).join('')}</tbody></table></div>`;
+  const cardsHtml = (rows) => `<div class="ae-cards">${rows.map(cardHtml).join('')}</div>`;
 
   el('ae-list').innerHTML = [...byUnit.values()].sort((a, b) => a.sort - b.sort).map((u) => {
     const blocks = [...u.lessons.values()].sort((a, b) => a.sort - b.sort).map((l, li) =>
-      `<div class="lesson-block"><h4 class="ltr">Lesson ${li + 1}: ${exEsc(l.title)}</h4>${tableHtml(l.rows)}</div>`).join('');
+      `<div class="ae-group"><h4 class="ltr"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-note"/></svg> Lesson ${li + 1}: ${exEsc(l.title)}</h4>${cardsHtml(l.rows)}</div>`).join('');
     const finalBlock = u.finals.length
-      ? `<div class="lesson-block" style="border-inline-start:4px solid #c9a227; padding-inline-start:10px;">
-           <h4>🏁 الاختبار الشامل للوحدة</h4>${tableHtml(u.finals)}</div>` : '';
-    return `<h3 class="mt-2">${exEsc(u.title)}</h3>${blocks}${finalBlock}`;
+      ? `<div class="ae-group ae-group-final"><h4><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-award"/></svg> الاختبار الشامل للوحدة</h4>${cardsHtml(u.finals)}</div>` : '';
+    return `<div class="ae-unitblock"><h3 class="ae-unittitle"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-assess"/></svg> ${exEsc(u.title)}</h3>${blocks}${finalBlock}</div>`;
   }).join('');
 }
 
@@ -8049,6 +8265,7 @@ const stPill = (v) => {
   return `<span class="pill ${cls}">${n}%</span>`;
 };
 const stCss = (name) => getComputedStyle(el('screen-admin-stats')).getPropertyValue(name).trim();
+const stIcon = (name) => `<svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-${name}"/></svg>`;
 
 function stBaseOptions() {
   return {
@@ -8081,9 +8298,9 @@ const stPassLine = {
 
 async function stBoot() {
   if (!el('st-from').value) {
-    const today = new Date(); const from = new Date(today); from.setDate(from.getDate() - 60);
-    el('st-from').value = from.toISOString().slice(0, 10);
-    el('st-to').value = today.toISOString().slice(0, 10);
+    const [from, to] = stTermRange('60');
+    el('st-from').value = from; el('st-to').value = to;
+    el('st-term').value = '60';
   }
   if (!stClassesLoaded) {
     const { data } = await supabase.from('classes').select('id, name').eq('is_active', true).order('name');
@@ -8092,7 +8309,35 @@ async function stBoot() {
   }
   await stLoad();
 }
-window.stTerm = () => { el('st-from').value = '2025-08-24'; el('st-to').value = '2026-01-01'; stLoad(); };
+/* اختيار المدة: يكتب في حقلَي التاريخ القائمين ثم يستدعي stLoad() — لا حساب جديد.
+   «الفصل الحالي» يُشتق من تاريخ اليوم بدل تواريخ ثابتة كانت تشير إلى عام مضى. */
+function stTermRange(kind) {
+  const today = new Date();
+  const iso = (d) => d.toISOString().slice(0, 10);
+  if (kind === '30' || kind === '60') {
+    const from = new Date(today); from.setDate(from.getDate() - Number(kind));
+    return [iso(from), iso(today)];
+  }
+  // الفصل الأول يبدأ مع بداية العام الدراسي (أغسطس)، والثاني مع بداية يناير
+  const y = today.getFullYear();
+  return today.getMonth() >= 7
+    ? [`${y}-08-01`, `${y}-12-31`]
+    : [`${y}-01-01`, `${y}-06-30`];
+}
+
+window.stTermPick = () => {
+  const kind = el('st-term').value;
+  if (kind === 'custom') return;                 // المعلم يضبط التاريخين بنفسه
+  const [from, to] = stTermRange(kind);
+  el('st-from').value = from; el('st-to').value = to;
+  stLoad();
+};
+
+// تعديل تاريخ يدويًا يعني «مدة مخصصة»
+window.stCustom = () => { el('st-term').value = 'custom'; };
+
+// يبقى لتوافق أي نداء قائم
+window.stTerm = () => { el('st-term').value = 'current'; stTermPick(); };
 
 window.stLoad = async () => {
   el('st-status').innerHTML = '<div class="state-box"><span class="spinner"></span></div>';
@@ -8120,15 +8365,18 @@ window.stLoad = async () => {
 function stRenderAll() {
   Object.values(stCharts).forEach((c) => c?.destroy()); stCharts = {};
   const t2 = stData.totals ?? {}, e = stData.exams ?? {};
-  el('st-tiles').innerHTML = `
-    <div class="card stat-tile"><div class="value" style="color:#2a78d6;">${stPct(t2.attendance_pct)}</div><div class="label">نسبة الحضور</div></div>
-    <div class="card stat-tile"><div class="value" style="color:#eb6834;">${stPct(t2.homework_pct)}</div><div class="label">تسليم الواجبات</div></div>
-    <div class="card stat-tile"><div class="value" style="color:#1baf7a;">${stPct(t2.participation_pct)}</div><div class="label">المشاركة</div></div>
-    <div class="card stat-tile"><div class="value">${stPct(e.avg_pct)}</div><div class="label">متوسط الاختبارات</div></div>
-    <div class="card stat-tile"><div class="value">${t2.days ?? 0}</div><div class="label">يوم مسجَّل</div></div>
-    <div class="card stat-tile"><div class="value">${t2.students ?? 0}</div><div class="label">طالب</div></div>
-    <div class="card stat-tile"><div class="value">${t2.stars ?? 0}</div><div class="label">مرات التميّز ⭐</div></div>
-    <div class="card stat-tile"><div class="value">${e.attempts ?? 0}</div><div class="label">محاولة اختبار مصحَّحة</div></div>`;
+  el('st-tiles').innerHTML = [
+    ['attend', 'students', stPct(t2.attendance_pct), 'نسبة الحضور'],
+    ['note', 'schedule', stPct(t2.homework_pct), 'تسليم الواجبات'],
+    ['activity', 'assess', stPct(t2.participation_pct), 'المشاركة'],
+    ['assess', 'reports', stPct(e.avg_pct), 'متوسط الاختبارات'],
+    ['calendar', 'neutral', t2.days ?? 0, 'الأيام المسجَّلة'],
+    ['users', 'students', t2.students ?? 0, 'الطلاب'],
+    ['star', 'schedule', t2.stars ?? 0, 'مرات التميّز'],
+    ['grade', 'assess', e.attempts ?? 0, 'محاولات مصحَّحة'],
+  ].map(([icon, tone, val, lbl]) => `<div class="ab-kpi">
+      <div class="ab-kpi-top"><span class="ic-tile tile-${tone}">${stIcon(icon)}</span></div>
+      <div class="ab-kpi-val">${val}</div><div class="ab-kpi-lbl">${lbl}</div></div>`).join('');
 
   const days = stData.by_day ?? [];
   const mkLine = (label, key, color) => ({ label, data: days.map((d) => stNum(d[key])), borderColor: color, backgroundColor: color,
@@ -8169,12 +8417,53 @@ function stRenderAll() {
     el('st-examcard').innerHTML = '<h3>متوسط درجات الاختبارات حسب الوحدة</h3><div class="state-box"><div class="icon">📝</div>لم يحلّ الطلاب أي اختبار بعد</div>';
   }
 
-  el('st-classtbody').innerHTML = rows.length ? rows.map((r) => `<tr><td>${exEsc(r.class_name)}</td><td class="num">${r.students}</td>
-    <td class="num">${stPill(r.attendance_pct)}</td><td class="num">${stPill(r.homework_pct)}</td><td class="num">${stPill(r.project_pct)}</td>
-    <td class="num">${stPill(r.activity_pct)}</td><td class="num">${stPill(r.participation_pct)}</td><td class="num">${r.stars}</td></tr>`).join('')
+  el('st-classtbody').innerHTML = rows.length ? rows.map(stClassRow).join('')
     : '<tr><td colspan="8"><div class="state-box">لا توجد بيانات</div></td></tr>';
+  stRenderClassPreview();
   stRenderStudents();
 }
+
+/* صفوف الجداول الكاملة — نفس الترميز السابق حرفًا بحرف، مُخرَجًا في دالة
+   حتى تستعمله الصفحة (للطباعة) والنافذة (لعرض الكل) بلا تكرار معرّفات. */
+const stClassRow = (r) => `<tr><td>${exEsc(r.class_name)}</td><td class="num">${r.students}</td>
+    <td class="num">${stPill(r.attendance_pct)}</td><td class="num">${stPill(r.homework_pct)}</td><td class="num">${stPill(r.project_pct)}</td>
+    <td class="num">${stPill(r.activity_pct)}</td><td class="num">${stPill(r.participation_pct)}</td><td class="num">${r.stars}</td></tr>`;
+
+const stStudentRow = (r) => `<tr><td>${exEsc(r.full_name)}</td><td>${exEsc(r.class_name ?? '')}</td>
+    <td class="num">${stPill(r.attendance_pct)}</td><td class="num">${stPill(r.homework_pct)}</td><td class="num">${stPill(r.participation_pct)}</td>
+    <td class="num">${r.stars}</td><td class="num">${r.exam_avg === null || r.exam_avg === undefined ? '<span class="text-muted">لم يختبر</span>' : stPill(r.exam_avg)}</td></tr>`;
+
+const ST_PREVIEW = 5;   // كم صفًا يظهر في البطاقة المضغوطة قبل «عرض الكل»
+
+function stRenderClassPreview() {
+  const rows = [...(stData.by_class ?? [])]
+    .sort((a, b) => (Number(b.attendance_pct ?? -1)) - (Number(a.attendance_pct ?? -1)));
+  const host = el('st-classpreview');
+  if (!rows.length) { host.innerHTML = '<div class="state-box">لا توجد بيانات</div>'; return; }
+  host.innerHTML = `<table class="ab-ptable">
+    <thead><tr><th>الشعبة</th><th class="num">طلاب</th><th class="num">الحضور</th><th class="num">المشاركة</th></tr></thead>
+    <tbody>${rows.slice(0, ST_PREVIEW).map((r) => `<tr><td>${exEsc(r.class_name)}</td>
+      <td class="num">${r.students}</td><td class="num">${stPill(r.attendance_pct)}</td>
+      <td class="num">${stPill(r.participation_pct)}</td></tr>`).join('')}</tbody></table>
+    ${rows.length > ST_PREVIEW ? `<div class="text-sm text-muted mt-1">و${rows.length - ST_PREVIEW} شعبة أخرى</div>` : ''}`;
+}
+
+/* النافذة تعرض الجدول الكامل نفسه — بلا معرّفات مكرّرة */
+window.stOpenAll = (kind) => {
+  if (!stData) return;
+  const classes = kind === 'classes';
+  el('st-alltitle').textContent = classes ? 'جدول الشُّعب كاملًا' : 'جدول الطلاب كاملًا';
+  const head = classes
+    ? '<tr><th>الشعبة</th><th class="num">طلاب</th><th class="num">الحضور</th><th class="num">الواجبات</th><th class="num">المشروعات</th><th class="num">الأنشطة</th><th class="num">المشاركة</th><th class="num">تميّز</th></tr>'
+    : '<tr><th>الطالب</th><th>الشعبة</th><th class="num">الحضور</th><th class="num">الواجبات</th><th class="num">المشاركة</th><th class="num">تميّز</th><th class="num">متوسط الاختبارات</th></tr>';
+  const body = classes
+    ? (stData.by_class ?? []).map(stClassRow).join('')
+    : stSortedStudents().map(stStudentRow).join('');
+  const count = classes ? (stData.by_class ?? []).length : stSortedStudents().length;
+  el('st-allbody').innerHTML = `<div class="text-sm text-muted">${count} سجلًا</div>
+    <div class="table-wrap ab-tablewrap mt-1"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
+  el('st-allmodal').classList.remove('hidden');
+};
 
 function stSortedStudents() {
   const rows = [...(stData.students ?? [])];
@@ -8188,10 +8477,23 @@ function stSortedStudents() {
 }
 window.stRenderStudents = () => {
   const rows = stSortedStudents();
-  el('st-studenttbody').innerHTML = rows.length ? rows.map((r) => `<tr><td>${exEsc(r.full_name)}</td><td>${exEsc(r.class_name ?? '')}</td>
-    <td class="num">${stPill(r.attendance_pct)}</td><td class="num">${stPill(r.homework_pct)}</td><td class="num">${stPill(r.participation_pct)}</td>
-    <td class="num">${r.stars}</td><td class="num">${r.exam_avg === null || r.exam_avg === undefined ? '<span class="text-muted">لم يختبر</span>' : stPill(r.exam_avg)}</td></tr>`).join('')
+  el('st-studenttbody').innerHTML = rows.length ? rows.map(stStudentRow).join('')
     : '<tr><td colspan="7"><div class="state-box">لا توجد بيانات</div></td></tr>';
+
+  const host = el('st-studentpreview');
+  if (!host) return;
+  host.innerHTML = rows.length ? `<table class="ab-ptable">
+      <thead><tr><th>الطالب</th><th class="num">الحضور</th><th class="num">المشاركة</th><th class="num">الاختبارات</th></tr></thead>
+      <tbody>${rows.slice(0, ST_PREVIEW).map((r) => `<tr><td>${exEsc(r.full_name)}</td>
+        <td class="num">${stPill(r.attendance_pct)}</td><td class="num">${stPill(r.participation_pct)}</td>
+        <td class="num">${r.exam_avg === null || r.exam_avg === undefined ? '<span class="text-muted">—</span>' : stPill(r.exam_avg)}</td></tr>`).join('')}</tbody></table>
+      ${rows.length > ST_PREVIEW ? `<div class="text-sm text-muted mt-1">و${rows.length - ST_PREVIEW} طالبًا آخر</div>` : ''}`
+    : '<div class="state-box">لا توجد بيانات</div>';
+
+  // النافذة المفتوحة تتبع الترتيب الجديد فورًا
+  if (!el('st-allmodal').classList.contains('hidden') && el('st-alltitle').textContent.includes('الطلاب')) {
+    window.stOpenAll('students');
+  }
 };
 
 window.stExport = () => {
@@ -12970,6 +13272,14 @@ window.vwOpenTeacher = async (screen) => {
         <input type="number" id="ab-thrcritical" min="1" max="200" value="8"></div>
     </div>
     <button class="btn btn-primary btn-block mt-2" id="ab-savethr" onclick="abSaveThresholds()">حفظ</button>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="st-allmodal">
+  <div class="modal" style="max-width:920px; max-height:86dvh; overflow-y:auto;">
+    <div class="flex-between"><h3 style="margin:0;" id="st-alltitle">القائمة الكاملة</h3>
+      <button class="btn btn-sm btn-icon" onclick="closeModal('st-allmodal')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-close"/></svg></button></div>
+    <div class="mt-2" id="st-allbody"></div>
   </div>
 </div>
 
