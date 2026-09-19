@@ -6915,6 +6915,251 @@ async function seRenderResult(attemptId) {
     </div>`;
 }
 
+/* ============================================================================
+   كاتب ملفات XLSX صغير ومستقل — بلا أي مكتبة خارجية.
+   يُنتج ملف Excel حقيقيًا (ZIP + OOXML) يفتحه Excel وWPS وGoogle Sheets وNumbers
+   بلا تحذير «صيغة الملف لا تطابق الامتداد» الذي كان يظهر مع ملفات .xls القديمة.
+   يدعم: RTL، تجميد الرؤوس، تصفية تلقائية، عرض الأعمدة، دمج الخلايا، وأنماط ملوّنة.
+   ============================================================================ */
+
+/* ---------- CRC32 (لجدول ZIP) ---------- */
+const XW_CRC = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[i] = c >>> 0;
+  }
+  return t;
+})();
+function xwCrc32(buf) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) c = XW_CRC[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+/* ---------- ZIP بلا ضغط (method = 0) ---------- */
+function xwZip(files) {
+  const enc = new TextEncoder();
+  const parts = []; const central = [];
+  let offset = 0;
+  const u16 = (n) => [n & 0xFF, (n >>> 8) & 0xFF];
+  const u32 = (n) => [n & 0xFF, (n >>> 8) & 0xFF, (n >>> 16) & 0xFF, (n >>> 24) & 0xFF];
+
+  for (const f of files) {
+    const name = enc.encode(f.name);
+    const data = typeof f.data === 'string' ? enc.encode(f.data) : f.data;
+    const crc = xwCrc32(data);
+    const local = [...u32(0x04034b50), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0),
+                   ...u32(crc), ...u32(data.length), ...u32(data.length),
+                   ...u16(name.length), ...u16(0)];
+    parts.push(new Uint8Array(local), name, data);
+    central.push([
+      [...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0),
+       ...u32(crc), ...u32(data.length), ...u32(data.length),
+       ...u16(name.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(offset)],
+      name,
+    ]);
+    offset += local.length + name.length + data.length;
+  }
+
+  const cdParts = []; let cdSize = 0;
+  for (const [head, name] of central) {
+    cdParts.push(new Uint8Array(head), name);
+    cdSize += head.length + name.length;
+  }
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0),
+    ...u16(files.length), ...u16(files.length), ...u32(cdSize), ...u32(offset), ...u16(0)]);
+
+  const all = [...parts, ...cdParts, end];
+  const total = all.reduce((n, a) => n + a.length, 0);
+  const out = new Uint8Array(total);
+  let pos = 0;
+  for (const a of all) { out.set(a, pos); pos += a.length; }
+  return out;
+}
+
+/* ---------- أدوات ---------- */
+const xwEsc = (v) => String(v ?? '')
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&apos;')
+  // Excel لا يقبل محارف التحكّم داخل XML
+  .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+
+function xwCol(n) {            // 1 => A، 27 => AA
+  let s = '';
+  while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = (n - 1 - m) / 26; }
+  return s;
+}
+const xwRef = (r, c) => xwCol(c) + r;
+
+/* ---------- الأنماط ---------- */
+/* الفهارس ثابتة ويُشار إليها بالاسم في XW_S أدناه */
+const XW_STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<numFmts count="2">
+  <numFmt numFmtId="164" formatCode="0.0&quot;%&quot;"/>
+  <numFmt numFmtId="165" formatCode="0.##"/>
+</numFmts>
+<fonts count="7">
+  <font><sz val="11"/><color rgb="FF0F1B2E"/><name val="Arial"/></font>
+  <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>
+  <font><b/><sz val="16"/><color rgb="FF0F1E36"/><name val="Arial"/></font>
+  <font><b/><sz val="11"/><color rgb="FF0F1B2E"/><name val="Arial"/></font>
+  <font><sz val="9"/><color rgb="FF8B94A6"/><name val="Arial"/></font>
+  <font><b/><sz val="11"/><color rgb="FF0A1526"/><name val="Arial"/></font>
+  <font><i/><sz val="9"/><color rgb="FF59647A"/><name val="Arial"/></font>
+</fonts>
+<fills count="9">
+  <fill><patternFill patternType="none"/></fill>
+  <fill><patternFill patternType="gray125"/></fill>
+  <fill><patternFill patternType="solid"><fgColor rgb="FF0F1E36"/><bgColor indexed="64"/></patternFill></fill>
+  <fill><patternFill patternType="solid"><fgColor rgb="FFF6F5F1"/><bgColor indexed="64"/></patternFill></fill>
+  <fill><patternFill patternType="solid"><fgColor rgb="FFE8F5E9"/><bgColor indexed="64"/></patternFill></fill>
+  <fill><patternFill patternType="solid"><fgColor rgb="FFFFF8E1"/><bgColor indexed="64"/></patternFill></fill>
+  <fill><patternFill patternType="solid"><fgColor rgb="FFFFEBEE"/><bgColor indexed="64"/></patternFill></fill>
+  <fill><patternFill patternType="solid"><fgColor rgb="FFFAFAF8"/><bgColor indexed="64"/></patternFill></fill>
+  <fill><patternFill patternType="solid"><fgColor rgb="FFC9A227"/><bgColor indexed="64"/></patternFill></fill>
+</fills>
+<borders count="3">
+  <border><left/><right/><top/><bottom/><diagonal/></border>
+  <border>
+    <left style="thin"><color rgb="FFE1DED6"/></left><right style="thin"><color rgb="FFE1DED6"/></right>
+    <top style="thin"><color rgb="FFE1DED6"/></top><bottom style="thin"><color rgb="FFE1DED6"/></bottom><diagonal/></border>
+  <border><left/><right/><top/><bottom style="medium"><color rgb="FFC9A227"/></bottom><diagonal/></border>
+</borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="21">
+  <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+  <xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf>
+  <xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+  <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+  <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+  <xf numFmtId="0" fontId="0" fillId="7" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+  <xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="165" fontId="0" fillId="7" borderId="1" xfId="0" applyNumberFormat="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="164" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="164" fontId="3" fillId="5" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="164" fontId="3" fillId="6" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="0" fontId="3" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="165" fontId="3" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="0" fontId="6" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+  <xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+  <xf numFmtId="0" fontId="5" fillId="8" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+  <xf numFmtId="0" fontId="0" fillId="6" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1"/>
+  <xf numFmtId="165" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="165" fontId="3" fillId="5" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  <xf numFmtId="165" fontId="3" fillId="6" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+</cellXfs>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>`;
+
+/* أسماء مقروءة لفهارس الأنماط */
+const XW_S = {
+  plain: 0, title: 1, sub: 2, head: 3,
+  text: 4, textBand: 5, num: 6, numBand: 7,
+  pctGood: 8, pctWarn: 9, pctBad: 10,
+  totalText: 11, totalNum: 12, note: 13,
+  name: 14, headGold: 15, missing: 16, rule: 17,
+  scoreGood: 18, scoreWarn: 19, scoreBad: 20,
+};
+
+/* ---------- بناء ورقة ---------- */
+/* rows: مصفوفة صفوف، كل صف مصفوفة خلايا: {v, s, t} حيث t='n'|'s' */
+function xwSheet(rows, opts = {}) {
+  const { cols = [], freeze = null, autoFilter = null, merges = [], rtl = true } = opts;
+  const colsXml = cols.length
+    ? `<cols>${cols.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('')}</cols>`
+    : '';
+  const pane = freeze
+    ? `<pane xSplit="${freeze.x || 0}" ySplit="${freeze.y || 0}" topLeftCell="${xwRef((freeze.y || 0) + 1, (freeze.x || 0) + 1)}" activePane="bottomRight" state="frozen"/>`
+      + `<selection pane="bottomRight" activeCell="${xwRef((freeze.y || 0) + 1, (freeze.x || 0) + 1)}" sqref="${xwRef((freeze.y || 0) + 1, (freeze.x || 0) + 1)}"/>`
+    : '';
+  const body = rows.map((cells, ri) => {
+    const r = ri + 1;
+    const cs = cells.map((c, ci) => {
+      if (c === null || c === undefined || c === '') return '';
+      const ref = xwRef(r, ci + 1);
+      const s = c.s ? ` s="${c.s}"` : '';
+      if (c.t === 'n') return `<c r="${ref}"${s}><v>${Number(c.v)}</v></c>`;
+      return `<c r="${ref}"${s} t="inlineStr"><is><t xml:space="preserve">${xwEsc(c.v)}</t></is></c>`;
+    }).join('');
+    return cs ? `<row r="${r}"${cells.__h ? ` ht="${cells.__h}" customHeight="1"` : ''}>${cs}</row>` : '';
+  }).join('');
+  const mergeXml = merges.length
+    ? `<mergeCells count="${merges.length}">${merges.map((m) => `<mergeCell ref="${m}"/>`).join('')}</mergeCells>` : '';
+  const filterXml = autoFilter ? `<autoFilter ref="${autoFilter}"/>` : '';
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>
+<sheetViews><sheetView${rtl ? ' rightToLeft="1"' : ''} workbookViewId="0" showGridLines="0">${pane}</sheetView></sheetViews>
+<sheetFormatPr defaultRowHeight="18"/>
+${colsXml}<sheetData>${body}</sheetData>${filterXml}${mergeXml}
+<pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>
+<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>
+</worksheet>`;
+}
+
+/* ---------- بناء المصنّف ---------- */
+function xwBuild(sheets) {          // sheets: [{name, rows, opts}]
+  const files = [];
+  files.push({ name: '[Content_Types].xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}
+<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>` });
+  files.push({ name: '_rels/.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>` });
+  files.push({ name: 'xl/workbook.xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<sheets>${sheets.map((s, i) => `<sheet name="${xwEsc(s.name).slice(0, 31)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets>
+</workbook>` });
+  files.push({ name: 'xl/_rels/workbook.xml.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}
+<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>` });
+  files.push({ name: 'xl/styles.xml', data: XW_STYLES });
+  sheets.forEach((s, i) => files.push({ name: `xl/worksheets/sheet${i + 1}.xml`, data: xwSheet(s.rows, s.opts) }));
+  return xwZip(files);
+}
+
+/* ---------- التنزيل ---------- */
+/* Blob بدل data: URL — هذا ما كان يمنع التنزيل في عدة متصفحات، خاصةً على الجوال */
+function xwDownload(bytes, filename) {
+  const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);          // فايرفوكس يشترط وجوده في الصفحة
+  a.click();
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
+}
+
+/* ---------- تنزيل موحَّد لكل ملفات التصدير ----------
+   كان كل تصدير يستعمل data: URL، وهو ما ترفضه عدة متصفحات (وأغلب متصفحات الجوال)
+   فلا ينزل الملف أصلًا. Blob + رابط داخل الصفحة يعمل في كل مكان. */
+function dlFile(content, filename, mime) {
+  const blob = content instanceof Uint8Array
+    ? new Blob([content], { type: mime })
+    : new Blob(['\ufeff' + content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
+}
+const dlExcelHtml = (html, filename) => dlFile(html, filename, 'application/vnd.ms-excel');
+
 /* ================= لوحة المعلم: الاختبارات وإحصاء الدرجات ================= */
 let aeStats = [];
 
@@ -7974,9 +8219,7 @@ function atDownloadExcel(html, filename) {
   const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">
     <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>التحضير</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
     </head><body dir="rtl">${html}</body></html>`;
-  const link = document.createElement('a');
-  link.href = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(template)));
-  link.download = filename; link.click();
+  dlExcelHtml(template, filename);
 }
 function atReportHeader(subtitle) {
   return `<h2>سجل متابعة الطلاب — المعلم: فهد الخالدي</h2><h3>المادة: اللغة الإنجليزية — ${atEsc(atSemesterName())} ${atEsc(atSettings.academicYear)}</h3><h3>المدرسة: ${atEsc(atSettings.school)}</h3><h3>${subtitle}</h3>`;
@@ -8510,10 +8753,7 @@ window.stExport = () => {
     <tr><th>الطالب</th><th>الشعبة</th><th>الحضور</th><th>الواجبات</th><th>المشاركة</th><th>تميّز</th><th>متوسط الاختبارات</th></tr>
     ${stSortedStudents().map((r) => `<tr><td>${exEsc(r.full_name)}</td><td>${exEsc(r.class_name ?? '')}</td><td>${stPct(r.attendance_pct)}</td><td>${stPct(r.homework_pct)}</td><td>${stPct(r.participation_pct)}</td><td>${r.stars}</td><td>${r.exam_avg === null || r.exam_avg === undefined ? '—' : stPct(r.exam_avg)}</td></tr>`).join('')}</table>`;
   const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body dir="rtl">${html}</body></html>`;
-  const link = document.createElement('a');
-  link.href = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(template)));
-  link.download = `الإحصائيات_${stData.range.from}_${stData.range.to}.xls`;
-  link.click();
+  dlExcelHtml(template, `الإحصائيات_${stData.range.from}_${stData.range.to}.xls`);
   toast('تم تصدير التقرير', 'success');
 };
 
@@ -9575,10 +9815,7 @@ window.abExport = () => {
     <tr><th>الاسم</th><th>رمز الطالب</th><th>الشعبة</th><th>أيام مسجّلة</th><th>حضور</th><th>غياب</th><th>تأخر</th><th>بعذر</th><th>نسبة الغياب</th><th>أطول تتابع</th><th>آخر غياب</th><th>الحالة</th></tr>
     ${abSortedStudents().map((r) => `<tr><td>${abEsc(r.full_name)}</td><td>${abEsc(r.student_code ?? '')}</td><td>${abEsc(r.class_name ?? '')}</td><td>${abNum(r.days_recorded)}</td><td>${abNum(r.present_days)}</td><td>${abNum(r.absent_days)}</td><td>${abNum(r.late_days)}</td><td>${abNum(r.excused_days)}</td><td>${abPct(r.absent_rate)}</td><td>${abNum(r.longest_streak)}</td><td>${abEsc(abDash(r.last_absent))}</td><td>${AB_LEVELS[abLevel(r.alert_level)].label}</td></tr>`).join('')}</table>`;
   const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body dir="rtl">${html}</body></html>`;
-  const link = document.createElement('a');
-  link.href = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(template)));
-  link.download = `متابعة_الغياب_${abState.from || 'from'}_${abState.to || 'to'}.xls`;
-  link.click();
+  dlExcelHtml(template, `متابعة_الغياب_${abState.from || 'from'}_${abState.to || 'to'}.xls`);
   toast('تم تصدير التقرير', 'success');
 };
 
@@ -11867,29 +12104,226 @@ window.fuSaveAll = async () => {
   finally { btn.disabled = false; }
 };
 
-window.fuExport = () => {
-  if (!fuState.rows.length) { toast('لا توجد بيانات للتصدير', 'error'); return; }
-  const head = `<tr><th>الطالب</th><th>رمز الطالب</th>${fuState.exams.map((e) => `<th>${fuEsc(e.title)}</th>`).join('')}<th>المعدل</th></tr>`;
-  const body = fuState.students.map((s) => {
-    const cells = fuState.exams.map((e) => {
-      const r = fuState.map.get(`${s.id}|${e.id}`);
-      if (!r) return '<td>—</td>';
+/* ============ تصدير كشف الدرجات إلى ملف Excel حقيقي (.xlsx) ============
+   قاعدة الدرجات هنا: الطالب الذي لم يبدأ الاختبار — أو بدأه ولم يسلّمه —
+   تُحتسب درجته صفرًا، وتدخل ضمن المجموع والنسبة. هذا حساب تصدير فقط،
+   ولا يمسّ شيئًا في قاعدة البيانات ولا في كشف الشاشة. */
+
+const FU_BANDS = [[90, 'ممتاز'], [80, 'جيد جدًا'], [70, 'جيد'], [50, 'مقبول'], [0, 'غير مجتاز']];
+const fuBand = (p) => (FU_BANDS.find(([m]) => Number(p) >= m) || FU_BANDS[FU_BANDS.length - 1])[1];
+const fuScoreStyle = (p) => (p >= 80 ? XW_S.scoreGood : p >= 50 ? XW_S.scoreWarn : XW_S.scoreBad);
+const fuPctStyle = (p) => (p >= 80 ? XW_S.pctGood : p >= 50 ? XW_S.pctWarn : XW_S.pctBad);
+const fuR2 = (n) => Math.round(Number(n) * 100) / 100;
+const fuXlDate = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return String(iso);
+  const p = (v) => String(v).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+const fuSafeName = (v) => String(v ?? '').replace(/[\\/:*?"<>|]/g, '-').trim() || 'ملف';
+
+/* نموذج التصدير: خلية لكل (طالب × اختبار) بدرجتها وحالتها */
+function fuExportModel() {
+  const { students, exams, map } = fuState;
+  const cells = new Map();
+  for (const s of students) {
+    for (const e of exams) {
+      const r = map.get(`${s.id}|${e.id}`);
+      const key = `${s.id}|${e.id}`;
+      if (!r) { cells.set(key, { assigned: false, max: Number(e.points ?? 0) }); continue; }
       const g = fuGrade(r);
-      if (g.percentage === null || g.percentage === undefined) return `<td>${(FU_EXAM_STATUS[r.status] || FU_EXAM_STATUS.not_started).label}</td>`;
-      return `<td>${Number(g.score ?? 0)} (${Number(g.percentage)}%)</td>`;
-    }).join('');
-    const avg = fuStudentAvg(s.id);
-    return `<tr><td>${fuEsc(s.name)}</td><td>${fuEsc(s.code ?? '')}</td>${cells}<td>${avg === null ? '—' : avg + '%'}</td></tr>`;
-  }).join('');
-  const html = `<h2>كشف درجات الاختبارات — المعلم فهد الخالدي</h2>
-    <h3>الشعبة: ${fuEsc(fuState.className)} — ${fuEsc(el('fu-unit').value || 'كل الوحدات')}</h3>
-    <table border="1" cellpadding="5" style="border-collapse:collapse;">${head}${body}</table>`;
-  const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body dir="rtl">${html}</body></html>`;
-  const link = document.createElement('a');
-  link.href = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(template)));
-  link.download = `كشف_الدرجات_${fuState.className || 'class'}.xls`;
-  link.click();
-  toast('تم تصدير الكشف', 'success');
+      const graded = g.percentage !== null && g.percentage !== undefined;
+      const max = Number(r.total_points ?? e.points ?? 0);
+      cells.set(key, {
+        assigned: true, graded, max,
+        score: graded ? fuR2(g.score ?? 0) : 0,          // لم يبدأ / لم يسلّم => صفر
+        pct: graded ? fuR2(g.percentage) : 0,
+        status: r.status || 'not_started',
+        manual: !!g.manual,
+        note: r.saved_note || '',
+        attempts: Number(r.attempts ?? 0),
+        last: r.last_submitted_at, savedAt: r.saved_at,
+      });
+    }
+  }
+  return { students, exams, cells };
+}
+
+/* ---------- الورقة 1: كشف الدرجات (طلاب × اختبارات) ---------- */
+function fuSheetMatrix(m, meta) {
+  const S = XW_S;
+  const nExam = m.exams.length;
+  const lastCol = 3 + nExam + 5;                 // م + الطالب + الرمز + الاختبارات + 5 أعمدة ختامية
+  const lastRef = xwCol(lastCol);
+  const rows = [];
+
+  rows.push([{ v: 'كشف درجات الاختبارات', s: S.title }]);
+  rows.push([{ v: `المعلم فهد الخالدي · مادة اللغة الإنجليزية · الشعبة: ${meta.className} · ${meta.unitLabel}`, s: S.sub }]);
+  rows.push([{ v: `تاريخ التصدير: ${meta.today} · عدد الطلاب: ${m.students.length} · عدد الاختبارات: ${nExam}`, s: S.sub }]);
+  rows.push([{ v: 'من لم يبدأ الاختبار أو بدأه ولم يسلّمه تُحتسب درجته صفرًا، وتدخل ضمن المجموع والنسبة.', s: S.note }]);
+  rows.push([]);
+
+  const head = [{ v: 'م', s: S.head }, { v: 'الطالب', s: S.head }, { v: 'رمز الطالب', s: S.head }];
+  for (const e of m.exams) head.push({ v: `${e.unit ? e.unit + '\n' : ''}${e.title}\n(من ${Number(e.points ?? 0)})`, s: S.head });
+  head.push({ v: 'المجموع', s: S.headGold }, { v: 'النهاية العظمى', s: S.headGold },
+             { v: 'النسبة %', s: S.headGold }, { v: 'التقدير', s: S.headGold },
+             { v: 'اختبارات بصفر', s: S.headGold });
+  head.__h = 46;
+  rows.push(head);
+
+  const totals = m.exams.map(() => ({ sum: 0, n: 0 }));
+  m.students.forEach((s, i) => {
+    const band = i % 2 === 1;
+    const row = [
+      { v: i + 1, t: 'n', s: band ? S.numBand : S.num },
+      { v: s.name, s: S.name },
+      { v: s.code ?? '', s: band ? S.textBand : S.text },
+    ];
+    let got = 0, max = 0, zeros = 0;
+    m.exams.forEach((e, ei) => {
+      const c = m.cells.get(`${s.id}|${e.id}`);
+      if (!c.assigned) { row.push({ v: '—', s: band ? S.textBand : S.text }); return; }
+      got += c.score; max += c.max;
+      if (!c.graded) zeros += 1;
+      totals[ei].sum += c.score; totals[ei].n += 1;
+      row.push({ v: c.score, t: 'n', s: fuScoreStyle(c.pct) });
+    });
+    const pct = max > 0 ? fuR2((got / max) * 100) : 0;
+    row.push({ v: fuR2(got), t: 'n', s: S.totalNum },
+             { v: fuR2(max), t: 'n', s: S.totalNum },
+             { v: pct, t: 'n', s: fuPctStyle(pct) },
+             { v: fuBand(pct), s: S.totalText },
+             { v: zeros, t: 'n', s: zeros ? S.missing : S.totalNum });
+    rows.push(row);
+  });
+
+  const foot = [{ v: '', s: S.totalText }, { v: 'متوسط الاختبار', s: S.totalText }, { v: '', s: S.totalText }];
+  let gGot = 0, gMax = 0;
+  m.exams.forEach((e, ei) => {
+    const t = totals[ei];
+    const avg = t.n ? fuR2(t.sum / t.n) : 0;
+    gGot += t.sum; gMax += t.n * Number(e.points ?? 0);
+    foot.push({ v: avg, t: 'n', s: S.totalNum });
+  });
+  const gPct = gMax > 0 ? fuR2((gGot / gMax) * 100) : 0;
+  foot.push({ v: fuR2(gGot), t: 'n', s: S.totalNum }, { v: fuR2(gMax), t: 'n', s: S.totalNum },
+            { v: gPct, t: 'n', s: fuPctStyle(gPct) }, { v: fuBand(gPct), s: S.totalText },
+            { v: '', s: S.totalText });
+  rows.push(foot);
+
+  const cols = [6, 32, 15, ...m.exams.map(() => 17), 12, 15, 11, 13, 14];
+  return {
+    name: 'كشف الدرجات',
+    rows,
+    opts: {
+      cols, freeze: { x: 3, y: 6 },
+      autoFilter: `A6:${lastRef}${6 + m.students.length}`,
+      merges: [`A1:${lastRef}1`, `A2:${lastRef}2`, `A3:${lastRef}3`, `A4:${lastRef}4`],
+    },
+  };
+}
+
+/* ---------- الورقة 2: تفاصيل كل درجة ---------- */
+function fuSheetDetails(m) {
+  const S = XW_S;
+  const HEAD = ['الطالب', 'رمز الطالب', 'الوحدة', 'الاختبار', 'الدرجة', 'النهاية العظمى', 'النسبة %',
+                'الحالة', 'مصدر الدرجة', 'عدد المحاولات', 'آخر تسليم', 'ملاحظة المعلم', 'تاريخ حفظ الدرجة'];
+  const rows = [HEAD.map((h) => ({ v: h, s: S.head }))];
+  rows[0].__h = 30;
+  let n = 0;
+  m.students.forEach((s) => {
+    m.exams.forEach((e) => {
+      const c = m.cells.get(`${s.id}|${e.id}`);
+      if (!c.assigned) return;
+      const band = n % 2 === 1; n += 1;
+      const T = band ? S.textBand : S.text;
+      const N = band ? S.numBand : S.num;
+      rows.push([
+        { v: s.name, s: T }, { v: s.code ?? '', s: T },
+        { v: e.unit ?? '', s: T }, { v: e.title, s: T },
+        { v: c.score, t: 'n', s: fuScoreStyle(c.pct) },
+        { v: c.max, t: 'n', s: N },
+        { v: c.pct, t: 'n', s: fuPctStyle(c.pct) },
+        { v: (FU_EXAM_STATUS[c.status] || FU_EXAM_STATUS.not_started).label, s: c.graded ? T : S.missing },
+        { v: c.graded ? (c.manual ? 'معدَّلة يدويًا' : 'تصحيح آلي') : '—', s: T },
+        { v: c.attempts, t: 'n', s: N },
+        { v: fuXlDate(c.last) || '—', s: T },
+        { v: c.note || '', s: T },
+        { v: fuXlDate(c.savedAt) || '—', s: T },
+      ]);
+    });
+  });
+  return {
+    name: 'تفاصيل الدرجات',
+    rows,
+    opts: { cols: [32, 15, 24, 30, 10, 14, 11, 13, 15, 13, 18, 30, 18],
+            freeze: { x: 1, y: 1 }, autoFilter: `A1:M${rows.length}` },
+  };
+}
+
+/* ---------- الورقة 3: ملخص كل اختبار ---------- */
+function fuSheetExams(m) {
+  const S = XW_S;
+  const HEAD = ['م', 'الاختبار', 'الوحدة', 'النهاية العظمى', 'عدد الطلاب', 'سلّموا', 'لم يبدؤوا',
+                'بدؤوا ولم يسلّموا', 'المتوسط (باحتساب الصفر)', 'متوسط المُسلِّمين',
+                'أعلى درجة', 'أدنى درجة', 'ناجحون ≥50%', 'نسبة النجاح %'];
+  const rows = [HEAD.map((h) => ({ v: h, s: S.head }))];
+  rows[0].__h = 44;
+  m.exams.forEach((e, i) => {
+    const list = m.students.map((s) => m.cells.get(`${s.id}|${e.id}`)).filter((c) => c && c.assigned);
+    const done = list.filter((c) => c.graded);
+    const notStarted = list.filter((c) => c.status === 'not_started').length;
+    const inProgress = list.filter((c) => c.status === 'in_progress').length;
+    const scores = list.map((c) => c.score);
+    const avgAll = list.length ? fuR2(scores.reduce((a, v) => a + v, 0) / list.length) : 0;
+    const avgDone = done.length ? fuR2(done.reduce((a, c) => a + c.score, 0) / done.length) : 0;
+    const pass = list.filter((c) => c.pct >= 50).length;
+    const passPct = list.length ? fuR2((pass / list.length) * 100) : 0;
+    const band = i % 2 === 1;
+    const T = band ? S.textBand : S.text;
+    const N = band ? S.numBand : S.num;
+    rows.push([
+      { v: i + 1, t: 'n', s: N }, { v: e.title, s: T }, { v: e.unit ?? '', s: T },
+      { v: Number(e.points ?? 0), t: 'n', s: N }, { v: list.length, t: 'n', s: N },
+      { v: done.length, t: 'n', s: N },
+      { v: notStarted, t: 'n', s: notStarted ? S.missing : N },
+      { v: inProgress, t: 'n', s: inProgress ? S.missing : N },
+      { v: avgAll, t: 'n', s: N }, { v: avgDone, t: 'n', s: N },
+      { v: scores.length ? Math.max(...scores) : 0, t: 'n', s: N },
+      { v: scores.length ? Math.min(...scores) : 0, t: 'n', s: N },
+      { v: pass, t: 'n', s: N },
+      { v: passPct, t: 'n', s: fuPctStyle(passPct) },
+    ]);
+  });
+  return {
+    name: 'ملخص الاختبارات',
+    rows,
+    opts: { cols: [5, 32, 24, 13, 11, 10, 11, 16, 20, 17, 11, 11, 13, 13],
+            freeze: { x: 2, y: 1 }, autoFilter: `A1:N${rows.length}` },
+  };
+}
+
+window.fuExport = () => {
+  if (!fuState.students.length || !fuState.exams.length) {
+    toast('لا توجد بيانات للتصدير — اختر الشعبة وحمّل الكشف أولًا', 'error');
+    return;
+  }
+  try {
+    const m = fuExportModel();
+    const d = new Date(); const p = (v) => String(v).padStart(2, '0');
+    const today = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    const meta = {
+      className: fuState.className || '—',
+      unitLabel: el('fu-unit').value ? `الوحدة: ${el('fu-unit').value}` : 'جميع الوحدات',
+      today,
+    };
+    const bytes = xwBuild([fuSheetMatrix(m, meta), fuSheetDetails(m), fuSheetExams(m)]);
+    xwDownload(bytes, `كشف_الدرجات_${fuSafeName(meta.className)}_${today}.xlsx`);
+    toast(`تم تصدير الكشف — ${m.students.length} طالبًا × ${m.exams.length} اختبارًا`, 'success');
+  } catch (err) {
+    toast('تعذّر التصدير: ' + err.message, 'error');
+  }
 };
 
 /* ============ قسم الواجبات ============ */
@@ -12911,9 +13345,7 @@ window.lsExport = () => {
       <td>${(r.supporting_styles ?? []).map(lsAr).join('، ')}</td>
       <td>${(r.lowest_styles ?? []).map(lsAr).join('، ')}</td></tr>`).join('')}</table>`;
   const tpl = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body dir="rtl">${html}</body></html>`;
-  const a = document.createElement('a');
-  a.href = 'data:application/vnd.ms-excel;base64,' + btoa(unescape(encodeURIComponent(tpl)));
-  a.download = 'انماط_التعلم.xls'; a.click();
+  dlExcelHtml(tpl, 'انماط_التعلم.xls');
   toast('تم التصدير', 'success');
 };
 
