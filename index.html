@@ -101,6 +101,14 @@ tr:last-child td { border-bottom:none; }
 .toast { background:#1c1f2b; color:#fff; padding:10px 18px; border-radius:999px; font-size:.88rem; box-shadow:var(--shadow-md); }
 .toast.error { background:var(--color-danger); }
 .toast.success { background:var(--color-success); }
+.dlsave { position:fixed; inset-block-end:16px; inset-inline-end:16px; z-index:100; max-width:min(92vw,340px); background:var(--color-surface,#fff); border:1px solid var(--color-border,#e5e7ef); border-inline-start:4px solid var(--color-accent,#c9a227); border-radius:12px; box-shadow:var(--shadow-md); padding:11px 13px; display:flex; gap:10px; align-items:flex-start; font-size:.84rem; line-height:1.6; }
+.dlsave a { font-weight:700; color:var(--color-primary); text-decoration:underline; word-break:break-all; }
+.dlsave button { background:none; border:0; font-size:1rem; line-height:1; cursor:pointer; color:var(--color-text-muted,#8a8fa3); padding:0 2px; flex:0 0 auto; }
+.dlerr { position:fixed; inset:0; z-index:120; background:rgba(12,18,32,.55); display:flex; align-items:center; justify-content:center; padding:16px; }
+.dlerr-box { background:var(--color-surface,#fff); border-radius:14px; width:100%; max-width:min(96vw,540px); padding:18px 18px 14px; box-shadow:var(--shadow-lg,0 20px 50px rgba(0,0,0,.3)); }
+.dlerr-box h4 { margin:0 0 8px; color:var(--color-danger); font-size:1rem; }
+.dlerr-box pre { background:var(--color-bg,#f6f7fb); border-radius:8px; padding:10px; font-size:.72rem; max-height:180px; overflow:auto; direction:ltr; text-align:left; white-space:pre-wrap; word-break:break-word; margin:0; }
+.dlerr-act { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 .text-muted { color:var(--color-text-muted); }
 .text-sm { font-size:.85rem; }
 .flex-between { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
@@ -7142,31 +7150,60 @@ ${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.open
 }
 
 /* ---------- التنزيل ---------- */
-/* Blob بدل data: URL — هذا ما كان يمنع التنزيل في عدة متصفحات، خاصةً على الجوال */
-function xwDownload(bytes, filename) {
-  const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename; a.rel = 'noopener';
-  a.style.display = 'none';
-  document.body.appendChild(a);          // فايرفوكس يشترط وجوده في الصفحة
-  a.click();
-  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
+/* Blob بدل data: URL — هذا ما كان يمنع التنزيل في عدة متصفحات، خاصةً على الجوال.
+   ويبقى بعدها عطل صامت: سفاري على الجوال ومتصفحات التطبيقات الداخلية (واتساب،
+   تيليجرام، تويتر) تتجاهل خاصية download فلا ينزل شيء ولا يظهر خطأ. لذلك يُعرض
+   بعد كل تصدير رابط تنزيل يدوي ظاهر لثوانٍ، فلا يبقى المعلم بلا ملف ولا رسالة. */
+function dlSupported() {
+  try { return 'download' in document.createElement('a'); } catch (e) { return false; }
 }
 
-/* ---------- تنزيل موحَّد لكل ملفات التصدير ----------
-   كان كل تصدير يستعمل data: URL، وهو ما ترفضه عدة متصفحات (وأغلب متصفحات الجوال)
-   فلا ينزل الملف أصلًا. Blob + رابط داخل الصفحة يعمل في كل مكان. */
-function dlFile(content, filename, mime) {
-  const blob = content instanceof Uint8Array
-    ? new Blob([content], { type: mime })
-    : new Blob(['\ufeff' + content], { type: mime + ';charset=utf-8' });
-  const url = URL.createObjectURL(blob);
+function dlManualCard(url, filename) {
+  const old = document.getElementById('dl-save');
+  if (old) old.remove();
+  const box = document.createElement('div');
+  box.id = 'dl-save'; box.className = 'dlsave';
+  const txt = document.createElement('div');
+  const lead = document.createElement('div');
+  lead.style.marginBottom = '4px';
+  lead.textContent = 'لم يبدأ التنزيل؟ اضغط اسم الملف:';
   const a = document.createElement('a');
-  a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
+  a.href = url; a.download = filename; a.rel = 'noopener'; a.textContent = filename;
+  txt.appendChild(lead); txt.appendChild(a);
+  const x = document.createElement('button');
+  x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', 'إغلاق');
+  x.onclick = () => box.remove();
+  box.appendChild(txt); box.appendChild(x);
+  document.body.appendChild(box);
+  setTimeout(() => { if (box.isConnected) box.remove(); }, 45000);
+}
+
+function dlBlob(blob, filename) {
+  const nav = window.navigator;
+  if (nav && typeof nav.msSaveOrOpenBlob === 'function') { nav.msSaveOrOpenBlob(blob, filename); return; }
+  const url = URL.createObjectURL(blob);
+  try {
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);          // فايرفوكس يشترط وجوده في الصفحة
+    a.click();
+    setTimeout(() => a.remove(), 4000);
+  } catch (e) { console.error('[download]', e); }
+  if (dlSupported()) setTimeout(() => dlManualCard(url, filename), 1400);
+  else dlManualCard(url, filename);
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+function xwDownload(bytes, filename) {
+  dlBlob(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), filename);
+}
+
+/* ---------- تنزيل موحَّد لكل ملفات التصدير ---------- */
+function dlFile(content, filename, mime) {
+  dlBlob(content instanceof Uint8Array
+    ? new Blob([content], { type: mime })
+    : new Blob(['﻿' + content], { type: mime + ';charset=utf-8' }), filename);
 }
 const dlExcelHtml = (html, filename) => dlFile(html, filename, 'application/vnd.ms-excel');
 
@@ -12347,25 +12384,119 @@ function fuSheetExams(m) {
   };
 }
 
+/* تقرير عطل التصدير: يُظهر السبب كاملًا بدل تنبيه عابر يختفي في ثوانٍ، ومعه
+   نسخة نصية جاهزة للإرسال، وتنزيل CSV احتياطي حتى لا يبقى المعلم بلا كشف. */
+function fuExportDiag(err) {
+  const g = (fn) => { try { return fn(); } catch (e) { return '?'; } };
+  return [
+    'fuExport failure report',
+    'when: ' + new Date().toISOString(),
+    'ua: ' + g(() => navigator.userAgent || '—'),
+    'class: ' + (fuState.className || '—'),
+    'students: ' + fuState.students.length + ' | exams: ' + fuState.exams.length
+      + ' | map: ' + g(() => fuState.map.size),
+    'deps: xwBuild=' + typeof xwBuild + ' xwDownload=' + typeof xwDownload
+      + ' Blob=' + typeof Blob + ' download=' + g(() => dlSupported()),
+    'error: ' + (err && err.name ? err.name + ': ' : '') + ((err && err.message) || String(err)),
+    'stack: ' + String((err && err.stack) || '—').split('\n').slice(0, 4).join(' | '),
+  ].join('\n');
+}
+
+/* كشف مبسّط بصيغة CSV — نفس الأعمدة والحسابات، بلا أي بناء OOXML */
+function fuExportCsv() {
+  const m = fuExportModel();
+  const q = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const head = ['م', 'الطالب', 'رمز الطالب', ...m.exams.map((e) => e.title),
+                'المجموع', 'مجموع درجات جميع الاختبارات', 'النسبة %', 'الحالة'];
+  const lines = [head.map(q).join(',')];
+  m.students.forEach((s, i) => {
+    let got = 0, max = 0;
+    const cells = m.exams.map((e) => {
+      const c = m.cells.get(`${s.id}|${e.id}`);
+      if (!c || !c.assigned) return '—';
+      got += c.score; max += c.max;
+      return c.score;
+    });
+    const pct = fuPct(got, max);
+    lines.push([i + 1, s.name, s.code ?? '', ...cells, fuR2(got), fuR2(max), pct,
+                fuStudentStatus(m, s, got, max, pct)].map(q).join(','));
+  });
+  return lines.join('\r\n');
+}
+
+function fuExportFail(err) {
+  console.error('[fuExport]', err);
+  const diag = fuExportDiag(err);
+  const old = document.getElementById('fu-exerr');
+  if (old) old.remove();
+  const wrap = document.createElement('div');
+  wrap.id = 'fu-exerr'; wrap.className = 'dlerr';
+  const box = document.createElement('div'); box.className = 'dlerr-box';
+  const h = document.createElement('h4');
+  h.textContent = 'تعذّر إنشاء ملف Excel';
+  const p = document.createElement('p');
+  p.style.cssText = 'margin:0 0 8px;font-size:.86rem;line-height:1.7';
+  p.textContent = 'انسخ التفاصيل وأرسلها ليُصلَح السبب، أو نزّل الكشف الآن بصيغة CSV — يفتح في Excel مباشرة.';
+  const pre = document.createElement('pre');
+  pre.textContent = diag;
+  const act = document.createElement('div'); act.className = 'dlerr-act';
+  const mk = (label, cls, fn) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = cls; b.textContent = label; b.onclick = fn;
+    return b;
+  };
+  act.appendChild(mk('نسخ التفاصيل', 'btn btn-outline btn-sm', () => {
+    try {
+      navigator.clipboard.writeText(diag);
+      toast('نُسخت التفاصيل', 'success');
+    } catch (e) {
+      const r = document.createRange(); r.selectNodeContents(pre);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      toast('حدّد النص وانسخه يدويًا', 'error');
+    }
+  }));
+  act.appendChild(mk('تنزيل CSV بدلًا منه', 'btn btn-primary btn-sm', () => {
+    try {
+      const d = new Date(); const p2 = (v) => String(v).padStart(2, '0');
+      const name = `كشف_الدرجات_${fuSafeName(fuState.className || 'شعبة')}_`
+        + `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}.csv`;
+      dlFile(fuExportCsv(), name, 'text/csv');
+      toast('نُزّل الكشف بصيغة CSV', 'success');
+    } catch (e2) {
+      toast('تعذّر حتى تصدير CSV: ' + e2.message, 'error');
+    }
+  }));
+  act.appendChild(mk('إغلاق', 'btn btn-outline btn-sm', () => wrap.remove()));
+  box.appendChild(h); box.appendChild(p); box.appendChild(pre); box.appendChild(act);
+  wrap.appendChild(box);
+  wrap.onclick = (ev) => { if (ev.target === wrap) wrap.remove(); };
+  document.body.appendChild(wrap);
+}
+
 window.fuExport = () => {
-  if (!fuState.students.length || !fuState.exams.length) {
-    toast('لا توجد بيانات للتصدير — اختر الشعبة وحمّل الكشف أولًا', 'error');
-    return;
-  }
   try {
+    if (!fuState.students.length || !fuState.exams.length) {
+      toast(fuState.students.length
+        ? 'لا توجد اختبارات في الكشف الحالي — غيّر الوحدة أو أعد تحميل الكشف'
+        : 'اختر الشعبة أولًا ثم اعرض كشف الدرجات', 'error');
+      return;
+    }
     const m = fuExportModel();
     const d = new Date(); const p = (v) => String(v).padStart(2, '0');
     const today = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    const unitSel = el('fu-unit');
+    const unitVal = unitSel ? unitSel.value : '';
     const meta = {
       className: fuState.className || '—',
-      unitLabel: el('fu-unit').value ? `الوحدة: ${el('fu-unit').value}` : 'جميع الوحدات',
+      unitLabel: unitVal ? `الوحدة: ${unitVal}` : 'جميع الوحدات',
       today,
     };
     const bytes = xwBuild([fuSheetMatrix(m, meta), fuSheetDetails(m), fuSheetExams(m)]);
+    if (!bytes || !bytes.length) throw new Error('الملف الناتج فارغ (xwBuild أعاد 0 بايت)');
     xwDownload(bytes, `كشف_الدرجات_${fuSafeName(meta.className)}_${today}.xlsx`);
     toast(`تم تصدير الكشف — ${m.students.length} طالبًا × ${m.exams.length} اختبارًا`, 'success');
   } catch (err) {
-    toast('تعذّر التصدير: ' + err.message, 'error');
+    fuExportFail(err);
   }
 };
 
