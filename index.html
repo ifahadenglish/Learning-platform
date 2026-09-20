@@ -12167,23 +12167,21 @@ function fuExportModel() {
   return { students, exams, cells };
 }
 
-/* تصنيف الطالب في عمود «التقدير».
-   حالة واحدة تخرج عن سُلّم التقديرات: طالب شارك في اختبار أو أكثر، ولم يبلغ
-   درجة النجاح في أيٍّ منها، ثم انقطع عن الاختبارات التي تليه في الكشف — هذا
-   تصنيفه «يحتاج متابعة»، لأن الرقم وحده لا يُظهر أنه توقّف عن المحاولة.
-   الترتيب المعتمد هو ترتيب الاختبارات في الكشف نفسه (لا تُخزَّن تواريخ إسناد).
+/* عمود «الحالة».
+   كل طالب دخل الاختبارات ولم يبلغ درجة النجاح — وهي نصف مجموع درجات جميع
+   الاختبارات — حالته «يحتاج متابعة». ومن بلغها فحالته تقديره من سُلّم النسبة.
+   ومن لم يدخل أي اختبار يبقى «غير مجتاز»، فهو لم يدخل أصلًا ليُحتاج متابعته هنا.
+   المقارنة على الدرجات نفسها (got × 2 ≥ max) لا على النسبة المقرَّبة، حتى لا
+   يُحسب من نال 24.8 من 50 ناجحًا لأن نسبته تُعرض 50%.
    لا يغيّر هذا شيئًا في الدرجات ولا النسب ولا المجاميع. */
-const FU_PASS = 50;
 const FU_FOLLOW_UP = 'يحتاج متابعة';
-function fuStudentBand(m, s, pct) {
-  const seq = m.exams
-    .map((e) => m.cells.get(`${s.id}|${e.id}`))
-    .filter((c) => c && c.assigned);
-  const lastTaken = seq.reduce((k, c, i) => (c.graded ? i : k), -1);
-  const tookAny = lastTaken >= 0;
-  const nonePassed = seq.every((c) => !c.graded || c.pct < FU_PASS);
-  const stoppedAfterwards = lastTaken < seq.length - 1;   // بقي اختبار أو أكثر لم يشارك فيه
-  return (tookAny && nonePassed && stoppedAfterwards) ? FU_FOLLOW_UP : fuBand(pct);
+function fuStudentStatus(m, s, got, max, pct) {
+  const enteredAny = m.exams.some((e) => {
+    const c = m.cells.get(`${s.id}|${e.id}`);
+    return c && c.assigned && c.graded;
+  });
+  const passed = max > 0 && got * 2 >= max;     // النجاح = نصف الدرجة الكاملة
+  return (enteredAny && !passed) ? FU_FOLLOW_UP : fuBand(pct);
 }
 
 /* ---------- الورقة 1: كشف الدرجات (طلاب × اختبارات) ---------- */
@@ -12204,7 +12202,7 @@ function fuSheetMatrix(m, meta) {
   for (const e of m.exams) head.push({ v: `${e.unit ? e.unit + '\n' : ''}${e.title}\n(من ${Number(e.points ?? 0)})`, s: S.head });
   head.push({ v: 'المجموع', s: S.headGold },
              { v: 'مجموع درجات جميع الاختبارات', s: S.headGold },
-             { v: 'النسبة %', s: S.headGold }, { v: 'التقدير', s: S.headGold });
+             { v: 'النسبة %', s: S.headGold }, { v: 'الحالة', s: S.headGold });
   head.__h = 46;
   rows.push(head);
 
@@ -12228,7 +12226,7 @@ function fuSheetMatrix(m, meta) {
     row.push({ v: fuR2(got), t: 'n', s: S.totalNum },
              { v: fuR2(max), t: 'n', s: S.totalNum },
              fuPctCell(pct),
-             { v: fuStudentBand(m, s, pct), s: S.totalText });
+             { v: fuStudentStatus(m, s, got, max, pct), s: S.totalText });
     rows.push(row);
   });
 
