@@ -109,6 +109,46 @@ tr:last-child td { border-bottom:none; }
 .dlerr-box h4 { margin:0 0 8px; color:var(--color-danger); font-size:1rem; }
 .dlerr-box pre { background:var(--color-bg,#f6f7fb); border-radius:8px; padding:10px; font-size:.72rem; max-height:180px; overflow:auto; direction:ltr; text-align:left; white-space:pre-wrap; word-break:break-word; margin:0; }
 .dlerr-act { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.spin-banner { position:fixed; inset-block-start:0; inset-inline:0; z-index:85;
+  background:var(--color-danger, #C13F58); color:#fff; display:flex; align-items:center;
+  justify-content:center; gap:12px; flex-wrap:wrap; padding:8px 14px; font-size:.85rem;
+  line-height:1.6; box-shadow:0 2px 10px rgba(0,0,0,.18); }
+.spin-banner .btn { background:#fff; color:var(--color-danger, #C13F58); border-color:#fff; font-weight:700; }
+body.spin-nagged { padding-block-start:var(--spin-h, 44px); }
+body.spin-nagged .app-sidebar { top:var(--spin-h, 44px); height:calc(100dvh - var(--spin-h, 44px)); }
+.pinrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:9px 11px;
+  border:1px solid var(--color-border); border-radius:var(--radius-md); background:#fff; margin-bottom:7px; }
+.pinrow .who { flex:1; min-width:150px; font-weight:600; font-size:.88rem; }
+.pinrow .who small { display:block; font-weight:500; font-size:.72rem; color:var(--color-text-3); }
+.pinval { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:1.15rem; font-weight:800;
+  letter-spacing:.22em; direction:ltr; background:var(--color-accent-bg); color:var(--color-accent-dark);
+  border-radius:8px; padding:3px 12px; min-width:104px; text-align:center; }
+@media print { .spin-banner { display:none !important; } body.spin-nagged { padding-block-start:0; } }
+
+/* ---------- باركود الاختبار ---------- */
+#ae-qrbox { display:flex; align-items:center; justify-content:center; padding:14px;
+  background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-md); }
+#ae-qrbox svg { width:100%; max-width:260px; height:auto; }
+.qr-acts { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.dep-note { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:space-between;
+  background:var(--color-accent-bg); border:1px solid var(--color-accent); color:var(--color-accent-dark);
+  border-radius:var(--radius-md); padding:9px 12px; font-size:.86rem; margin-bottom:10px; }
+.dep-note b { font-size:.95rem; }
+.deplink { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.76rem; direction:ltr;
+  word-break:break-all; background:var(--color-surface-2); border-radius:8px; padding:5px 9px; display:inline-block; }
+#qr-printarea { display:none; }
+.qr-sheet { text-align:center; color:#000; }
+.qr-sheet .qr-sheet-h { font-size:12pt; font-weight:700; }
+.qr-sheet h1 { font-size:24pt; margin:8px 0 14px; }
+.qr-sheet-qr svg { width:118mm; height:118mm; }
+.qr-sheet-steps { display:inline-block; text-align:start; font-size:13pt; line-height:2; margin:14px auto 8px; }
+.qr-sheet-url { font-size:9pt; direction:ltr; word-break:break-all; color:#333; border-top:1px solid #000; padding-top:8px; margin-top:10px; }
+@media print {
+  body.qrprinting .app-shell,
+  body.qrprinting .modal-backdrop,
+  body.qrprinting .toast-stack { display:none !important; }
+  body.qrprinting #qr-printarea { display:block !important; }
+}
 .text-muted { color:var(--color-text-muted); }
 .text-sm { font-size:.85rem; }
 .flex-between { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
@@ -2201,7 +2241,10 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
       <div class="steps"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
       <div id="sl-error" class="hidden text-sm" style="color:var(--color-danger); margin-bottom:12px;"></div>
 
-      <div id="sl-step1"><div id="sl-classlist" class="state-box"><span class="spinner"></span></div></div>
+      <div id="sl-step1">
+        <div id="sl-depnote" class="dep-note hidden"></div>
+        <div id="sl-classlist" class="state-box"><span class="spinner"></span></div>
+      </div>
 
       <div id="sl-step2" class="hidden">
         <div class="field"><input type="search" id="sl-search" placeholder="ابحث عن اسمك..."></div>
@@ -2225,6 +2268,18 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
             placeholder="••••" required style="text-align:center; letter-spacing:.6em; font-size:1.5rem; font-weight:800;"></div>
           <button type="submit" class="btn btn-primary btn-block" id="sl-pinbtn">دخول</button>
         </form>
+        <button class="btn btn-outline btn-block mt-1" onclick="slGoStep(2)">⟵ لست أنا، رجوع</button>
+      </div>
+
+      <div id="sl-stepspin" class="hidden">
+        <p class="text-sm">أهلًا <b id="sl-spinname"></b><span id="sl-spinhint"></span></p>
+        <form id="sl-spinform">
+          <div class="field" id="sl-spinfield"><input type="tel" id="sl-spinvalue" inputmode="numeric" maxlength="6"
+            placeholder="••••••" autocomplete="off" oninput="slSpinClean()"
+            style="text-align:center; letter-spacing:.45em; font-size:1.5rem; font-weight:800; direction:ltr;"></div>
+          <button type="submit" class="btn btn-primary btn-block" id="sl-spinbtn">دخول</button>
+        </form>
+        <p class="text-sm text-muted mt-1" id="sl-spinnote"></p>
         <button class="btn btn-outline btn-block mt-1" onclick="slGoStep(2)">⟵ لست أنا، رجوع</button>
       </div>
 
@@ -2465,6 +2520,13 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
                 <div class="text-sm text-muted">الطالب يختار اسمه ثم يكتب رمزًا رقميًا واحدًا تعطيه لطلابك (مثل رمز الصف). حلٌّ وسط: أسهل من كلمة المرور وأأمن من الدخول المفتوح.</div></div>
               </div>
             </label>
+            <label class="card mode-card">
+              <div class="flex-gap" style="align-items:flex-start; gap:8px;">
+                <input type="radio" name="aa-loginmode" id="aa-modestudentpin" style="width:auto; margin-top:4px;" onchange="aaSetLoginMode('studentpin')">
+                <div><b><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-key"/></svg> كلمة سر خاصة بكل طالب (٦ أرقام)</b>
+                <div class="text-sm text-muted">لكل طالب كلمة سر يضعها بنفسه. من لم يضعها بعد يدخل باسمه ويُذكَّر بوضعها في كل مرة. وأنت تستطيع استرجاعها لمن نسيها أو تصفيرها ليضع غيرها.</div></div>
+              </div>
+            </label>
           </div>
 
           <div class="pin-box mt-2 hidden" id="aa-pinpanel">
@@ -2489,9 +2551,23 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
           <div class="mt-1 text-sm" id="aa-modemsg"></div>
         </div>
 
+        <div class="card mt-2" style="border-inline-start:4px solid var(--color-accent);">
+          <div class="flex-between">
+            <h3 style="margin:0;"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-key"/></svg> كلمات سر الطلاب</h3>
+            <div class="flex-gap">
+              <select id="aa-pinclass" style="min-width:200px;" onchange="aaLoadPins()"></select>
+              <button class="btn btn-outline btn-sm" onclick="aaLoadPins()">تحديث</button>
+            </div>
+          </div>
+          <p class="text-sm text-muted mt-1">كلمة سر كل طالب محفوظة لديك: تستطيع إظهارها لمن نسيها وإرسالها له، أو تصفيرها ليضع كلمة سر جديدة بنفسه. كل إظهار يُسجَّل بتاريخه.</p>
+          <div id="aa-pinssummary" class="mt-1"></div>
+          <div id="aa-pinsbody" class="mt-1"><div class="state-box">اختر شعبة لعرض كلمات السر</div></div>
+        </div>
+
         <div class="section-tabs mt-2">
           <button class="chip active" data-section="grades" onclick="aaSwitchSection('grades')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-book"/></svg> الصفوف الدراسية</button>
           <button class="chip" data-section="classes" onclick="aaSwitchSection('classes')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-school"/></svg> الشُّعب</button>
+          <button class="chip" data-section="depts" onclick="aaSwitchSection('depts')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-users"/></svg> الأقسام</button>
         </div>
 
         <div id="aa-section-grades">
@@ -2504,6 +2580,17 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
               <table><thead><tr><th>الاسم</th><th>القسم</th><th>الحالة</th><th></th></tr></thead>
               <tbody id="aa-gradestbody"><tr><td colspan="4"><div class="state-box"><span class="spinner"></span></div></td></tr></tbody></table>
             </div>
+          </div>
+        </div>
+
+        <div id="aa-section-depts" class="hidden">
+          <div class="card">
+            <div class="flex-between">
+              <h3 style="margin:0;">الأقسام</h3>
+              <button class="btn btn-primary btn-sm" onclick="aaOpenAddDept()">+ إضافة قسم</button>
+            </div>
+            <p class="text-sm text-muted mt-1">القسم <b>الخاص</b> لا تظهر شُعبه في قائمة الدخول التي يراها طلاب الفترة الصباحية إطلاقًا؛ لا يصل إليها إلا من فتح رابط القسم. أضِف طلابه كبقية الطلاب من «الطلاب».</p>
+            <div id="aa-deptsbody" class="mt-2"><div class="state-box"><span class="spinner"></span></div></div>
           </div>
         </div>
 
@@ -4287,6 +4374,63 @@ h1 .nav-ic, h2 .nav-ic, h3 .nav-ic{ margin-inline-end:6px; color:var(--color-pri
 
 <!-- حاوية طباعة الخطة العلاجية: تظهر عند الطباعة فقط -->
 <div id="rp-printarea"></div>
+<div id="qr-printarea"></div>
+
+<div class="modal-backdrop hidden" id="aa-adddeptmodal">
+  <div class="modal" style="max-width:430px;">
+    <div class="flex-between"><h3 style="margin:0;">إضافة قسم</h3>
+      <button class="btn btn-sm btn-icon" onclick="closeModal('aa-adddeptmodal')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-close"/></svg></button></div>
+    <div class="field mt-2"><label>اسم القسم</label><input type="text" id="aa-deptname" placeholder="التعليم المستمر"></div>
+    <div class="field"><label>الرمز المختصر (اختياري)</label><input type="text" id="aa-deptcode" dir="ltr" placeholder="CONT"></div>
+    <label class="retake-toggle" style="margin:4px 0 0;">
+      <input type="checkbox" id="aa-deptprivate" checked>
+      قسم خاص: لا يظهر في قائمة الدخول، ويُدخل إليه برابط
+    </label>
+    <div class="text-sm" id="aa-adddeptmsg" style="min-height:20px;"></div>
+    <button class="btn btn-primary btn-block mt-1" onclick="aaAddDept()">إضافة</button>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="aa-deplinkmodal">
+  <div class="modal" style="max-width:470px;">
+    <div class="flex-between"><h3 style="margin:0;">رابط دخول القسم</h3>
+      <button class="btn btn-sm btn-icon" onclick="closeModal('aa-deplinkmodal')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-close"/></svg></button></div>
+    <p class="text-sm mt-1" id="aa-deplinkname" style="font-weight:700;"></p>
+    <p class="text-sm text-muted">أرسل هذا الرابط لطلاب القسم وحدهم. من يفتحه يرى شُعب هذا القسم فقط، ويبقى محفوظًا في جهازه فلا يحتاج الرابط في كل مرة.</p>
+    <div class="field mt-2"><label>رابط المنصة</label>
+      <input type="text" id="aa-deplinkbase" dir="ltr" oninput="aaDepLinkRender()" placeholder="https://..."></div>
+    <div class="mt-1"><span class="deplink" id="aa-deplinkurl"></span></div>
+    <div id="aa-deplinkqr" class="mt-2" style="display:flex; justify-content:center;"></div>
+    <div class="qr-acts">
+      <button class="btn btn-primary btn-sm" onclick="aaDepLinkCopy(this)">نسخ الرابط</button>
+      <button class="btn btn-outline btn-sm" onclick="aaDepRotate()">تجديد الرمز</button>
+      <button class="btn btn-outline btn-sm" onclick="aaDepOpenPublic()">جعله قسمًا عامًا</button>
+    </div>
+    <p class="text-sm text-muted mt-1">«تجديد الرمز» يُبطل كل الروابط القديمة فورًا — استعمله إن تسرّب الرابط.</p>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="ae-qrmodal">
+  <div class="modal" style="max-width:480px; max-height:90dvh; overflow-y:auto;">
+    <div class="flex-between"><h3 style="margin:0;">باركود الاختبار</h3>
+      <button class="btn btn-sm btn-icon" onclick="closeModal('ae-qrmodal')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#nv-close"/></svg></button></div>
+    <p class="text-sm text-muted mt-1" id="ae-qrtitle" style="font-weight:700; color:var(--color-text-1);"></p>
+    <p class="text-sm text-muted">يمسحه الطالب بكاميرا جواله، فيفتح المنصة ويختار اسمه ويُدخل كلمة سره، ثم يبدأ هذا الاختبار مباشرةً — فتُنسب الدرجة إليه بلا التباس.</p>
+    <div class="mt-2" id="ae-qrbox"></div>
+    <div class="field mt-2"><label>رابط المنصة</label>
+      <input type="text" id="ae-qrbase" dir="ltr" oninput="aeQrRender()" placeholder="https://...">
+      <div class="field-hint">عنوان المنصة كما يفتحه الطلاب. يُحفظ في هذا الجهاز فلا تكتبه في كل مرة.</div>
+    </div>
+    <div class="field"><label>الرابط الكامل</label>
+      <input type="text" id="ae-qrlink" dir="ltr" readonly onclick="this.select()"></div>
+    <div class="qr-acts">
+      <button class="btn btn-primary btn-sm" onclick="aeQrCopy(this)">نسخ الرابط</button>
+      <button class="btn btn-outline btn-sm" onclick="aeQrPng()">حفظ صورة</button>
+      <button class="btn btn-outline btn-sm" onclick="aeQrSvg()">حفظ SVG</button>
+      <button class="btn btn-outline btn-sm" onclick="aeQrPrint()">ورقة للطباعة</button>
+    </div>
+  </div>
+</div>
 
 <!-- ================= Modal: تفصيل ضعف الطالب ================= -->
 <div class="modal-backdrop hidden" id="rp-swmodal">
@@ -4861,6 +5005,7 @@ window.go = async function go(name) {
 window.closeModal = (id) => el(id).classList.add('hidden');
 window.doSignOut = async () => {
   if (viewerMode) return window.vwExit();   // الزائر يعود للوحته لا لتسجيل خروج معلم
+  spinBannerHide();
   await supabase.auth.signOut(); go('landing');
 };
 
@@ -4887,17 +5032,18 @@ el('al-form').addEventListener('submit', async (e) => {
 let slStudents = [], slSelected = null;
 function resetStudentLogin() {
   el('sl-error').classList.add('hidden');
-  ['sl-step1','sl-steplogin','sl-stepactivate','sl-steppin'].forEach((id) => el(id).classList.add('hidden'));
+  ['sl-step1','sl-steplogin','sl-stepactivate','sl-steppin','sl-stepspin'].forEach((id) => el(id).classList.add('hidden'));
   el('sl-step1').classList.remove('hidden');
 }
 function slShowError(msg) { el('sl-error').textContent = msg; el('sl-error').classList.remove('hidden'); }
 function slGoStep(n) {
-  ['sl-step1','sl-step2','sl-steplogin','sl-stepactivate','sl-steppin'].forEach((id) => el(id).classList.add('hidden'));
+  ['sl-step1','sl-step2','sl-steplogin','sl-stepactivate','sl-steppin','sl-stepspin'].forEach((id) => el(id).classList.add('hidden'));
   if (n === 1) el('sl-step1').classList.remove('hidden');
   if (n === 2) el('sl-step2').classList.remove('hidden');
   if (n === 'login') el('sl-steplogin').classList.remove('hidden');
   if (n === 'activate') el('sl-stepactivate').classList.remove('hidden');
   if (n === 'pin') el('sl-steppin').classList.remove('hidden');
+  if (n === 'spin') el('sl-stepspin').classList.remove('hidden');
   document.querySelectorAll('#screen-student-login .steps .dot').forEach((d, i) => {
     const idx = n === 1 ? 1 : (n === 2 ? 2 : 3);
     d.classList.toggle('active', i < idx);
@@ -4905,10 +5051,43 @@ function slGoStep(n) {
 }
 window.slGoStep = slGoStep;
 
+/* ---------- القسم الخاص: رمز يصل مع الرابط ويبقى محفوظًا في الجهاز ---------- */
+let depToken = null;
+function depTokenLoad() {
+  if (depToken) return depToken;
+  try { depToken = localStorage.getItem('dep-token') || null; } catch { depToken = null; }
+  return depToken;
+}
+window.depTokenSet = (t) => {
+  depToken = t || null;
+  try { if (depToken) localStorage.setItem('dep-token', depToken); else localStorage.removeItem('dep-token'); }
+  catch { /* تصفّح خاص */ }
+};
+window.depLeave = () => { window.depTokenSet(null); slLoadClasses(); };
+
 async function slLoadClasses() {
   el('sl-classlist').innerHTML = '<span class="spinner"></span>';
+  const note = el('sl-depnote');
+  note.classList.add('hidden');
+  const token = depTokenLoad();
   try {
-    const { data, error } = await supabase.rpc('list_login_classes');
+    let data, error;
+    if (token) {
+      ({ data, error } = await supabase.rpc('list_login_classes_by_token', { p_token: token }));
+      if (!error && (!data || !data.length)) {
+        // رمز منتهٍ أو مجدَّد: نرجع للقائمة العامة بدل شاشة فارغة
+        window.depTokenSet(null);
+        note.className = 'dep-note';
+        note.innerHTML = '<span>هذا الرابط لم يعد صالحًا — اطلب من معلمك رابطًا جديدًا.</span>';
+        ({ data, error } = await supabase.rpc('list_login_classes'));
+      } else if (!error) {
+        note.className = 'dep-note';
+        note.innerHTML = `<span><b>${exEsc(data[0].department_name)}</b> — تدخل عبر رابط قسمك الخاص.</span>`
+          + '<button class="btn btn-outline btn-sm" onclick="depLeave()">لست من هذا القسم</button>';
+      }
+    } else {
+      ({ data, error } = await supabase.rpc('list_login_classes'));
+    }
     if (error) throw error;
     if (!data || data.length === 0) { el('sl-classlist').innerHTML = '<div class="state-box"><div class="icon">📭</div>لا توجد شعب متاحة</div>'; return; }
     const wrap = document.createElement('div'); wrap.className = 'name-list';
@@ -4924,7 +5103,7 @@ async function slLoadClasses() {
 
 async function slSelectClass(classId) {
   try {
-    const { data, error } = await supabase.rpc('list_class_students_for_login', { p_class_id: classId });
+    const { data, error } = await supabase.rpc('list_class_students_for_login', { p_class_id: classId, p_token: depTokenLoad() });
     if (error) throw error;
     slStudents = data ?? [];
     slRenderNames(slStudents);
@@ -4937,9 +5116,15 @@ function slRenderNames(list) {
   if (list.length === 0) { box.innerHTML = '<div class="state-box">لا يوجد طلاب</div>'; return; }
   list.forEach((s) => {
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'name-item';
-    btn.innerHTML = (slLoginMode === 'open' || slLoginMode === 'pin')
-      ? `<span>${s.full_name}</span><span>دخول ›</span>`
-      : `<span>${s.full_name}</span>` + (s.is_activated ? '<span class="badge badge-success">مفعّل</span>' : '<span class="badge badge-warning">جديد</span>');
+    if (slLoginMode === 'studentpin') {
+      btn.innerHTML = `<span>${s.full_name}</span>` + (s.has_pin
+        ? '<span class="badge badge-success">🔑 له كلمة سر</span>'
+        : '<span class="badge badge-warning">بلا كلمة سر</span>');
+    } else {
+      btn.innerHTML = (slLoginMode === 'open' || slLoginMode === 'pin')
+        ? `<span>${s.full_name}</span><span>دخول ›</span>`
+        : `<span>${s.full_name}</span>` + (s.is_activated ? '<span class="badge badge-success">مفعّل</span>' : '<span class="badge badge-warning">جديد</span>');
+    }
     btn.addEventListener('click', () => slSelectStudent(s));
     box.appendChild(btn);
   });
@@ -4970,6 +5155,20 @@ async function slSelectStudent(s) {
     setTimeout(() => el('sl-pinvalue').focus(), 60);
     return;
   }
+  if (slLoginMode === 'studentpin') {
+    const has = s.has_pin === true;
+    el('sl-spinname').textContent = s.full_name;
+    el('sl-spinhint').textContent = has ? '، أدخل كلمة سرك:' : ' — لم تضع كلمة سر بعد.';
+    el('sl-spinvalue').value = '';
+    el('sl-spinfield').classList.toggle('hidden', !has);
+    el('sl-spinbtn').textContent = has ? 'دخول' : 'ادخل وضع كلمة سرك الآن';
+    el('sl-spinnote').textContent = has
+      ? 'نسيتَ كلمة سرك؟ راجع معلمك — يستطيع إرجاعها لك أو تصفيرها لتضع غيرها.'
+      : 'ستطلب منك المنصة وضع كلمة سر من ٦ أرقام بعد الدخول مباشرةً.';
+    slGoStep('spin');
+    if (has) setTimeout(() => el('sl-spinvalue').focus(), 60);
+    return;
+  }
   if (s.is_activated) { el('sl-loginname').textContent = s.full_name; slGoStep('login'); }
   else { el('sl-activatename').textContent = s.full_name; slGoStep('activate'); }
 }
@@ -4997,6 +5196,38 @@ el('sl-pinform').addEventListener('submit', async (e) => {
   } finally { btn.disabled = false; btn.textContent = 'دخول'; }
 });
 
+/* حقل كلمة السر يقبل الأرقام وحدها — والتحقق من الطول رسالتنا لا رسالة المتصفح */
+window.slSpinClean = () => {
+  const i = el('sl-spinvalue');
+  i.value = i.value.replace(/\D/g, '').slice(0, 6);
+};
+
+el('sl-spinform').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  el('sl-error').classList.add('hidden');
+  const btn = el('sl-spinbtn'); const label = btn.textContent;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري الدخول...';
+  try {
+    const has = slSelected.has_pin === true;
+    const pin = String(el('sl-spinvalue').value ?? '').trim();
+    if (has && !/^[0-9]{6}$/.test(pin)) throw new Error('كلمة السر مكوّنة من ٦ أرقام');
+    const { data, error } = await supabase.functions.invoke('student-self-login', {
+      body: { student_id: slSelected.student_id ?? slSelected.id, pin: has ? pin : '' },
+    });
+    if (error || !data || data.success !== true) {
+      let msg = (data && data.error) || 'تعذّر الدخول';
+      if (error && !(data && data.error)) { try { const b = await error.context.json(); if (b && b.error) msg = b.error; } catch { /* لا جسم */ } }
+      throw new Error(msg);
+    }
+    const { error: otpErr } = await supabase.auth.verifyOtp({ email: data.email, token: data.token, type: 'email' });
+    if (otpErr) throw new Error('تعذّر إكمال الدخول. حاول مرة أخرى');
+    spinJustLoggedIn = data.needs_pin === true;
+    go('student-home');
+  } catch (err) {
+    slShowError(err.message);
+  } finally { btn.disabled = false; btn.textContent = label; }
+});
+
 el('sl-loginform').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = el('sl-loginbtn'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري الدخول...';
@@ -5021,6 +5252,117 @@ el('sl-activateform').addEventListener('submit', async (e) => {
     go('student-home');
   } catch (err) { slShowError(err.message); } finally { btn.disabled = false; btn.textContent = 'تفعيل الحساب والدخول'; }
 });
+
+/* ================= كلمة سر الطالب: التذكير الدائم ونافذة الضبط =================
+   الطالب الذي لم يضع كلمة سر يدخل بلا عائق، لكنه يرى شريطًا ثابتًا في كل شاشة
+   حتى يضعها. الشريط عنصر مثبَّت في الصفحة لا داخل شاشة بعينها، فيبقى ظاهرًا
+   مهما تنقّل بين الدروس والاختبارات والرسائل. */
+let spinJustLoggedIn = false;
+
+function spinBannerFit() {
+  const bar = document.getElementById('spin-banner');
+  if (!bar) return;
+  // الشريط يلتفّ إلى سطرين على الجوال، فارتفاعه يُقاس ولا يُفترض
+  document.documentElement.style.setProperty('--spin-h', bar.offsetHeight + 'px');
+}
+
+function spinBannerHide() {
+  document.getElementById('spin-banner')?.remove();
+  document.body.classList.remove('spin-nagged');
+  document.documentElement.style.removeProperty('--spin-h');
+  window.removeEventListener('resize', spinBannerFit);
+}
+
+function spinBannerShow() {
+  if (document.getElementById('spin-banner')) return;
+  const bar = document.createElement('div');
+  bar.id = 'spin-banner'; bar.className = 'spin-banner';
+  const txt = document.createElement('span');
+  txt.innerHTML = '<b>🔑 لم تضع كلمة سر لحسابك بعد.</b> بدونها يستطيع أي زميل الدخول باسمك.';
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'btn btn-sm btn-primary';
+  btn.textContent = 'ضع كلمة سرك الآن';
+  btn.onclick = () => window.spinOpen(false);
+  bar.appendChild(txt); bar.appendChild(btn);
+  document.body.appendChild(bar);
+  document.body.classList.add('spin-nagged');
+  spinBannerFit();
+  window.addEventListener('resize', spinBannerFit);
+}
+
+/* نافذة وضع/تغيير كلمة السر — change=true تعني تغييرًا اختياريًا لا تذكيرًا */
+window.spinOpen = (change) => {
+  document.getElementById('spin-modal')?.remove();
+  const wrap = document.createElement('div');
+  wrap.id = 'spin-modal'; wrap.className = 'modal-backdrop';
+  wrap.innerHTML = `<div class="modal" style="max-width:420px;">
+      <div class="flex-between"><h3 style="margin:0;">🔑 ${change ? 'تغيير كلمة السر' : 'ضع كلمة سرك'}</h3>
+        <button class="btn btn-sm btn-icon" type="button" id="spin-x">✕</button></div>
+      <p class="text-sm text-muted">كلمة السر ٦ أرقام تختارها أنت وتحفظها. لا تجعلها أرقامًا متسلسلة (123456) ولا مكرّرة (111111)، ولا تخبر بها أحدًا.</p>
+      <div class="field"><label>كلمة السر</label>
+        <input type="tel" id="spin-a" inputmode="numeric" maxlength="6" autocomplete="off"
+               style="text-align:center; letter-spacing:.45em; font-size:1.4rem; font-weight:800; direction:ltr;" placeholder="••••••"></div>
+      <div class="field"><label>أعدها مرة أخرى</label>
+        <input type="tel" id="spin-b" inputmode="numeric" maxlength="6" autocomplete="off"
+               style="text-align:center; letter-spacing:.45em; font-size:1.4rem; font-weight:800; direction:ltr;" placeholder="••••••"></div>
+      <div class="text-sm" id="spin-msg" style="min-height:1.4em; color:var(--color-danger);"></div>
+      <button class="btn btn-primary btn-block" type="button" id="spin-save">حفظ كلمة السر</button>
+      ${change ? '' : '<button class="btn btn-outline btn-block btn-sm mt-1" type="button" id="spin-later">لاحقًا</button>'}
+    </div>`;
+  document.body.appendChild(wrap);
+  const close = () => wrap.remove();
+  wrap.querySelector('#spin-x').onclick = close;
+  wrap.querySelector('#spin-later')?.addEventListener('click', close);
+  ['spin-a', 'spin-b'].forEach((id) => {
+    const i = wrap.querySelector('#' + id);
+    i.addEventListener('input', () => { i.value = i.value.replace(/\D/g, '').slice(0, 6); });
+  });
+  wrap.querySelector('#spin-save').onclick = async () => {
+    const a = wrap.querySelector('#spin-a').value;
+    const b = wrap.querySelector('#spin-b').value;
+    const msg = wrap.querySelector('#spin-msg');
+    if (!/^[0-9]{6}$/.test(a)) { msg.textContent = 'اكتب ٦ أرقام بالضبط'; return; }
+    if (a !== b) { msg.textContent = 'الكلمتان غير متطابقتين'; return; }
+    const save = wrap.querySelector('#spin-save');
+    save.disabled = true; msg.style.color = 'var(--color-text-muted)'; msg.textContent = 'جارٍ الحفظ…';
+    try {
+      const { error } = await supabase.rpc('set_my_pin', { p_pin: a });
+      if (error) throw new Error(error.message);
+      close(); spinBannerHide();
+      toast('تم حفظ كلمة سرك — احفظها جيدًا', 'success');
+      spinRefreshChip(true);
+    } catch (err) {
+      msg.style.color = 'var(--color-danger)'; msg.textContent = err.message;
+      save.disabled = false;
+    }
+  };
+  setTimeout(() => wrap.querySelector('#spin-a').focus(), 60);
+};
+
+/* زر «تغيير كلمة السر» في ترويسة صفحة الطالب لمن وضعها أصلًا */
+function spinRefreshChip(has) {
+  const host = el('sh-chips');
+  if (!host) return;
+  host.querySelector('.spin-chip')?.remove();
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'head-chip spin-chip';
+  b.style.cssText = 'cursor:pointer; font:inherit;';
+  b.textContent = has ? '🔑 تغيير كلمة السر' : '🔑 ضع كلمة سرك';
+  b.onclick = () => window.spinOpen(has);
+  host.appendChild(b);
+}
+
+/* يُنادى بعد تحميل صفحة الطالب: يقرر إظهار الشريط أو إخفاءه */
+async function spinCheck() {
+  try {
+    const { data, error } = await supabase.rpc('my_pin_status');
+    if (error) throw new Error(error.message);
+    const has = data === true;
+    if (has) spinBannerHide(); else spinBannerShow();
+    spinRefreshChip(has);
+    if (!has && spinJustLoggedIn) { spinJustLoggedIn = false; setTimeout(() => window.spinOpen(false), 700); }
+  } catch { /* لا نعطّل الصفحة إن تعذّر الفحص */ }
+}
 
 /* ================= الزائر: دخول بكود وتصفح للقراءة فقط ================= */
 const VISITOR_STORAGE_KEY = 'visitor_session';
@@ -5174,6 +5516,8 @@ async function ahBootStudents() {
   const opts = ahClasses.map((c) => `<option value="${c.id}">${c.department_name} - ${c.grade_name} - ${c.name}</option>`).join('');
   el('ah-classselect').innerHTML = opts;
   el('ah-transferclass').innerHTML = opts;
+  el('aa-pinclass').innerHTML = opts;
+  if (ahClasses.length) aaLoadPins();
   if (ahClasses.length) { ahCurrentClassId = ahClasses[0].id; await ahLoadStudents(); }
   else el('ah-tbody').innerHTML = '<tr><td colspan="4"><div class="state-box">لا توجد شعب بعد</div></td></tr>';
 }
@@ -5691,6 +6035,7 @@ async function aaBoot() {
   if (!(await vwGuard())) return;
   aaDepartments = await listDepartments();
   el('aa-gradedept').innerHTML = aaDepartments.map((d) => `<option value="${d.id}">${d.name}</option>`).join('');
+  await aaLoadDepts();
   await aaLoadGrades();
   await aaLoadClasses();
   await aaLoadLoginMode();
@@ -5701,6 +6046,127 @@ window.aaSwitchSection = (section) => {
   document.querySelectorAll('#screen-admin-academic .section-tabs .chip').forEach((c) => c.classList.toggle('active', c.dataset.section === section));
   el('aa-section-grades').classList.toggle('hidden', section !== 'grades');
   el('aa-section-classes').classList.toggle('hidden', section !== 'classes');
+  el('aa-section-depts').classList.toggle('hidden', section !== 'depts');
+};
+
+/* ---------- الأقسام: عام أو خاص برابط ---------- */
+let aaDeptRows = [];
+let aaDepLink = { id: null, name: '', token: '' };
+
+async function aaLoadDepts() {
+  try {
+    const { data, error } = await supabase.rpc('teacher_departments');
+    if (error) throw new Error(error.message);
+    aaDeptRows = data ?? [];
+    aaRenderDepts();
+  } catch (err) {
+    el('aa-deptsbody').innerHTML = `<div class="state-box"><div class="icon">⚠️</div>${exEsc(err.message)}</div>`;
+  }
+}
+
+function aaRenderDepts() {
+  if (!aaDeptRows.length) { el('aa-deptsbody').innerHTML = '<div class="state-box">لا توجد أقسام</div>'; return; }
+  el('aa-deptsbody').innerHTML = aaDeptRows.map((d) => {
+    const id = exEsc(d.id);
+    const priv = !!d.entry_token;
+    return `<div class="pinrow">
+      <span class="who">${exEsc(d.name)}${d.code ? ` <span class="text-sm text-muted">(${exEsc(d.code)})</span>` : ''}
+        <small>${d.grade_count} صف · ${d.class_count} شعبة · ${d.student_count} طالب</small></span>
+      ${priv ? '<span class="badge badge-warning">قسم خاص برابط</span>'
+             : '<span class="badge badge-success">يظهر في قائمة الدخول</span>'}
+      <button class="btn btn-sm ${priv ? 'btn-primary' : 'btn-outline'}" onclick="aaDepLinkOpen('${id}')">${priv ? 'رابط الدخول' : 'اجعله خاصًا برابط'}</button>
+    </div>`;
+  }).join('');
+}
+
+window.aaOpenAddDept = () => {
+  el('aa-deptname').value = ''; el('aa-deptcode').value = '';
+  el('aa-deptprivate').checked = true; el('aa-adddeptmsg').textContent = '';
+  el('aa-adddeptmodal').classList.remove('hidden');
+};
+
+window.aaAddDept = async () => {
+  const name = el('aa-deptname').value.trim();
+  if (!name) { el('aa-adddeptmsg').textContent = 'اكتب اسم القسم'; return; }
+  el('aa-adddeptmsg').textContent = 'جارٍ الإضافة...';
+  try {
+    const { data, error } = await supabase.rpc('teacher_create_department', {
+      p_name: name, p_code: el('aa-deptcode').value.trim() || null, p_private: el('aa-deptprivate').checked,
+    });
+    if (error) throw new Error(error.message);
+    el('aa-adddeptmodal').classList.add('hidden');
+    toast('تمت إضافة القسم — أضِف له صفًا ثم شُعبة ثم طلابه', 'success');
+    await aaLoadDepts();
+    aaDepartments = await listDepartments();
+    el('aa-gradedept').innerHTML = aaDepartments.map((x) => `<option value="${x.id}">${x.name}</option>`).join('');
+    if (data && el('aa-deptprivate').checked) window.aaDepLinkOpen(data);
+  } catch (err) { el('aa-adddeptmsg').textContent = 'خطأ: ' + err.message; }
+};
+
+window.aaDepLinkOpen = async (deptId) => {
+  const row = aaDeptRows.find((x) => String(x.id) === String(deptId));
+  try {
+    const { data, error } = await supabase.rpc('teacher_department_token', { p_department: deptId, p_rotate: false });
+    if (error) throw new Error(error.message);
+    aaDepLink = { id: deptId, name: row ? row.name : '', token: String(data ?? '') };
+    el('aa-deplinkname').textContent = aaDepLink.name;
+    el('aa-deplinkbase').value = aeQrDefaultBase();
+    window.aaDepLinkRender();
+    el('aa-deplinkmodal').classList.remove('hidden');
+    await aaLoadDepts();
+  } catch (err) { toast(err.message, 'error'); }
+};
+
+window.aaDepLinkRender = () => {
+  const base = String(el('aa-deplinkbase').value ?? '').trim();
+  if (!base) {
+    el('aa-deplinkurl').textContent = 'اكتب عنوان المنصة أعلاه';
+    el('aa-deplinkqr').innerHTML = ''; return;
+  }
+  try { localStorage.setItem('qr-base', base); } catch { /* تصفّح خاص */ }
+  const url = base + (base.includes('?') ? '&' : '?') + 'dep=' + encodeURIComponent(aaDepLink.token);
+  el('aa-deplinkurl').textContent = url;
+  try { el('aa-deplinkqr').innerHTML = qrSvg(url, { scale: 4 }); }
+  catch { el('aa-deplinkqr').innerHTML = ''; }
+};
+
+window.aaDepLinkCopy = async (btn) => {
+  const url = el('aa-deplinkurl').textContent;
+  if (!url.startsWith('http')) return;
+  const old = btn.textContent;
+  try {
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
+    else {
+      const ta = document.createElement('textarea');
+      ta.value = url; ta.style.position = 'fixed'; ta.style.insetInlineStart = '-9999px';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    btn.textContent = '✓ نُسخ';
+    setTimeout(() => { btn.textContent = old; }, 1600);
+  } catch { toast('تعذّر النسخ — انسخ الرابط يدويًا', 'error'); }
+};
+
+window.aaDepRotate = async () => {
+  if (!confirm('تجديد الرمز يُبطل كل الروابط القديمة فورًا، وسيحتاج طلاب القسم الرابط الجديد. أمتابع؟')) return;
+  try {
+    const { data, error } = await supabase.rpc('teacher_department_token', { p_department: aaDepLink.id, p_rotate: true });
+    if (error) throw new Error(error.message);
+    aaDepLink.token = String(data ?? '');
+    window.aaDepLinkRender();
+    toast('تم تجديد الرمز — أرسل الرابط الجديد لطلاب القسم', 'success');
+    await aaLoadDepts();
+  } catch (err) { toast(err.message, 'error'); }
+};
+
+window.aaDepOpenPublic = async () => {
+  if (!confirm('جعل هذا القسم عامًا يُظهر شُعبه لكل من يفتح المنصة. أمتابع؟')) return;
+  try {
+    const { error } = await supabase.rpc('teacher_open_department', { p_department: aaDepLink.id });
+    if (error) throw new Error(error.message);
+    el('aa-deplinkmodal').classList.add('hidden');
+    toast('صار القسم عامًا ويظهر في قائمة الدخول', 'success');
+    await aaLoadDepts();
+  } catch (err) { toast(err.message, 'error'); }
 };
 async function aaLoadGrades() {
   aaGrades = await listGradeLevelsFull();
@@ -5866,11 +6332,12 @@ window.aaFixCoverage = async (gradeId) => {
 
 /* ---------- وضع دخول الطلاب: كلمة مرور / اسم فقط / رمز رقمي ---------- */
 // 'password' = رمز تفعيل + كلمة مرور · 'open' = اختيار الاسم فقط · 'pin' = الاسم + رمز رقمي مشترك
-const AA_MODE_RADIO = { password: 'aa-modepassword', open: 'aa-modeopen', pin: 'aa-modepin' };
+const AA_MODE_RADIO = { password: 'aa-modepassword', open: 'aa-modeopen', pin: 'aa-modepin', studentpin: 'aa-modestudentpin' };
 const AA_MODE_DONE = {
   password: '<span style="color:#1b5e20">✔ تم التفعيل: الطلاب يدخلون برمز تفعيل وكلمة مرور.</span>',
   open: '<span style="color:#8d6e00">✔ تم التفعيل: الطلاب يدخلون باختيار أسمائهم فقط — لا حاجة لرموز تفعيل ولا كلمات مرور.</span>',
   pin: '<span style="color:#1b5e20">✔ تم التفعيل: الطالب يختار اسمه ثم يكتب الرمز الرقمي أدناه.</span>',
+  studentpin: '<span style="color:#1b5e20">✔ تم التفعيل: لكل طالب كلمة سر خاصة به. من لم يضعها بعد يدخل باسمه ويُذكَّر بوضعها، وتظهر حالته في «كلمات سر الطلاب» أدناه.</span>',
 };
 
 function aaApplyMode(mode) {
@@ -5946,6 +6413,104 @@ window.aaSavePin = async () => {
     el('aa-pinmsg').textContent = 'خطأ: ' + err.message;
   } finally { el('aa-savepin').disabled = false; }
 };
+/* ---------- كلمات سر الطلاب: عرض واسترجاع وتصفير ---------- */
+let aaPins = [];
+
+window.aaLoadPins = async () => {
+  const classId = el('aa-pinclass').value;
+  if (!classId) { el('aa-pinsbody').innerHTML = '<div class="state-box">اختر شعبة لعرض كلمات السر</div>'; return; }
+  el('aa-pinsbody').innerHTML = '<div class="state-box"><span class="spinner"></span></div>';
+  el('aa-pinssummary').innerHTML = '';
+  try {
+    const { data, error } = await supabase.rpc('teacher_class_pins', { p_class: classId });
+    if (error) throw new Error(error.message);
+    aaPins = data ?? [];
+    aaRenderPins();
+  } catch (err) {
+    el('aa-pinsbody').innerHTML = `<div class="state-box"><div class="icon">⚠️</div>${exEsc(err.message)}</div>`;
+  }
+};
+
+function aaRenderPins() {
+  if (!aaPins.length) {
+    el('aa-pinsbody').innerHTML = '<div class="state-box">لا يوجد طلاب في هذه الشعبة</div>';
+    return;
+  }
+  const withPin = aaPins.filter((r) => r.has_pin).length;
+  const without = aaPins.length - withPin;
+  el('aa-pinssummary').innerHTML = `<div class="grid grid-stats">
+    <div class="card stat-tile"><div class="value">${aaPins.length}</div><div class="label">طالب</div></div>
+    <div class="card stat-tile"><div class="value" style="color:var(--color-success);">${withPin}</div><div class="label">وضعوا كلمة سر</div></div>
+    <div class="card stat-tile"><div class="value" style="color:var(--color-danger);">${without}</div><div class="label">بلا كلمة سر</div></div>
+  </div>`;
+
+  el('aa-pinsbody').innerHTML = aaPins.map((r) => {
+    const id = exEsc(r.student_id);
+    const when = r.set_at ? new Date(r.set_at).toLocaleDateString('ar-SA', { dateStyle: 'medium' }) : '';
+    return `<div class="pinrow" id="pinrow-${id}">
+      <span class="who">${exEsc(r.full_name)}
+        <small>${exEsc(r.student_code ?? '')}${r.has_pin ? ` · وضعها ${exEsc(when)}` : ''}</small></span>
+      ${r.has_pin
+        ? `<span class="pinval" id="pinval-${id}">••••••</span>
+           <button class="btn btn-outline btn-sm" id="pinshow-${id}" onclick="aaRevealPin('${id}')">إظهار</button>
+           <button class="btn btn-outline btn-sm" onclick="aaCopyPin('${id}', this)">نسخ رسالة</button>
+           <button class="btn btn-danger btn-sm" onclick="aaResetPin('${id}')">تصفير</button>`
+        : '<span class="badge badge-warning">لم يضع كلمة سر بعد</span>'}
+    </div>`;
+  }).join('');
+}
+
+window.aaRevealPin = async (studentId) => {
+  const btn = el(`pinshow-${studentId}`);
+  const box = el(`pinval-${studentId}`);
+  if (!btn || !box) return;
+  if (btn.dataset.shown === '1') {
+    box.textContent = '••••••'; btn.textContent = 'إظهار'; btn.dataset.shown = '';
+    return;
+  }
+  btn.disabled = true;
+  try {
+    const { data, error } = await supabase.rpc('teacher_reveal_pin', { p_student: studentId });
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error('لا توجد كلمة سر محفوظة');
+    box.textContent = String(data);
+    btn.textContent = 'إخفاء'; btn.dataset.shown = '1';
+  } catch (err) { toast(err.message, 'error'); }
+  finally { btn.disabled = false; }
+};
+
+window.aaCopyPin = async (studentId, btn) => {
+  const r = aaPins.find((x) => String(x.student_id) === String(studentId));
+  if (!r) return;
+  const old = btn.textContent;
+  btn.disabled = true;
+  try {
+    const { data, error } = await supabase.rpc('teacher_reveal_pin', { p_student: studentId });
+    if (error) throw new Error(error.message);
+    const text = `${r.full_name}\nكلمة سر دخولك لمنصة اللغة الإنجليزية: ${data}\nاحتفظ بها ولا تخبر بها أحدًا.`;
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.insetInlineStart = '-9999px';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    btn.textContent = '✓ نُسخت';
+    setTimeout(() => { btn.textContent = old; }, 1800);
+  } catch (err) { toast(err.message, 'error'); btn.textContent = old; }
+  finally { btn.disabled = false; }
+};
+
+window.aaResetPin = async (studentId) => {
+  const r = aaPins.find((x) => String(x.student_id) === String(studentId));
+  if (!confirm(`تصفير كلمة سر «${r ? r.full_name : ''}»؟\nسيدخل باسمه في المرة القادمة وتطلب منه المنصة وضع كلمة سر جديدة.`)) return;
+  try {
+    const { error } = await supabase.rpc('teacher_reset_pin', { p_student: studentId });
+    if (error) throw new Error(error.message);
+    toast('تم التصفير — سيضع الطالب كلمة سر جديدة عند دخوله', 'success');
+    await window.aaLoadPins();
+  } catch (err) { toast(err.message, 'error'); }
+};
+
 window.aaOpenAddGrade = () => { el('aa-gradename').value = ''; el('aa-addgrademsg').textContent = ''; el('aa-addgrademodal').classList.remove('hidden'); };
 window.aaAddGrade = async () => {
   const name = el('aa-gradename').value.trim();
@@ -6362,6 +6927,17 @@ async function shBoot() {
   // بلا هذا الفحص كانت الصفحة كلها تتعطّل ولا يرى الطالب شيئًا لو تعذّرت قراءة بياناته
   if (!student) { await supabase.auth.signOut(); return go('student-login'); }
   currentStudent = student;
+
+  // دخل بمسح باركود: يذهب إلى اختباره مباشرةً، ويبقى شريط كلمة السر ظاهرًا
+  // بلا نافذة تقاطعه في منتصف الاختبار.
+  if (qrWantedExam) {
+    const wanted = qrWantedExam;
+    qrWantedExam = null;
+    spinJustLoggedIn = false;
+    spinCheck();
+    return window.seOpenExamById(wanted);
+  }
+
   el('sh-greeting').textContent = `أهلًا ${student.full_name} 👋`;
   el('sh-code').textContent = `الرقم التعريفي: ${student.student_code ?? '—'} · اللغة الإنجليزية`;
 
@@ -6399,6 +6975,8 @@ async function shBoot() {
         </div></div>`).join('')
       + '<div class="mt-1"><button class="btn btn-outline btn-sm" onclick="go(\'student-messages\')">فتح صندوق الرسائل ›</button></div>'
     : '<div class="state-box"><div class="icon">📭</div>لا توجد رسائل بعد</div>';
+
+  spinCheck();
 }
 
 /* ================= دروس الطالب ================= */
@@ -6505,6 +7083,7 @@ const exEsc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','
 let seExams = [];
 let seUnit = null, seExam = null, sePaper = null, seAttempt = null, seFilter = 'all';
 let seWantedExam = null;   // اختبار يُفتح مباشرةً عند دخول الشاشة (من الخطة العلاجية مثلًا)
+let qrWantedExam = null;   // اختبار وصل إليه الطالب بمسح الباركود، ينتظر اكتمال الدخول
 const seAnswers = new Map();
 
 const seFmtDue = (iso) => { if (!iso) return ''; try { return new Date(iso).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; } };
@@ -6581,6 +7160,13 @@ async function seBoot() {
 
   // فتح اختبار محدد مباشرة (مثلًا من زر «ابدأ الاختبار العلاجي» في الخطة)
   const target = wanted ? seExams.find((e) => e.id === wanted) : null;
+  if (wanted && !target) {
+    el('se-content').innerHTML = `<div class="state-box"><div class="icon">🔒</div>
+      <b>هذا الاختبار غير متاح لك</b>
+      <div class="text-sm text-muted mt-1">الرمز الذي مسحته يخصّ اختبارًا لم يُرسَل إلى شعبتك، أو أُرسل إلى شعبة أخرى. راجع معلمك.</div>
+      <button class="btn btn-outline btn-sm mt-2" onclick="go('student-exams')">عرض اختباراتي</button></div>`;
+    return;
+  }
   if (target) {
     seExam = target;
     if (!seIsPersonal(target) && target.unit_id) seUnit = { id: target.unit_id, title: target.unit_title ?? '' };
@@ -7169,6 +7755,7 @@ function dlManualCard(url, filename) {
   lead.textContent = 'لم يبدأ التنزيل؟ اضغط اسم الملف:';
   const a = document.createElement('a');
   a.href = url; a.download = filename; a.rel = 'noopener'; a.textContent = filename;
+  a.target = '_blank';   // ولو تجاهل المتصفّح download فلن يفقد المعلم صفحته
   txt.appendChild(lead); txt.appendChild(a);
   const x = document.createElement('button');
   x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', 'إغلاق');
@@ -7182,16 +7769,21 @@ function dlBlob(blob, filename) {
   const nav = window.navigator;
   if (nav && typeof nav.msSaveOrOpenBlob === 'function') { nav.msSaveOrOpenBlob(blob, filename); return; }
   const url = URL.createObjectURL(blob);
-  try {
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; a.rel = 'noopener';
-    a.style.display = 'none';
-    document.body.appendChild(a);          // فايرفوكس يشترط وجوده في الصفحة
-    a.click();
-    setTimeout(() => a.remove(), 4000);
-  } catch (e) { console.error('[download]', e); }
-  if (dlSupported()) setTimeout(() => dlManualCard(url, filename), 1400);
-  else dlManualCard(url, filename);
+  // في متصفّح لا يدعم download، النقر البرمجي يفتح الملف محلّ الصفحة فيخرج
+  // المعلم من المنصة ويضيع ما بين يديه. هناك نكتفي بالبطاقة ورابطها المفتوح في تبويب جديد.
+  if (dlSupported()) {
+    try {
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.rel = 'noopener';
+      a.style.display = 'none';
+      document.body.appendChild(a);          // فايرفوكس يشترط وجوده في الصفحة
+      a.click();
+      setTimeout(() => a.remove(), 4000);
+    } catch (e) { console.error('[download]', e); }
+    setTimeout(() => dlManualCard(url, filename), 1400);
+  } else {
+    dlManualCard(url, filename);
+  }
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
@@ -7277,6 +7869,480 @@ function aeFmt(iso) {
   try { return new Date(iso).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }); } catch { return iso; }
 }
 
+/* ============================================================================
+   مولّد QR مستقل — بلا أي مكتبة خارجية (وضع البايت، الإصدارات ١..١٠، تصحيح M).
+   كُتب داخل المنصة لأن شبكات المدرسة تحجب الـCDN، ولأن الباركود يجب أن يعمل
+   ولو انقطع الإنترنت عن جهاز العرض.
+   ============================================================================ */
+
+/* ---------- حساب في الحقل GF(256) بالكثيرة 0x11D ---------- */
+const QR_EXP = new Uint8Array(512);
+const QR_LOG = new Uint8Array(256);
+(() => {
+  let x = 1;
+  for (let i = 0; i < 255; i++) {
+    QR_EXP[i] = x;
+    QR_LOG[x] = i;
+    x <<= 1;
+    if (x & 0x100) x ^= 0x11D;
+  }
+  for (let i = 255; i < 512; i++) QR_EXP[i] = QR_EXP[i - 255];
+})();
+const qrMul = (a, b) => (a === 0 || b === 0 ? 0 : QR_EXP[QR_LOG[a] + QR_LOG[b]]);
+
+/* كثيرة المولّد لعدد معيّن من رموز التصحيح */
+function qrGenPoly(n) {
+  let g = [1];
+  for (let i = 0; i < n; i++) {
+    const next = new Array(g.length + 1).fill(0);
+    for (let j = 0; j < g.length; j++) {
+      next[j] ^= qrMul(g[j], QR_EXP[i]);
+      next[j + 1] ^= g[j];
+    }
+    g = next;
+  }
+  return g.reverse();   // الأعلى درجةً أولًا، ومعامل الصدارة = ١
+}
+
+/* باقي القسمة = رموز التصحيح */
+function qrEcc(data, n) {
+  const g = qrGenPoly(n);
+  const res = new Uint8Array(data.length + n);
+  res.set(data, 0);
+  for (let i = 0; i < data.length; i++) {
+    const f = res[i];
+    if (f === 0) continue;
+    for (let j = 0; j < g.length; j++) res[i + j] ^= qrMul(g[j], f);
+  }
+  return res.slice(data.length);
+}
+
+/* ---------- جداول الإصدارات (مستوى التصحيح M) ----------
+   [إجمالي الرموز، رموز التصحيح لكل كتلة، عدد كتل المجموعة ١، عدد كتل المجموعة ٢] */
+const QR_M = {
+  1:  [26,  10, 1, 0],
+  2:  [44,  16, 1, 0],
+  3:  [70,  26, 1, 0],
+  4:  [100, 18, 2, 0],
+  5:  [134, 24, 2, 0],
+  6:  [172, 16, 4, 0],
+  7:  [196, 18, 4, 0],
+  8:  [242, 22, 2, 2],
+  9:  [292, 22, 3, 2],
+  10: [346, 26, 4, 1],
+};
+const QR_ALIGN = {
+  1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30],
+  6: [6, 34], 7: [6, 22, 38], 8: [6, 24, 42], 9: [6, 26, 46], 10: [6, 28, 50],
+};
+
+/* بنية الكتل: [[بيانات، تصحيح] لكل كتلة] */
+function qrBlocks(version) {
+  const [total, ecPer, g1, g2] = QR_M[version];
+  const blocks = g1 + g2;
+  const dataTotal = total - ecPer * blocks;
+  const short = Math.floor(dataTotal / blocks);
+  const out = [];
+  for (let i = 0; i < g1; i++) out.push([short, ecPer]);
+  for (let i = 0; i < g2; i++) out.push([short + 1, ecPer]);
+  return out;
+}
+const qrDataCapacity = (version) => {
+  const [total, ecPer, g1, g2] = QR_M[version];
+  return total - ecPer * (g1 + g2);
+};
+/* أقصى عدد بايتات نصّية يسعها الإصدار */
+const qrByteCapacity = (version) =>
+  Math.floor((qrDataCapacity(version) * 8 - 4 - (version >= 10 ? 16 : 8)) / 8);
+
+/* ---------- ترميز النص إلى رموز بيانات ---------- */
+function qrEncodeData(bytes, version) {
+  const cap = qrDataCapacity(version);
+  const countBits = version >= 10 ? 16 : 8;
+  const bits = [];
+  const push = (value, n) => { for (let i = n - 1; i >= 0; i--) bits.push((value >> i) & 1); };
+
+  push(0b0100, 4);                 // وضع البايت
+  push(bytes.length, countBits);
+  for (const b of bytes) push(b, 8);
+
+  const capBits = cap * 8;
+  for (let i = 0; i < 4 && bits.length < capBits; i++) bits.push(0);   // الخاتمة
+  while (bits.length % 8 !== 0) bits.push(0);
+
+  const out = new Uint8Array(cap);
+  for (let i = 0; i < bits.length / 8; i++) {
+    let v = 0;
+    for (let j = 0; j < 8; j++) v = (v << 1) | bits[i * 8 + j];
+    out[i] = v;
+  }
+  const PAD = [0xEC, 0x11];
+  for (let i = bits.length / 8, k = 0; i < cap; i++, k++) out[i] = PAD[k % 2];
+  return out;
+}
+
+/* ---------- تشابك الكتل ---------- */
+function qrInterleave(data, version) {
+  const spec = qrBlocks(version);
+  const dataBlocks = []; const ecBlocks = [];
+  let at = 0;
+  for (const [dLen, eLen] of spec) {
+    const d = data.slice(at, at + dLen); at += dLen;
+    dataBlocks.push(d);
+    ecBlocks.push(qrEcc(d, eLen));
+  }
+  const out = [];
+  const maxD = Math.max(...dataBlocks.map((b) => b.length));
+  for (let i = 0; i < maxD; i++) for (const b of dataBlocks) if (i < b.length) out.push(b[i]);
+  const maxE = Math.max(...ecBlocks.map((b) => b.length));
+  for (let i = 0; i < maxE; i++) for (const b of ecBlocks) if (i < b.length) out.push(b[i]);
+  return Uint8Array.from(out);
+}
+
+/* ---------- بناء المصفوفة ---------- */
+function qrEmptyMatrix(size) {
+  return { size, m: Array.from({ length: size }, () => new Int8Array(size).fill(-1)) };
+}
+function qrPlaceFinder(g, r, c) {
+  for (let i = -1; i <= 7; i++) {
+    for (let j = -1; j <= 7; j++) {
+      const y = r + i, x = c + j;
+      if (y < 0 || x < 0 || y >= g.size || x >= g.size) continue;
+      const on = (i >= 0 && i <= 6 && (j === 0 || j === 6))
+              || (j >= 0 && j <= 6 && (i === 0 || i === 6))
+              || (i >= 2 && i <= 4 && j >= 2 && j <= 4);
+      g.m[y][x] = on ? 1 : 0;
+    }
+  }
+}
+function qrPlaceAlign(g, version) {
+  const c = QR_ALIGN[version];
+  for (const r of c) {
+    for (const col of c) {
+      // لا تُرسم فوق مربّعات التموضع الثلاثة
+      if ((r === 6 && col === 6) || (r === 6 && col === g.size - 7) || (r === g.size - 7 && col === 6)) continue;
+      for (let i = -2; i <= 2; i++) {
+        for (let j = -2; j <= 2; j++) {
+          const on = Math.max(Math.abs(i), Math.abs(j)) !== 1;
+          g.m[r + i][col + j] = on ? 1 : 0;
+        }
+      }
+    }
+  }
+}
+function qrReserve(g, version) {
+  const s = g.size;
+  // معلومات النسق
+  for (let i = 0; i <= 8; i++) {
+    if (g.m[8][i] === -1) g.m[8][i] = 0;
+    if (g.m[i][8] === -1) g.m[i][8] = 0;
+  }
+  for (let i = 0; i < 8; i++) {
+    if (g.m[8][s - 1 - i] === -1) g.m[8][s - 1 - i] = 0;
+    if (g.m[s - 1 - i][8] === -1) g.m[s - 1 - i][8] = 0;
+  }
+  g.m[s - 8][8] = 1;                       // الوحدة الداكنة الثابتة
+  if (version >= 7) {
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 3; j++) {
+        g.m[s - 11 + j][i] = 0;
+        g.m[i][s - 11 + j] = 0;
+      }
+    }
+  }
+}
+function qrSkeleton(version) {
+  const size = version * 4 + 17;
+  const g = qrEmptyMatrix(size);
+  qrPlaceFinder(g, 0, 0);
+  qrPlaceFinder(g, 0, size - 7);
+  qrPlaceFinder(g, size - 7, 0);
+  qrPlaceAlign(g, version);
+  for (let i = 8; i < size - 8; i++) {      // خطّا التوقيت
+    const v = i % 2 === 0 ? 1 : 0;
+    g.m[6][i] = v;
+    g.m[i][6] = v;
+  }
+  qrReserve(g, version);
+  return g;
+}
+
+/* ترتيب وحدات البيانات: زجزاج من أسفل اليمين، عمودان في كل مرة، ويُتخطّى العمود ٦ */
+function qrDataPositions(g) {
+  const s = g.size;
+  const pos = [];
+  let up = true;
+  for (let right = s - 1; right > 0; right -= 2) {
+    if (right === 6) right = 5;
+    for (let k = 0; k < s; k++) {
+      const row = up ? s - 1 - k : k;
+      for (let t = 0; t < 2; t++) {
+        const col = right - t;
+        if (g.m[row][col] === -1) pos.push([row, col]);
+      }
+    }
+    up = !up;
+  }
+  return pos;
+}
+
+const QR_MASKS = [
+  (i, j) => (i + j) % 2 === 0,
+  (i) => i % 2 === 0,
+  (i, j) => j % 3 === 0,
+  (i, j) => (i + j) % 3 === 0,
+  (i, j) => (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0,
+  (i, j) => ((i * j) % 2) + ((i * j) % 3) === 0,
+  (i, j) => (((i * j) % 2) + ((i * j) % 3)) % 2 === 0,
+  (i, j) => (((i + j) % 2) + ((i * j) % 3)) % 2 === 0,
+];
+
+/* BCH لمعلومات النسق (١٥ بتًا) */
+function qrFormatBits(mask) {
+  const data = (0b00 << 3) | mask;          // 00 = مستوى التصحيح M
+  let d = data << 10;
+  for (let i = 14; i >= 10; i--) if ((d >> i) & 1) d ^= 0x537 << (i - 10);
+  return ((data << 10) | d) ^ 0x5412;
+}
+/* BCH لمعلومات الإصدار (١٨ بتًا) — للإصدار ٧ فأعلى */
+function qrVersionBits(version) {
+  let d = version << 12;
+  for (let i = 17; i >= 12; i--) if ((d >> i) & 1) d ^= 0x1F25 << (i - 12);
+  return (version << 12) | d;
+}
+
+function qrApplyFormat(g, mask) {
+  const s = g.size;
+  const bits = qrFormatBits(mask);
+  const get = (i) => (bits >> i) & 1;
+  // النسخة الأولى: العمود ٨ نزولًا ثم الصف ٨ يسارًا
+  for (let i = 0; i <= 5; i++) g.m[i][8] = get(i);
+  g.m[7][8] = get(6);
+  g.m[8][8] = get(7);
+  g.m[8][7] = get(8);
+  for (let i = 9; i <= 14; i++) g.m[8][14 - i] = get(i);
+  // النسخة الثانية: الصف ٨ من اليمين (٨ وحدات) ثم العمود ٨ في الأسفل (٧ وحدات)
+  for (let i = 0; i <= 7; i++) g.m[8][s - 1 - i] = get(i);
+  for (let i = 8; i <= 14; i++) g.m[s - 15 + i][8] = get(i);
+  g.m[s - 8][8] = 1;   // الوحدة الداكنة الثابتة
+}
+function qrApplyVersion(g, version) {
+  if (version < 7) return;
+  const s = g.size;
+  const bits = qrVersionBits(version);
+  for (let i = 0; i < 18; i++) {
+    const b = (bits >> i) & 1;
+    const r = Math.floor(i / 3), c = i % 3;
+    g.m[s - 11 + c][r] = b;
+    g.m[r][s - 11 + c] = b;
+  }
+}
+
+/* ---------- عقوبات اختيار القناع ---------- */
+function qrPenalty(m, size) {
+  let p = 0;
+  const line = (get) => {
+    for (let i = 0; i < size; i++) {
+      let run = 1;
+      for (let j = 1; j < size; j++) {
+        if (get(i, j) === get(i, j - 1)) { run++; } else { if (run >= 5) p += 3 + (run - 5); run = 1; }
+      }
+      if (run >= 5) p += 3 + (run - 5);
+    }
+  };
+  line((i, j) => m[i][j]);
+  line((i, j) => m[j][i]);
+
+  for (let i = 0; i < size - 1; i++) {
+    for (let j = 0; j < size - 1; j++) {
+      const v = m[i][j];
+      if (v === m[i][j + 1] && v === m[i + 1][j] && v === m[i + 1][j + 1]) p += 3;
+    }
+  }
+
+  const PAT1 = [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0];
+  const PAT2 = [0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1];
+  const scan = (get) => {
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j <= size - 11; j++) {
+        let a = true, b = true;
+        for (let k = 0; k < 11; k++) {
+          const v = get(i, j + k);
+          if (v !== PAT1[k]) a = false;
+          if (v !== PAT2[k]) b = false;
+        }
+        if (a) p += 40;
+        if (b) p += 40;
+      }
+    }
+  };
+  scan((i, j) => m[i][j]);
+  scan((i, j) => m[j][i]);
+
+  let dark = 0;
+  for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) dark += m[i][j];
+  const pct = (dark * 100) / (size * size);
+  p += Math.floor(Math.abs(pct - 50) / 5) * 10;
+  return p;
+}
+
+/* ---------- الواجهة: نص ← مصفوفة وحدات ---------- */
+function qrEncode(text) {
+  const bytes = new TextEncoder().encode(String(text));
+  let version = 0;
+  for (let v = 1; v <= 10; v++) { if (bytes.length <= qrByteCapacity(v)) { version = v; break; } }
+  if (!version) throw new Error('النص أطول من أن يسعه الباركود (الحد ' + qrByteCapacity(10) + ' حرفًا)');
+
+  const codewords = qrInterleave(qrEncodeData(bytes, version), version);
+  const base = qrSkeleton(version);
+  const positions = qrDataPositions(base);
+
+  // مصفوفة البيانات بلا قناع + خريطة الوحدات الوظيفية
+  const raw = base.m.map((r) => Int8Array.from(r));
+  const isData = Array.from({ length: base.size }, () => new Uint8Array(base.size));
+  let bit = 0;
+  for (const [r, c] of positions) {
+    const byte = codewords[bit >> 3];
+    raw[r][c] = byte === undefined ? 0 : (byte >> (7 - (bit & 7))) & 1;
+    isData[r][c] = 1;
+    bit++;
+  }
+
+  let best = null;
+  for (let mask = 0; mask < 8; mask++) {
+    const m = raw.map((r) => Int8Array.from(r));
+    for (let i = 0; i < base.size; i++) {
+      for (let j = 0; j < base.size; j++) {
+        if (isData[i][j] && QR_MASKS[mask](i, j)) m[i][j] ^= 1;
+      }
+    }
+    const g = { size: base.size, m };
+    qrApplyVersion(g, version);
+    qrApplyFormat(g, mask);
+    const score = qrPenalty(m, base.size);
+    if (!best || score < best.score) best = { score, mask, m };
+  }
+  return { size: base.size, version, mask: best.mask, modules: best.m };
+}
+
+/* ---------- الرسم: SVG نقيّ (يطبع ويُعرض بأي مقاس بلا تشويش) ---------- */
+function qrSvg(text, opts = {}) {
+  const { quiet = 4, scale = 8, dark = '#000000', light = '#FFFFFF' } = opts;
+  const q = qrEncode(text);
+  const n = q.size + quiet * 2;
+  const px = n * scale;
+  let d = '';
+  for (let i = 0; i < q.size; i++) {
+    for (let j = 0; j < q.size; j++) {
+      if (q.modules[i][j]) d += `M${(j + quiet) * scale} ${(i + quiet) * scale}h${scale}v${scale}h-${scale}z`;
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${px} ${px}" shape-rendering="crispEdges" role="img" aria-label="رمز الاستجابة السريعة">`
+    + `<rect width="${px}" height="${px}" fill="${light}"/><path fill="${dark}" d="${d}"/></svg>`;
+}
+
+/* ================= نشر الاختبار عبر باركود =================
+   المحرّك أعلاه مكتوب هنا لا مستوردًا: المنصة ملف واحد، وشبكة المدرسة تحجب
+   الـCDN، والباركود يجب أن يُطبع ولو كان جهاز المعلم بلا إنترنت. */
+let aeQr = { examId: null, title: '' };
+let aeQrUrl = '';
+
+function aeQrDefaultBase() {
+  try { const v = localStorage.getItem('qr-base'); if (v) return v; } catch { /* تصفّح خاص */ }
+  const u = location.origin + location.pathname;
+  return /^https?:/i.test(u) ? u : '';
+}
+function aeQrFileName(ext) {
+  const t = String(aeQr.title || 'exam').replace(/[\\/:*?"<>|]+/g, '').trim().slice(0, 40) || 'exam';
+  return `باركود ${t}.${ext}`;
+}
+
+window.aeQrOpen = (examId, title) => {
+  aeQr = { examId, title };
+  el('ae-qrtitle').textContent = title;
+  el('ae-qrbase').value = aeQrDefaultBase();
+  window.aeQrRender();
+  el('ae-qrmodal').classList.remove('hidden');
+};
+
+window.aeQrRender = () => {
+  const base = String(el('ae-qrbase').value ?? '').trim();
+  const box = el('ae-qrbox');
+  if (!base) {
+    box.innerHTML = '<div class="state-box">اكتب عنوان المنصة أعلاه ليظهر الباركود</div>';
+    el('ae-qrlink').value = ''; aeQrUrl = ''; return;
+  }
+  try { localStorage.setItem('qr-base', base); } catch { /* تصفّح خاص */ }
+  aeQrUrl = base + (base.includes('?') ? '&' : '?') + 'exam=' + encodeURIComponent(aeQr.examId);
+  el('ae-qrlink').value = aeQrUrl;
+  try { box.innerHTML = qrSvg(aeQrUrl, { scale: 6 }); }
+  catch (err) {
+    aeQrUrl = '';
+    box.innerHTML = `<div class="state-box"><div class="icon">⚠️</div>${exEsc(err.message)}<div class="text-sm text-muted mt-1">اختصر عنوان المنصة.</div></div>`;
+  }
+};
+
+window.aeQrCopy = async (btn) => {
+  if (!aeQrUrl) return;
+  const old = btn.textContent;
+  try {
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(aeQrUrl);
+    else { const i = el('ae-qrlink'); i.select(); document.execCommand('copy'); }
+    btn.textContent = '✓ نُسخ';
+    setTimeout(() => { btn.textContent = old; }, 1600);
+  } catch { toast('تعذّر النسخ — انسخ الرابط من الحقل يدويًا', 'error'); }
+};
+
+window.aeQrSvg = () => {
+  if (!aeQrUrl) return;
+  dlFile(qrSvg(aeQrUrl, { scale: 12 }), aeQrFileName('svg'), 'image/svg+xml');
+};
+
+window.aeQrPng = () => {
+  if (!aeQrUrl) return;
+  let url = '';
+  try {
+    const svg = qrSvg(aeQrUrl, { scale: 12 });
+    url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth || 600; c.height = img.naturalHeight || 600;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob((b) => {
+          URL.revokeObjectURL(url);
+          if (b) dlBlob(b, aeQrFileName('png'));
+          else toast('تعذّر إنشاء الصورة — جرّب «حفظ SVG»', 'error');
+        }, 'image/png');
+      } catch (err) { URL.revokeObjectURL(url); toast('تعذّر إنشاء الصورة — جرّب «حفظ SVG»', 'error'); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); toast('تعذّر إنشاء الصورة — جرّب «حفظ SVG»', 'error'); };
+    img.src = url;
+  } catch (err) { if (url) URL.revokeObjectURL(url); toast('تعذّر إنشاء الصورة — جرّب «حفظ SVG»', 'error'); }
+};
+
+window.aeQrPrint = () => {
+  if (!aeQrUrl) return;
+  el('qr-printarea').innerHTML = `<div class="qr-sheet">
+    <div class="qr-sheet-h">اللغة الإنجليزية — اختبار إلكتروني</div>
+    <h1>${exEsc(aeQr.title)}</h1>
+    <div class="qr-sheet-qr">${qrSvg(aeQrUrl, { scale: 10 })}</div>
+    <ol class="qr-sheet-steps">
+      <li>افتح كاميرا جوالك ووجّهها إلى الرمز.</li>
+      <li>اضغط الرابط الذي يظهر على الشاشة.</li>
+      <li>اختر شعبتك ثم اسمك، وأدخل كلمة سرك.</li>
+      <li>سيفتح الاختبار مباشرةً — اقرأ السؤال جيدًا قبل الإجابة.</li>
+    </ol>
+    <div class="qr-sheet-url">${exEsc(aeQrUrl)}</div>
+  </div>`;
+  document.body.classList.add('qrprinting');
+  window.print();
+};
+window.addEventListener('afterprint', () => document.body.classList.remove('qrprinting'));
+
 function aeRenderList() {
   if (!aeStats.length) { el('ae-list').innerHTML = '<div class="state-box"><div class="icon">📭</div>لا توجد اختبارات</div>'; return; }
   const byUnit = new Map();
@@ -7320,6 +8386,7 @@ function aeRenderList() {
         <button class="btn btn-sm btn-outline" onclick="aeDetail('${r.exam_id}', '${safeTitle}')">تفاصيل</button>
         <button class="btn btn-sm btn-primary" onclick="aeAssignOpen('${r.exam_id}', '${safeTitle}')">إرسال لشعبة</button>
         <button class="btn btn-sm btn-outline" onclick="aeStuAssignOpen('${r.exam_id}', '${safeTitle}')">إرسال لطالب</button>
+        <button class="btn btn-sm btn-outline" onclick="aeQrOpen('${r.exam_id}', '${safeTitle}')">باركود</button>
       </div>
     </article>`;
   };
@@ -13825,12 +14892,23 @@ window.vwOpenTeacher = async (screen) => {
 
 /* ================= بدء التشغيل: هل يوجد جلسة مفتوحة؟ ================= */
 (async function boot() {
-  if (new URLSearchParams(window.location.search).get('t')) return go('attend');
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('t')) return go('attend');
+  // باركود اختبار: نحفظ المعرّف ونمرّ بالدخول، ثم يُفتح الاختبار في shBoot
+  const scanned = params.get('exam');
+  if (scanned && /^[0-9a-fA-F-]{16,40}$/.test(scanned)) qrWantedExam = scanned;
+  // رابط قسم خاص: يُحفظ الرمز في الجهاز فلا يحتاجه الطالب مرة أخرى
+  const dep = params.get('dep');
+  let depArrived = false;
+  if (dep && /^[0-9a-f]{12,40}$/i.test(dep)) { window.depTokenSet(dep); depArrived = true; }
   const { data: { session } } = await supabase.auth.getSession();
   // زائر بجلسة سارية: يعود لصفحته مباشرة بدل صفحة البداية
-  if (!session) return go(readVisitorSession() ? 'visitor-home' : 'landing');
+  if (!session) return go((qrWantedExam || depArrived) ? 'student-login' : (readVisitorSession() ? 'visitor-home' : 'landing'));
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
-  if (profile && ['teacher','assistant'].includes(profile.role)) return go('admin-home');
+  if (profile && ['teacher','assistant'].includes(profile.role)) {
+    if (qrWantedExam) { qrWantedExam = null; setTimeout(() => toast('هذا الباركود للطلاب — أنت داخل بحساب المعلم', 'error'), 900); }
+    return go('admin-home');
+  }
   const { data: studentId } = await supabase.rpc('current_student_id');
   if (studentId) return go('student-home');
   go('landing');
