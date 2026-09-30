@@ -5075,6 +5075,16 @@ async function slLoadClasses() {
     if (token) {
       ({ data, error } = await supabase.rpc('list_login_classes_by_token', { p_token: token }));
       if (!error && (!data || !data.length)) {
+        // لا شُعب: إمّا الرمز لم يعد صالحًا، وإمّا القسم صحيح لكنه فارغ بعد.
+        // التفريق بينهما مهم: الأول يُرجع الطالب للقائمة العامة، والثاني يُبقيه في قسمه.
+        const { data: depName } = await supabase.rpc('department_by_token', { p_token: token });
+        if (depName) {
+          note.className = 'dep-note';
+          note.innerHTML = `<span><b>${exEsc(depName)}</b> — لم يُضِف معلمك شُعب هذا القسم بعد.</span>`
+            + '<button class="btn btn-outline btn-sm" onclick="depLeave()">لست من هذا القسم</button>';
+          el('sl-classlist').innerHTML = '<div class="state-box"><div class="icon">📭</div>لا توجد شعب في قسمك بعد — راجع معلمك</div>';
+          return;
+        }
         // رمز منتهٍ أو مجدَّد: نرجع للقائمة العامة بدل شاشة فارغة
         window.depTokenSet(null);
         note.className = 'dep-note';
